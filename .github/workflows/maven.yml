@@ -37,7 +37,7 @@ jobs:
 
     # SonarQube
     - name : Run SonarQube
-      run : mvn sonar:sonar -Dsonar.projectKey=hello -Dsonar.host.url=${{secrets.SONAR_HOST}} -Dsonar.login=${{secrets.SONAR_TOKEN}}
+      run : mvn sonar:sonar -Dsonar.projectKey=github-action -Dsonar.host.url=${{secrets.SONAR_HOST}} -Dsonar.login=${{secrets.SONAR_TOKEN}}
 
     # First Server deploy
     - name : upload file
