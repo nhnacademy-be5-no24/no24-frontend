@@ -63,22 +63,22 @@ jobs:
 
     # Second Server deploy
     
-    - name : upload file
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.SSH_IP_2 }}
-        username: ${{ secrets.SSH_ID }}
-        key: ${{ secrets.SSH_KEY }}
-        port: ${{ secrets.SSH_PORT_2 }}
-        source: "target/*.jar"
-        target: "~/"
-        rm: false
+    # - name : upload file
+    #   uses: appleboy/scp-action@master
+    #   with:
+    #     host: ${{ secrets.SSH_IP_2 }}
+    #     username: ${{ secrets.SSH_ID }}
+    #     key: ${{ secrets.SSH_KEY }}
+    #     port: ${{ secrets.SSH_PORT_2 }}
+    #     source: "target/*.jar"
+    #     target: "~/"
+    #     rm: false
     
-    - name: execute shell script
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SSH_IP_2 }}
-        username: ${{ secrets.SSH_ID }}
+    # - name: execute shell script
+    #   uses: appleboy/ssh-action@master
+    #   with:
+    #     host: ${{ secrets.SSH_IP_2 }}
+    #     username: ${{ secrets.SSH_ID }}
         key: ${{ secrets.SSH_KEY }}
         port: ${{ secrets.SSH_PORT_2 }}
         script_stop: true
