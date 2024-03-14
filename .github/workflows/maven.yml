@@ -79,7 +79,7 @@ jobs:
     #   with:
     #     host: ${{ secrets.SSH_IP_2 }}
     #     username: ${{ secrets.SSH_ID }}
-        key: ${{ secrets.SSH_KEY }}
-        port: ${{ secrets.SSH_PORT_2 }}
-        script_stop: true
-        script: "./startup.sh"
+        # key: ${{ secrets.SSH_KEY }}
+        # port: ${{ secrets.SSH_PORT_2 }}
+        # script_stop: true
+        # script: "./startup.sh"
