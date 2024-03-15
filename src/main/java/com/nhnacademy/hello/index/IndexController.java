@@ -1,5 +1,6 @@
 package com.nhnacademy.hello.index;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -9,6 +10,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 @Controller
+@Slf4j
 public class IndexController {
     @GetMapping(value = {"/index.html","/"})
     public ModelAndView index(HttpServletRequest request) throws UnknownHostException {
@@ -17,6 +19,8 @@ public class IndexController {
         ModelAndView mav = new ModelAndView("index/index");
         mav.addObject("ip", localHost.getHostAddress());
         mav.addObject("port", request.getServerPort());
+
+        log.info("hello world");
 
         return mav;
     }
