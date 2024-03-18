@@ -1,4 +1,4 @@
-package com.nhnacademy.hello.index;
+package com.nhnacademy.frontend.index;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
