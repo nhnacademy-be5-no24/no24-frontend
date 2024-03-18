@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.nhnacademy</groupId>
-    <artifactId>frontend</artifactId>
+    <artifactId>no24-frontend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>frontend</name>
-    <description>frontend</description>
+    <name>no24-frontend</name>
+    <description>no24-frontend</description>
     <packaging>jar</packaging>
     <properties>
 
