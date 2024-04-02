@@ -13,15 +13,8 @@ import java.net.UnknownHostException;
 @Slf4j
 public class IndexController {
     @GetMapping(value = {"/index.html","/"})
-    public ModelAndView index(HttpServletRequest request) throws UnknownHostException {
-        InetAddress localHost = InetAddress.getLocalHost();
+    public String index(){
 
-        ModelAndView mav = new ModelAndView("index/index");
-        mav.addObject("ip", localHost.getHostAddress());
-        mav.addObject("port", request.getServerPort());
-
-        log.info("hello world");
-
-        return mav;
+        return "index/index";
     }
 }
