@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>no24 Bookstore</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <style>
+        .menu-nav .text-muted:hover {
+            color: white !important;
+        }
+        .menu-nav .current {
+            color: white !important;
+        }
+        .sub-menu {
+            display: none;
+            position: absolute;
+            background-color: #343a40; /* 배경색을 조절하세요 */
+            padding: 5px;
+            border-radius: 5px;
+            z-index: 1; /* 메뉴가 다른 요소 위에 나타나도록 설정 */
+            margin-top: 40px;
+        }
+        .sub-menu a {
+            color: #fff;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .category-nav a {
+            padding: 1px;
+        }
+        .container {
+            max-width: none !important;
+            width: 1200px;
+        }
+        .user-menu {
+            border: solid 1px #d0d0d0;
+            background-color: #f2f2f2;
+            border-radius: 5px;
+            width: 220px;
+            height: 120px;
+            color: black;
+        }
+        .user-menu:hover {
+            color: black;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #D3D3D3">
+        <div class="container">
+            <div class="col-md-2 mr-4">
+                <a class="navbar-brand" href="/">
+                    <img src="/img/logo.png" alt="no24 bookstore" style="height: 80px;">
+                </a>
+            </div>
+            <div class="col-md-10 ml-4">
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" type="search" placeholder="찾으려는 도서를 입력해주세요." aria-label="Search" style="width: 60vw; max-width: 800px">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">통합검색</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <div class="col-12">
+                <div class="row menu-nav justify-content-between">
+                    <div class="col-xs-6">
+                        <div class="row">
+                            <strong><a class="nav-link text-muted current" href="#">도서</a></strong>
+                            <div class="sub-menu navbar-nav">
+                                <strong><a class="nav-link text-muted" href="#">국내도서</a></strong>
+                                <strong><a class="nav-link text-muted" href="#">외국도서</a></strong>
+                                <strong><a class="nav-link text-muted" href="#">신간도서</a></strong>
+                                <strong><a class="nav-link text-muted" href="#">인기도서</a></strong>
+                            </div>
+                            <strong><a class="nav-link text-muted" href="#">장바구니</a></strong>
+                            <strong><a class="nav-link text-muted" href="#">주문내역</a></strong>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 ml-auto">
+                        <div class="row">
+                            <strong><a class="nav-link text-muted" href="#">로그인</a></strong>
+                            <strong><a class="nav-link text-muted" href="/info">마이페이지</a></strong>
+                            <!-- todo: 관리자 전용. 예외처리 필요 -->
+                            <strong><a class="nav-link text-muted" href="#">관리자페이지</a></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                document.addEventListener("DOMContentLoaded", function(){
+                    const bookNav = document.querySelector('.nav-link[href="#"]');
+                    const subMenu = document.querySelector('.sub-menu');
+                    bookNav.addEventListener('mouseover', function(){
+                        subMenu.style.display = 'flex';
+                    });
+                    bookNav.addEventListener('mouseout', function(){
+                        subMenu.style.display = 'none';
+                    });
+                    subMenu.addEventListener('mouseover', function(){
+                        subMenu.style.display = 'flex';
+                    });
+                    subMenu.addEventListener('mouseout', function(){
+                        subMenu.style.display = 'none';
+                    });
+                });
+            </script>
+        </div>
+    </nav>
+
+    <!-- 마이 페이지 -->
+    <div class="container">
+        <div class="row">
+            <!-- 왼쪽 메뉴 목록 네비게이션 -->
+            <div class="col-md-2 mt-4 mb-4" style="min-height: 800px">
+                <!-- todo: 상위 카테고리 필요 -->
+                <div class="list-group">
+                    <ul class="navbar-nav category-nav">
+                        <h5><strong>회원 정보</strong></h5>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/info/user">회원정보 수정</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/info/address">배송주소 관리</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">내 등급 현황</a>
+                        </li>
+
+                        <br>
+
+                        <h5><strong>쇼핑내역</strong></h5>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">주문/배송 목록</a>
+                        </li>
+                        <li class="nav-item" style="padding-top: 0px">
+                            <a class="nav-link" href="#">포인트 사용/적립 내역</a>
+                        </li>
+                        <li class="nav-item" style="padding: 0px">
+                            <a class="nav-link" href="#">쿠폰함</a>
+                        </li>
+                        <li class="nav-item" style="padding-top: 0px">
+                            <a class="nav-link" href="#">문의 내역</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-10 mt-4 mb-4">
+                <!-- 마이페이지에 들어갈 목록 -->
+                <h4><strong>좋은 하루 되세요 Test User님!</strong></h4>
+                <div class="row p-4">
+                    <a class="mr-4 p-3 user-menu" href="#">
+                        <strong>회원 등급</strong>
+                        <br>
+                        <br>
+                        <div class="row pl-3 pr-3 justify-content-between">
+                            <img src="/icon/tier.png" style="width: 40px; height: 40px;">
+                            &nbsp;
+                            <span style="font-size: 18px; margin-top: 10px">
+                                <strong>일반 등급</strong>
+                            </span>
+                        </div>
+                    </a>
+                    <a class="mr-4 p-3 user-menu" href="#">
+                        <strong>쿠폰 개수</strong>
+                        <br>
+                        <br>
+                        <div class="row pl-3 pr-3 justify-content-between">
+                            <img src="/icon/coupon.png" style="width: 45px; height: 45px;">
+                            &nbsp;
+                            <span style="font-size: 18px; margin-top: 10px">
+                                <strong>0 장</strong>
+                            </span>
+                        </div>
+                    </a>
+                    <a class="mr-4 p-3 user-menu" href="#">
+                        <strong>포인트</strong>
+                        <br>
+                        <br>
+                        <div class="row pl-3 pr-3 justify-content-between">
+                            <img src="/icon/coin.png" style="width: 40px; height: 40px;">
+                            &nbsp;
+                            <span style="font-size: 18px; margin-top: 10px">
+                                <strong>10,000 포인트</strong>
+                            </span>
+                        </div>
+                    </a>
+                    <a class="p-3 user-menu" href="#">
+                        <strong>장바구니</strong>
+                        <br>
+                        <br>
+                        <div class="row pl-3 pr-3 justify-content-between">
+                            <img src="/icon/cart.png" style="width: 40px; height: 40px;">
+                            &nbsp;
+                            <span style="font-size: 18px; margin-top: 10px">
+                                <strong>2 건</strong>
+                            </span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3">
+        © 2024 no24 Bookstore. All rights reserved.
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+            crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+            integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
+    </body>
+</html>

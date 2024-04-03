@@ -47,27 +47,45 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #D3D3D3">
         <div class="container">
-            <a class="navbar-brand" href="/">
-                <img src="/img/logo.png" alt="no24 bookstore" style="height: 80px;">
-            </a>
-            <form class="form-inline my-2 my-lg-0">
-                <input class="form-control mr-sm-2" type="search" placeholder="상품 검색" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">검색</button>
-            </form>
+            <div class="col-md-2 mr-4">
+                <a class="navbar-brand" href="/">
+                    <img src="/img/logo.png" alt="no24 bookstore" style="height: 80px;">
+                </a>
+            </div>
+            <div class="col-md-10 ml-4">
+                <form class="form-inline my-2 my-lg-0">
+                    <input class="form-control mr-sm-2" type="search" placeholder="찾으려는 도서를 입력해주세요." aria-label="Search" style="width: 87%;">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit">통합검색</button>
+                </form>
+            </div>
         </div>
     </nav>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <div class="row menu-nav">
-                <a class="nav-link text-muted current" href="#">도서</a>
-                <div class="sub-menu navbar-nav">
-                    <a class="nav-link text-muted" href="#">국내도서</a>
-                    <a class="nav-link text-muted" href="#">외국도서</a>
-                    <a class="nav-link text-muted" href="#">신간도서</a>
-                    <a class="nav-link text-muted" href="#">인기도서</a>
+            <div class="col-12">
+                <div class="row menu-nav justify-content-between">
+                    <div class="col-md-6">
+                        <div class="row">
+                            <strong><a class="nav-link text-muted current" href="#">도서</a></strong>
+                            <div class="sub-menu navbar-nav">
+                                <strong><a class="nav-link text-muted" href="#">국내도서</a></strong>
+                                <strong><a class="nav-link text-muted" href="#">외국도서</a></strong>
+                                <strong><a class="nav-link text-muted" href="#">신간도서</a></strong>
+                                <strong><a class="nav-link text-muted" href="#">인기도서</a></strong>
+                            </div>
+                            <strong><a class="nav-link text-muted" href="#">장바구니</a></strong>
+                            <strong><a class="nav-link text-muted" href="#">주문내역</a></strong>
+                        </div>
+                    </div>
+                    <div class="col-xs-6 ml-auto">
+                        <div class="row">
+                            <strong><a class="nav-link text-muted" href="#">로그인</a></strong>
+                            <strong><a class="nav-link text-muted" href="/info">마이페이지</a></strong>
+                            <!-- todo: 관리자 전용. 예외처리 필요 -->
+                            <strong><a class="nav-link text-muted" href="#">관리자페이지</a></strong>
+                        </div>
+                    </div>
                 </div>
-                <a class="nav-link text-muted" href="#">장바구니</a>
-                <a class="nav-link text-muted" href="#">주문내역</a>
             </div>
             <script>
                 document.addEventListener("DOMContentLoaded", function(){
@@ -91,14 +109,16 @@
     </nav>
 
 
-
+    <!-- 도서 페이지 -->
     <div class="container">
         <div class="row">
             <!-- 왼쪽에 세로 카테고리 네비게이션 -->
             <div class="col-md-2 mt-4 mb-4">
-                <h2><b>국내도서</b></h2>
+                <!-- todo: 상위 카테고리 필요 -->
+                <h4><b>국내도서</b></h4>
                 <div class="list-group">
                     <ul class="navbar-nav category-nav">
+                        <!-- todo: 하위 카테고리 List spread out -->
                         <li class="nav-item">
                             <a class="nav-link" href="#">소설</a>
                         </li>
@@ -165,12 +185,42 @@
                     </ul>
                 </div>
             </div>
-            <div class="col-md-9 mt-4 mb-4">
-                <!-- 도서 상품 블록 시작 -->
-                <div class="row mb-4">
+            <div class="col-md-10 mt-4 mb-4">
+                <div class="col-12 mb-4">
+                    <div class="row justify-content-between">
+                        <div class="col-sm-10">
+                            <!-- 현재 카테고리 -->
+                            <p style="margin-bottom: 0px">카테고리</p>
+                            <div class="current-category" style="margin-bottom: 10px">
+                                <a style="font-size: 14px; color: gray" href="#"> 국내도서</a>
+                                <span style="font-size: 14px; color: gray"> > </span>
+                                <a style="font-size: 14px; color: gray" href="#">인문</a>
+                                <span style="font-size: 14px; color: gray"> > </span>
+                                <a style="font-size: 14px; color: gray" href="#">인문학 일반</a>
+                                <span style="font-size: 14px; color: gray"> > </span>
+                                <a style="font-size: 14px; color: gray" href="#">인문교양</a>
+                            </div>
+                        </div>
+                        <div class="col-xs-2">
+                            <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                    정렬
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <li><a class="dropdown-item" href="#">최신순</a></li>
+                                    <li><a class="dropdown-item" href="#">판매량순</a></li>
+                                    <li><a class="dropdown-item" href="#">가격 높은 순</a></li>
+                                    <li><a class="dropdown-item" href="#">가격 낮은 순</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    <!-- 도서 상품 블록 시작 -->
+
                     <!-- 첫 번째 도서 블록 -->
-                    <div class="col-md-12 mb-4">
-                        <div class="row">
+                    <div class="col-12 mb-4">
+                        <div class="row justify-content-between">
                             <!-- 책 이미지 -->
                             <div class="col-sm-2">
                                 <img src="/img/book1.jpg" class="img-fluid" alt="Book 1" style="min-width: 110px">
@@ -206,263 +256,191 @@
                     </div>
 
 
-                    <div class="col-md-12 mb-4">
-                        <div class="row">
-                            <!-- 책 이미지 -->
-                            <div class="col-sm-2">
-                                <img src="/img/book1.jpg" class="img-fluid" alt="Book 1" style="min-width: 110px">
+                <div class="col-12 mb-4">
+                    <div class="row justify-content-between">
+                        <!-- 책 이미지 -->
+                        <div class="col-sm-2">
+                            <img src="/img/book1.jpg" class="img-fluid" alt="Book 1" style="min-width: 110px">
+                        </div>
+                        <!-- 책 정보 -->
+                        <div class="col-sm-8">
+                            <strong>Book Title 1</strong>
+                            <br>
+                            <span>Author Name 저 · Publisher · 2024.04.02</span>
+                            <br><br>
+                            <strong>24,000원</strong>
+                            <p class="description">최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온
+                                최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온</p>
+                            <!-- 좋아요 / 리뷰 아이콘 -->
+                            <div>
+                                <span><img class="icon" src="/icon/like.png" alt="좋아요" style="width: 20px; height:20px;"></span>
+                                <span>200</span>
+                                &nbsp;
+                                <span><img class="icon" src="/icon/review.png" alt="리뷰" style="width: 16px; height:16px;"></span>
+                                <span>10</span>
                             </div>
-                            <!-- 책 정보 -->
-                            <div class="col-sm-8">
-                                <strong>Book Title 1</strong>
-                                <br>
-                                <span>Author Name 저 · Publisher · 2024.04.02</span>
-                                <br><br>
-                                <strong>24,000원</strong>
-                                <p class="description">최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온
-                                    최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온</p>
-                                <!-- 좋아요 / 리뷰 아이콘 -->
-                                <div>
-                                    <span><img class="icon" src="/icon/like.png" alt="좋아요" style="width: 20px; height:20px;"></span>
-                                    <span>200</span>
-                                    &nbsp;
-                                    <span><img class="icon" src="/icon/review.png" alt="리뷰" style="width: 16px; height:16px;"></span>
-                                    <span>10</span>
-                                </div>
+                        </div>
+                        <!-- 버튼 -->
+                        <div class="col-xs-2">
+                            <div class="row-md-12">
+                                <button class="btn btn-primary">장바구니</button>
                             </div>
-                            <!-- 버튼 -->
-                            <div class="col-xs-2">
-                                <div class="row-md-12">
-                                    <button class="btn btn-primary">장바구니</button>
-                                </div>
-                                <div class="row-md-12 mt-2">
-                                    <button class="btn btn-success">바로구매</button>
-                                </div>
+                            <div class="row-md-12 mt-2">
+                                <button class="btn btn-success">바로구매</button>
                             </div>
                         </div>
                     </div>
+                </div>
 
 
-                    <div class="col-md-12 mb-4">
-                        <div class="row">
-                            <!-- 책 이미지 -->
-                            <div class="col-sm-2">
-                                <img src="/img/book1.jpg" class="img-fluid" alt="Book 1" style="min-width: 110px">
+                <div class="col-12 mb-4">
+                    <div class="row justify-content-between">
+                        <!-- 책 이미지 -->
+                        <div class="col-sm-2">
+                            <img src="/img/book1.jpg" class="img-fluid" alt="Book 1" style="min-width: 110px">
+                        </div>
+                        <!-- 책 정보 -->
+                        <div class="col-sm-8">
+                            <strong>Book Title 1</strong>
+                            <br>
+                            <span>Author Name 저 · Publisher · 2024.04.02</span>
+                            <br><br>
+                            <strong>24,000원</strong>
+                            <p class="description">최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온
+                                최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온</p>
+                            <!-- 좋아요 / 리뷰 아이콘 -->
+                            <div>
+                                <span><img class="icon" src="/icon/like.png" alt="좋아요" style="width: 20px; height:20px;"></span>
+                                <span>200</span>
+                                &nbsp;
+                                <span><img class="icon" src="/icon/review.png" alt="리뷰" style="width: 16px; height:16px;"></span>
+                                <span>10</span>
                             </div>
-                            <!-- 책 정보 -->
-                            <div class="col-sm-8">
-                                <strong>Book Title 1</strong>
-                                <br>
-                                <span>Author Name 저 · Publisher · 2024.04.02</span>
-                                <br><br>
-                                <strong>24,000원</strong>
-                                <p class="description">최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온
-                                    최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온</p>
-                                <!-- 좋아요 / 리뷰 아이콘 -->
-                                <div>
-                                    <span><img class="icon" src="/icon/like.png" alt="좋아요" style="width: 20px; height:20px;"></span>
-                                    <span>200</span>
-                                    &nbsp;
-                                    <span><img class="icon" src="/icon/review.png" alt="리뷰" style="width: 16px; height:16px;"></span>
-                                    <span>10</span>
-                                </div>
+                        </div>
+                        <!-- 버튼 -->
+                        <div class="col-xs-2">
+                            <div class="row-md-12">
+                                <button class="btn btn-primary">장바구니</button>
                             </div>
-                            <!-- 버튼 -->
-                            <div class="col-xs-2">
-                                <div class="row-md-12">
-                                    <button class="btn btn-primary">장바구니</button>
-                                </div>
-                                <div class="row-md-12 mt-2">
-                                    <button class="btn btn-success">바로구매</button>
-                                </div>
+                            <div class="row-md-12 mt-2">
+                                <button class="btn btn-success">바로구매</button>
                             </div>
                         </div>
                     </div>
+                </div>
 
 
-                    <div class="col-md-12 mb-4">
-                        <div class="row">
-                            <!-- 책 이미지 -->
-                            <div class="col-sm-2">
-                                <img src="/img/book1.jpg" class="img-fluid" alt="Book 1" style="min-width: 110px">
+                <div class="col-12 mb-4">
+                    <div class="row justify-content-between">
+                        <!-- 책 이미지 -->
+                        <div class="col-sm-2">
+                            <img src="/img/book1.jpg" class="img-fluid" alt="Book 1" style="min-width: 110px">
+                        </div>
+                        <!-- 책 정보 -->
+                        <div class="col-sm-8">
+                            <strong>Book Title 1</strong>
+                            <br>
+                            <span>Author Name 저 · Publisher · 2024.04.02</span>
+                            <br><br>
+                            <strong>24,000원</strong>
+                            <p class="description">최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온
+                                최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온</p>
+                            <!-- 좋아요 / 리뷰 아이콘 -->
+                            <div>
+                                <span><img class="icon" src="/icon/like.png" alt="좋아요" style="width: 20px; height:20px;"></span>
+                                <span>200</span>
+                                &nbsp;
+                                <span><img class="icon" src="/icon/review.png" alt="리뷰" style="width: 16px; height:16px;"></span>
+                                <span>10</span>
                             </div>
-                            <!-- 책 정보 -->
-                            <div class="col-sm-8">
-                                <strong>Book Title 1</strong>
-                                <br>
-                                <span>Author Name 저 · Publisher · 2024.04.02</span>
-                                <br><br>
-                                <strong>24,000원</strong>
-                                <p class="description">최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온
-                                    최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온</p>
-                                <!-- 좋아요 / 리뷰 아이콘 -->
-                                <div>
-                                    <span><img class="icon" src="/icon/like.png" alt="좋아요" style="width: 20px; height:20px;"></span>
-                                    <span>200</span>
-                                    &nbsp;
-                                    <span><img class="icon" src="/icon/review.png" alt="리뷰" style="width: 16px; height:16px;"></span>
-                                    <span>10</span>
-                                </div>
+                        </div>
+                        <!-- 버튼 -->
+                        <div class="col-xs-2">
+                            <div class="row-md-12">
+                                <button class="btn btn-primary">장바구니</button>
                             </div>
-                            <!-- 버튼 -->
-                            <div class="col-xs-2">
-                                <div class="row-md-12">
-                                    <button class="btn btn-primary">장바구니</button>
-                                </div>
-                                <div class="row-md-12 mt-2">
-                                    <button class="btn btn-success">바로구매</button>
-                                </div>
+                            <div class="row-md-12 mt-2">
+                                <button class="btn btn-success">바로구매</button>
                             </div>
                         </div>
                     </div>
+                </div>
 
 
-                    <div class="col-md-12 mb-4">
-                        <div class="row">
-                            <!-- 책 이미지 -->
-                            <div class="col-sm-2">
-                                <img src="/img/book1.jpg" class="img-fluid" alt="Book 1" style="min-width: 110px">
+                <div class="col-12 mb-4">
+                    <div class="row justify-content-between">
+                        <!-- 책 이미지 -->
+                        <div class="col-sm-2">
+                            <img src="/img/book1.jpg" class="img-fluid" alt="Book 1" style="min-width: 110px">
+                        </div>
+                        <!-- 책 정보 -->
+                        <div class="col-sm-8">
+                            <strong>Book Title 1</strong>
+                            <br>
+                            <span>Author Name 저 · Publisher · 2024.04.02</span>
+                            <br><br>
+                            <strong>24,000원</strong>
+                            <p class="description">최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온
+                                최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온</p>
+                            <!-- 좋아요 / 리뷰 아이콘 -->
+                            <div>
+                                <span><img class="icon" src="/icon/like.png" alt="좋아요" style="width: 20px; height:20px;"></span>
+                                <span>200</span>
+                                &nbsp;
+                                <span><img class="icon" src="/icon/review.png" alt="리뷰" style="width: 16px; height:16px;"></span>
+                                <span>10</span>
                             </div>
-                            <!-- 책 정보 -->
-                            <div class="col-sm-8">
-                                <strong>Book Title 1</strong>
-                                <br>
-                                <span>Author Name 저 · Publisher · 2024.04.02</span>
-                                <br><br>
-                                <strong>24,000원</strong>
-                                <p class="description">최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온
-                                    최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온</p>
-                                <!-- 좋아요 / 리뷰 아이콘 -->
-                                <div>
-                                    <span><img class="icon" src="/icon/like.png" alt="좋아요" style="width: 20px; height:20px;"></span>
-                                    <span>200</span>
-                                    &nbsp;
-                                    <span><img class="icon" src="/icon/review.png" alt="리뷰" style="width: 16px; height:16px;"></span>
-                                    <span>10</span>
-                                </div>
+                        </div>
+                        <!-- 버튼 -->
+                        <div class="col-xs-2">
+                            <div class="row-md-12">
+                                <button class="btn btn-primary">장바구니</button>
                             </div>
-                            <!-- 버튼 -->
-                            <div class="col-xs-2">
-                                <div class="row-md-12">
-                                    <button class="btn btn-primary">장바구니</button>
-                                </div>
-                                <div class="row-md-12 mt-2">
-                                    <button class="btn btn-success">바로구매</button>
-                                </div>
+                            <div class="row-md-12 mt-2">
+                                <button class="btn btn-success">바로구매</button>
                             </div>
                         </div>
                     </div>
+                </div>
 
 
-                    <div class="col-md-12 mb-4">
-                        <div class="row">
-                            <!-- 책 이미지 -->
-                            <div class="col-sm-2">
-                                <img src="/img/book1.jpg" class="img-fluid" alt="Book 1" style="min-width: 110px">
+                <div class="col-12 mb-4">
+                    <div class="row justify-content-between">
+                        <!-- 책 이미지 -->
+                        <div class="col-sm-2">
+                            <img src="/img/book1.jpg" class="img-fluid" alt="Book 1" style="min-width: 110px">
+                        </div>
+                        <!-- 책 정보 -->
+                        <div class="col-sm-8">
+                            <strong>Book Title 1</strong>
+                            <br>
+                            <span>Author Name 저 · Publisher · 2024.04.02</span>
+                            <br><br>
+                            <strong>24,000원</strong>
+                            <p class="description">최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온
+                                최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온</p>
+                            <!-- 좋아요 / 리뷰 아이콘 -->
+                            <div>
+                                <span><img class="icon" src="/icon/like.png" alt="좋아요" style="width: 20px; height:20px;"></span>
+                                <span>200</span>
+                                &nbsp;
+                                <span><img class="icon" src="/icon/review.png" alt="리뷰" style="width: 16px; height:16px;"></span>
+                                <span>10</span>
                             </div>
-                            <!-- 책 정보 -->
-                            <div class="col-sm-8">
-                                <strong>Book Title 1</strong>
-                                <br>
-                                <span>Author Name 저 · Publisher · 2024.04.02</span>
-                                <br><br>
-                                <strong>24,000원</strong>
-                                <p class="description">최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온
-                                    최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온</p>
-                                <!-- 좋아요 / 리뷰 아이콘 -->
-                                <div>
-                                    <span><img class="icon" src="/icon/like.png" alt="좋아요" style="width: 20px; height:20px;"></span>
-                                    <span>200</span>
-                                    &nbsp;
-                                    <span><img class="icon" src="/icon/review.png" alt="리뷰" style="width: 16px; height:16px;"></span>
-                                    <span>10</span>
-                                </div>
+                        </div>
+                        <!-- 버튼 -->
+                        <div class="col-xs-2">
+                            <div class="row-md-12">
+                                <button class="btn btn-primary">장바구니</button>
                             </div>
-                            <!-- 버튼 -->
-                            <div class="col-xs-2">
-                                <div class="row-md-12">
-                                    <button class="btn btn-primary">장바구니</button>
-                                </div>
-                                <div class="row-md-12 mt-2">
-                                    <button class="btn btn-success">바로구매</button>
-                                </div>
+                            <div class="row-md-12 mt-2">
+                                <button class="btn btn-success">바로구매</button>
                             </div>
                         </div>
                     </div>
+                </div>
 
 
-                    <div class="col-md-12 mb-4">
-                        <div class="row">
-                            <!-- 책 이미지 -->
-                            <div class="col-sm-2">
-                                <img src="/img/book1.jpg" class="img-fluid" alt="Book 1" style="min-width: 110px">
-                            </div>
-                            <!-- 책 정보 -->
-                            <div class="col-sm-8">
-                                <strong>Book Title 1</strong>
-                                <br>
-                                <span>Author Name 저 · Publisher · 2024.04.02</span>
-                                <br><br>
-                                <strong>24,000원</strong>
-                                <p class="description">최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온
-                                    최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온</p>
-                                <!-- 좋아요 / 리뷰 아이콘 -->
-                                <div>
-                                    <span><img class="icon" src="/icon/like.png" alt="좋아요" style="width: 20px; height:20px;"></span>
-                                    <span>200</span>
-                                    &nbsp;
-                                    <span><img class="icon" src="/icon/review.png" alt="리뷰" style="width: 16px; height:16px;"></span>
-                                    <span>10</span>
-                                </div>
-                            </div>
-                            <!-- 버튼 -->
-                            <div class="col-xs-2">
-                                <div class="row-md-12">
-                                    <button class="btn btn-primary">장바구니</button>
-                                </div>
-                                <div class="row-md-12 mt-2">
-                                    <button class="btn btn-success">바로구매</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div class="col-md-12 mb-4">
-                        <div class="row">
-                            <!-- 책 이미지 -->
-                            <div class="col-sm-2">
-                                <img src="/img/book1.jpg" class="img-fluid" alt="Book 1" style="min-width: 110px">
-                            </div>
-                            <!-- 책 정보 -->
-                            <div class="col-sm-8">
-                                <strong>Book Title 1</strong>
-                                <br>
-                                <span>Author Name 저 · Publisher · 2024.04.02</span>
-                                <br><br>
-                                <strong>24,000원</strong>
-                                <p class="description">최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온
-                                    최근 몇 년 동안 지구에서 가장 혁신적인 기업 가운데 하나라는 평가를 들어온 브리지워터 어소시에이츠 창립자로, 헤지펀드의 대부라 불리며 세계 0.001% 안에 드는 부의 거인 레이 달리오가 지켜온</p>
-                                <!-- 좋아요 / 리뷰 아이콘 -->
-                                <div>
-                                    <span><img class="icon" src="/icon/like.png" alt="좋아요" style="width: 20px; height:20px;"></span>
-                                    <span>200</span>
-                                    &nbsp;
-                                    <span><img class="icon" src="/icon/review.png" alt="리뷰" style="width: 16px; height:16px;"></span>
-                                    <span>10</span>
-                                </div>
-                            </div>
-                            <!-- 버튼 -->
-                            <div class="col-xs-2">
-                                <div class="row-md-12">
-                                    <button class="btn btn-primary">장바구니</button>
-                                </div>
-                                <div class="row-md-12 mt-2">
-                                    <button class="btn btn-success">바로구매</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                     <!-- Pagination -->
                     <nav aria-label="Page navigation example">
                         <ul class="pagination justify-content-center">
@@ -491,9 +469,9 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
             integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
             crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"
-            integrity="sha384-MCm7XREtNRL6EyTJM8hoq7rLP9UibKkVjDop4t+LHO+ATcO3zplgGmWvFuzbCCNh"
-            crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
             integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
     </body>
