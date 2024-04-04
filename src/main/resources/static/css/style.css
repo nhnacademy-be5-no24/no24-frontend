@@ -1,0 +1,49 @@
+
+.menu-nav .text-muted:hover {
+    color: white !important;
+}
+.menu-nav .current {
+    color: white !important;
+}
+.sub-menu {
+    display: none;
+    position: absolute;
+    background-color: #343a40; /* 배경색을 조절하세요 */
+    padding: 5px;
+    border-radius: 5px;
+    z-index: 1; /* 메뉴가 다른 요소 위에 나타나도록 설정 */
+    margin-top: 40px;
+}
+.sub-menu a {
+    color: #fff;
+    display: block;
+    margin-bottom: 5px;
+}
+.category-nav a {
+    padding: 1px;
+}
+.container {
+    max-width: none !important;
+    width: 1200px;
+}
+.user-menu {
+    border: solid 1px #d0d0d0;
+    background-color: #f2f2f2;
+    border-radius: 5px;
+    width: 220px;
+    height: 120px;
+    color: black;
+}
+.user-menu:hover {
+    color: black;
+    text-decoration: none;
+}
+.description {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis; /* 텍스트가 넘칠 때 생략 부호(...) 표시 */
+    font-size: 14px;
+}
+.icon {
+    margin-bottom: 3px;
+}
