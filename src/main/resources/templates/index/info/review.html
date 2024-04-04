@@ -9,8 +9,8 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
 </head>
 <body>
-    <div th:replace="/nav/header.html"></div>
-    <div th:replace="/nav/menu.html"></div>
+    <div th:replace="./nav/header.html"></div>
+    <div th:replace="./nav/menu.html"></div>
 
     <!-- 도서 페이지 -->
     <div class="container">
@@ -18,7 +18,7 @@
             <!-- 왼쪽에 세로 카테고리 네비게이션 -->
             <div class="col-md-2 mt-4 mb-4" style="min-height: 800px">
                 <div class="list-group">
-                    <div th:replace="/sidebar/user_sidebar.html"></div>
+                    <div th:replace="./sidebar/user_sidebar.html"></div>
                 </div>
             </div>
 
