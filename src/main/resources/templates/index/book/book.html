@@ -9,8 +9,8 @@
     <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
 </head>
 <body>
-    <div th:replace="/nav/header.html"></div>
-    <div th:replace="/nav/menu.html"></div>
+    <div th:replace="./nav/header.html"></div>
+    <div th:replace="./nav/menu.html"></div>
 
     <!-- 도서 페이지 -->
     <div class="container">
@@ -20,7 +20,7 @@
                 <!-- todo: 상위 카테고리 필요 -->
                 <h4><b>국내도서</b></h4>
                 <div class="list-group">
-                    <div th:replace="/sidebar/book_sidebar.html"></div>
+                    <div th:replace="./sidebar/book_sidebar.html"></div>
                 </div>
             </div>
             <div class="col-md-10 mt-4 mb-4">
