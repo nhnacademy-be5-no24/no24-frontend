@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>no24 Bookstore</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+</head>
+<body>
+    <div th:replace="/nav/header.html"></div>
+    <div th:replace="/nav/menu.html"></div>
+
+    <!-- 도서 페이지 -->
+    <div class="container">
+        <div class="row">
+            <!-- 왼쪽에 세로 카테고리 네비게이션 -->
+            <div class="col-md-2 mt-4 mb-4" style="min-height: 800px">
+                <div class="list-group">
+                    <div th:replace="/sidebar/user_sidebar.html"></div>
+                </div>
+            </div>
+
+            <div class="col-md-10 mt-4 mb-4">
+                <h4 class="mb-3"><strong>내 등급 현황</strong></h4>
+                <div class="col-sm-12 card mt-2 p-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="/icon/tier_platinum.png" style="width:200px; height:200px;">
+                        </div>
+                        <div class="col-md-9">
+                            <h4><strong>플래티넘</strong></h4>
+                            <h5 class="mt-3"><strong>혜택</strong></h5>
+                            <ul>
+                                <li>도서 주문 시 4% 포인트 적립</li>
+                                <li>10% 할인 쿠폰 2장</li>
+                                <li>20% 할인 쿠폰 1장</li>
+                            </ul>
+                            <p><strong>등급 UP 까지 남은 주문 금액 : 57,000원</strong></p>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="mb-3 mt-4"><strong>등급 표</strong></h4>
+
+                <div class="col-sm-12 card mt-2 p-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="/icon/tier_normal.png" style="width:200px; height:200px;">
+                        </div>
+                        <div class="col-md-9">
+                            <h4><strong>일반</strong></h4>
+                            <h5 class="mt-3"><strong>혜택</strong></h5>
+                            <ul>
+                                <li>도서 주문 시 1% 포인트 적립</li>
+                            </ul>
+
+                            <h5><strong>조건</strong></h5>
+                            <p>없음</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-12 card mt-2 p-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="/icon/tier_royal.png" style="width:200px; height:200px;">
+                        </div>
+                        <div class="col-md-9">
+                            <h4 style="display: inline"><strong>로얄</strong></h4>
+                            <span class="text-muted ml-3"> * 등급이 적용된 다음 달부터 쿠폰이 지급됩니다.</span>
+                            <h5 class="mt-3"><strong>혜택</strong></h5>
+                            <ul>
+                                <li>도서 주문 시 2% 포인트 적립</li>
+                                <li>10% 할인 쿠폰 1장</li>
+                            </ul>
+                            <h5><strong>조건</strong></h5>
+                            <p>주문 금액 10만원 이상</p>
+                            <p class="text-muted">* 등급이 적용된 다음 달부터 쿠폰이 지급됩니다.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-12 card mt-2 p-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="/icon/tier_gold.png" style="width:200px; height:200px;">
+                        </div>
+                        <div class="col-md-9">
+                            <h4 style="display: inline"><strong>골드</strong></h4>
+                            <span class="text-muted ml-3"> * 등급이 적용된 다음 달부터 쿠폰이 지급됩니다.</span>
+                            <h5 class="mt-3"><strong>혜택</strong></h5>
+                            <ul>
+                                <li>도서 주문 시 3% 포인트 적립</li>
+                                <li>10% 할인 쿠폰 2장</li>
+                            </ul>
+                            <h5><strong>조건</strong></h5>
+                            <p>주문 금액 20만원 이상</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-12 card mt-2 p-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="/icon/tier_platinum.png" style="width:200px; height:200px;">
+                        </div>
+                        <div class="col-md-9">
+                            <h4 style="display: inline"><strong>플래티넘</strong></h4>
+                            <span class="text-muted ml-3"> * 등급이 적용된 다음 달부터 쿠폰이 지급됩니다.</span>
+                            <h5 class="mt-3"><strong>혜택</strong></h5>
+                            <ul>
+                                <li>도서 주문 시 4% 포인트 적립</li>
+                                <li>10% 할인 쿠폰 2장</li>
+                                <li>20% 할인 쿠폰 1장</li>
+                            </ul>
+                            <h5><strong>조건</strong></h5>
+                            <p>주문 금액 30만원 이상</p>
+                        </div>
+                    </div>
+                </div>
+                <br>
+                <br>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3">
+        © 2024 no24 Bookstore. All rights reserved.
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+            crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+            integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
+    </body>
+</html>
