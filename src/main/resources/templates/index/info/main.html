@@ -17,7 +17,6 @@
         <div class="row">
             <!-- 왼쪽 메뉴 목록 네비게이션 -->
             <div class="col-md-2 mt-4 mb-4" style="min-height: 800px">
-                <!-- todo: 상위 카테고리 필요 -->
                 <div class="list-group">
                     <div th:replace="/sidebar/user_sidebar.html"></div>
                 </div>
@@ -27,7 +26,7 @@
                 <!-- 마이페이지에 들어갈 목록 -->
                 <h4><strong>좋은 하루 되세요 Test User님!</strong></h4>
                 <div class="row p-4">
-                    <a class="mr-4 p-3 user-menu" href="#">
+                    <a class="mr-4 p-3 user-menu" href="/info/tier">
                         <strong>회원 등급</strong>
                         <br>
                         <br>
@@ -39,7 +38,7 @@
                             </span>
                         </div>
                     </a>
-                    <a class="mr-4 p-3 user-menu" href="#">
+                    <a class="mr-4 p-3 user-menu" href="/info/coupon">
                         <strong>쿠폰 개수</strong>
                         <br>
                         <br>
@@ -51,7 +50,7 @@
                             </span>
                         </div>
                     </a>
-                    <a class="mr-4 p-3 user-menu" href="#">
+                    <a class="mr-4 p-3 user-menu" href="/info/point">
                         <strong>포인트</strong>
                         <br>
                         <br>
