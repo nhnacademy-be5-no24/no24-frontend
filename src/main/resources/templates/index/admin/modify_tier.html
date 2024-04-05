@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>no24 Bookstore</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" th:href="@{'/css/style.css' + '?after'}" />
+</head>
+<body>
+<div th:replace="./nav/header.html"></div>
+<div th:replace="./nav/menu.html"></div>
+
+<!-- 마이 페이지 -->
+<div class="container">
+    <div class="row">
+        <!-- 왼쪽 메뉴 목록 네비게이션 -->
+        <div class="col-md-2 mt-4 mb-4" style="min-height: 800px">
+            <!-- todo: 상위 카테고리 필요 -->
+            <div class="list-group">
+                <div th:replace="./sidebar/admin_sidebar.html"></div>
+            </div>
+        </div>
+
+        <div class="col-10 mt-4 mb-4">
+            <h4><strong>일반 등급 수정</strong></h4>
+            <form method="post" action="/admin/tier/modify/1">
+            <!-- 조건 수정 -->
+                <div class="form-group">
+                    <label for="orderAmount">주문 금액</label>
+                    <input type="text" class="form-control" id="orderAmount" placeholder="주문 금액 입력">
+                </div>
+
+                <!-- 혜택 수정 -->
+                <div class="form-group">
+                    <label for="pointRate">포인트 적립율</label>
+                    <input type="text" class="form-control" id="pointRate" placeholder="포인트 적립율 입력">
+                </div>
+
+                <div class="form-group">
+                    <label for="coupon10">10% 할인쿠폰 지급개수</label>
+                    <input type="text" class="form-control" id="coupon10" placeholder="10% 할인쿠폰 지급개수 입력">
+                </div>
+
+                <div class="form-group">
+                    <label for="coupon20">20% 할인쿠폰 지급개수</label>
+                    <input type="text" class="form-control" id="coupon20" placeholder="20% 할인쿠폰 지급개수 입력">
+                </div>
+
+                <button type="submit" class="btn btn-primary">저장</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<footer class="bg-dark text-white text-center py-3">
+    © 2024 no24 Bookstore. All rights reserved.
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
+</body>
+</html>

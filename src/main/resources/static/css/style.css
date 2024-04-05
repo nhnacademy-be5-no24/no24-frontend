@@ -54,7 +54,12 @@ footer {
     z-index: 4;
 }
 
-.book:hover {
+.admin-coupon a, .admin-wrap a, .admin-tier a {
+    color: black;
+    text-decoration: none;
+}
+
+.book:hover, .admin-coupon a:hover, .admin-wrap a:hover, .admin-tier a:hover {
     color: black;
     text-decoration: none;
 }
@@ -64,4 +69,9 @@ hr {
     height: 1px;
     background-color: #000; /* 가로 선의 색상 */
     margin: 20px 0; /* 상단 및 하단 여백 지정 */
+}
+
+.table td, .table th {
+    vertical-align: middle !important;
+    text-align: center;
 }
