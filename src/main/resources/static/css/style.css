@@ -75,3 +75,24 @@ hr {
     vertical-align: middle !important;
     text-align: center;
 }
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
+.form-check-input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+}
+
+.cart-card td {
+    padding: 10px 20px 10px 0px;
+    text-align: right;
+}
+
+.cart-card th {
+    padding: 10px 20px 10px 0px;
+}

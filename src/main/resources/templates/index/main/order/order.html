@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>no24 Bookstore</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" th:href="@{'/css/style.css'}" />
+</head>
+<body>
+    <div th:replace="./nav/header.html"></div>
+    <div th:replace="./nav/menu.html"></div>
+
+    <!-- 카트 페이지 -->
+    <div class="container mb-4">
+        <h3 class="my-4"><strong>주문 결제 페이지</strong></h3>
+
+        <hr>
+
+        <h4>구매자 정보</h4>
+        <p>이름: <span th:text="'John Doe'"></span></p>
+        <p>이메일: <span th:text="'john.doe@example.com'"></span></p>
+        <p>전화번호: <span th:text="'123-456-7890'"></span></p>
+
+        <hr>
+
+        <h4>받는 사람 정보</h4>
+        <p>이름: <span th:text="'Jane Doe'"></span></p>
+        <p>주소: <span th:text="'123 Main St, City, Country'"></span></p>
+        <p>전화번호: <span th:text="'987-654-3210'"></span></p>
+
+        <hr>
+
+        <h4>상품 리스트</h4>
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">상품명</th>
+                <th scope="col">수량</th>
+                <th scope="col">가격</th>
+                <th scope="col">쿠폰</th>
+                <th scope="col">포장 여부</th>
+                <th scope="col">총 금액</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr th:each="item, itemStat : ${cart}">
+                    <td th:text="${item.title}" />
+                    <td th:text="${item.quantity}" />
+                    <td th:text="${item.price}" />
+                    <td>
+                        <select class="form-control" th:id="'coupon-' + ${item.id}">
+                            <option value="-">미사용</option>
+                            <option value="1">생일 축하 쿠폰 3000원</option>
+                            <option value="2">소설 카테고리 5% 할인 쿠폰</option>
+                            <option value="3">플래티넘 등급 20% 할인 쿠폰</option>
+                        </select>
+                    </td>
+                    <td>
+                        <a th:id="'wrap-input-' + ${item.id}">포장지 설정</a>
+                    </td>
+                    <td>
+                        25000원
+                    </td>
+                    <div th:id="'wrap-info-' + ${item.id}" hidden>
+                        a
+                    </div>
+                </tr>
+            </tbody>
+        </table>
+
+        <hr>
+
+        <h4>결제 정보</h4>
+        <p>총 가격: <span id="totalPrice" th:text="'50,000'"></span>원</p>
+        <button class="btn btn-primary mb-4" id="paymentButton">결제하기</button>
+
+        <br>
+        <br>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3">
+        © 2024 no24 Bookstore. All rights reserved.
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+            crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+            integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
+
+    <script>
+        function openPopup() {
+        }
+
+        document.querySelectorAll('[id^="wrap-input-"]').forEach(function(btn) {
+            btn.addEventListener("click", function () {
+                // 팝업창을 열기 위한 코드
+                let popup = window.open('/order/input/wrap', 'popup', 'width=800, height=500');
+
+                // 팝업창이 닫힐 때 값을 전달받기 위한 이벤트 리스너
+                window.addEventListener('message', function (event) {
+                    // 전달받은 값이 있다면 처리
+                    if (event.data) {
+                        console.log(event.data);
+                        document.getElementById('wrap-info-' + btn.id.split("-")[2]).innerHTML = event.data;
+                    }
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>

@@ -58,12 +58,24 @@
                             <p>적립금: 100원</p>
                             <p>재고 상태: 재고 있음</p>
                             <p>배송 안내: 2~3일 소요</p>
-                            <!-- 좋아요 개수 및 버튼 -->
-                            <!-- 구매하기, 장바구니 버튼 -->
-                            <button type="button" class="btn btn-primary">구매하기</button>
-                            <button type="button" class="btn btn-secondary">장바구니</button>
 
-                            <br><br>
+                            <div class="row">
+                                <div class="col-md-3 input-group">
+                                    <div class="input-group-prepend">
+                                        <button class="btn btn-outline-secondary" type="button" id="decreaseQty">-</button>
+                                    </div>
+                                    <input type="number" class="form-control" value="1" id="quantity" min="1" style="text-align: center;">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-outline-secondary" type="button" id="increaseQty">+</button>
+                                    </div>
+                                </div>
+                                <!-- 좋아요 개수 및 버튼 -->
+                                <!-- 구매하기, 장바구니 버튼 -->
+                                <button type="button" class="btn btn-primary">구매하기</button>
+                                <button type="button" class="btn btn-secondary ml-2">장바구니</button>
+                            </div>
+
+                            <br>
 
                             <a href="#"><span><img class="icon" src="/icon/like.png" alt="좋아요" style="width: 30px; height:30px;"></span></a>
                             <span>10</span>
@@ -260,5 +272,25 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
             integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let decreaseBtn = document.getElementById('decreaseQty');
+            let increaseBtn = document.getElementById('increaseQty');
+            let quantityInput = document.getElementById('quantity');
+
+            decreaseBtn.addEventListener('click', function() {
+                let currentValue = parseInt(quantityInput.value);
+                if (currentValue > 1) {
+                    quantityInput.value = currentValue - 1;
+                }
+            });
+
+            increaseBtn.addEventListener('click', function() {
+                let currentValue = parseInt(quantityInput.value);
+                quantityInput.value = currentValue + 1;
+            });
+        });
+    </script>
     </body>
 </html>
