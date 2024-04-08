@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>no24 Bookstore</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" th:href="@{'/css/style.css'}" />
+</head>
+<body>
+    <div class="p-4">
+        <h4><strong>포장지 설정</strong></h4>
+        <table id="packaging-table" class="table">
+            <thead>
+            <tr>
+                <th scope="col">포장지</th>
+                <th scope="col">가격</th>
+                <th scope="col">개수</th>
+                <th scope="col">총 금액</th>
+                <th scope="col">포장 삭제</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="packaging-table-row">
+                <td>
+                    <select class="form-control packaging-select">
+                        <option value="1">고급 포장지</option>
+                        <option value="2">일반 포장지</option>
+                    </select>
+                </td>
+                <td class="price align-middle">500</td>
+                <td><input type="number" class="form-control quantity" value="1"></td>
+                <td class="total align-middle"></td>
+                <td><button class="btn btn-danger delete-row">포장 삭제</button></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <button class="btn btn-success" id="add-row">행 추가</button>
+
+        <button class="btn btn-primary" id="submit-btn" onclick="sendMessage()">적용하기</button>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+            crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+            integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Add Row Button Click Event
+            $("#add-row").click(function() {
+                var newRow = `
+                <tr class="packaging-table-row">
+                    <td>
+                        <select class="form-control packaging-select">
+                            <option value="1">고급 포장지</option>
+                            <option value="2">일반 포장지</option>
+                        </select>
+                    </td>
+                    <td class="price align-middle">500</td>
+                    <td><input type="number" class="form-control quantity" value="1" min="1"></td>
+                    <td class="total align-middle">0</td>
+                    <td><button class="btn btn-danger delete-row">포장 삭제</button></td>
+                </tr>
+            `;
+                $("#packaging-table tbody").append(newRow);
+                calculateTotal();
+            });
+
+            // Delete Row Button Click Event
+            $(document).on("click", ".delete-row", function() {
+                $(this).closest("tr").remove();
+            });
+
+            // Calculate Total Price
+            function calculateTotal() {
+                $("#packaging-table tbody tr").each(function() {
+                    var price = parseInt($(this).find(".price").text());
+                    var quantity = parseInt($(this).find(".quantity").val());
+                    var total = price * quantity;
+                    $(this).find(".total").text(total);
+                });
+            }
+
+            // Calculate Total on Change
+            $(document).on("change", ".packaging-select, .quantity", function() {
+                calculateTotal();
+            });
+
+            // Initial Calculation
+            calculateTotal();
+        });
+
+        function sendMessage() {
+            let arr = [];
+            let rows = document.querySelectorAll('.packaging-table-row');
+
+            rows.forEach(function (row) {
+                let wrap = row.querySelector('.packaging-select');
+                let wrap_id = wrap.options[wrap.selectedIndex].value;
+                let quantity = row.querySelector('.quantity').value;
+
+                console.log(wrap_id + ": " + quantity);
+
+                let item = {
+                    wrap_id: wrap_id,
+                    quantity: quantity
+                };
+
+                arr.push(item);
+            });
+
+            console.log(arr);
+
+            // 메인 페이지로 값을 전달
+            window.opener.postMessage(JSON.stringify(arr), '*');
+
+            // 팝업창 닫기
+            window.close();
+        }
+    </script>
+
+</body>
+</html>
