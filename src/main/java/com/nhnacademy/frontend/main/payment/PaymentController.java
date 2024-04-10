@@ -74,7 +74,7 @@ public class PaymentController {
         }
 
         // todo: 필요내용 추가 필요
-        ModelAndView mav = new ModelAndView("/index/main/order/payment");
+        ModelAndView mav = new ModelAndView("index/main/order/payment");
         mav.addObject("orderId", orderId);
         mav.addObject("orderTitle", "example1 외 5권");
         mav.addObject("amount", 50000);
