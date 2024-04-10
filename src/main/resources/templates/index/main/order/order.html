@@ -5,7 +5,6 @@
     <title>no24 Bookstore</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
           integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-
     <link rel="stylesheet" type="text/css" th:href="@{'/css/style.css'}" />
 </head>
 <body>
@@ -13,7 +12,7 @@
     <div th:replace="./nav/menu.html"></div>
 
     <!-- 카트 페이지 -->
-    <div class="container mb-4">
+    <form method="post" action="/payment" class="container mb-4">
         <h3 class="my-4"><strong>주문 결제 페이지</strong></h3>
 
         <hr>
@@ -50,8 +49,8 @@
                     <td th:text="${item.quantity}" />
                     <td th:text="${item.price}" />
                     <td>
-                        <select class="form-control" th:id="'coupon-' + ${item.id}">
-                            <option value="-">미사용</option>
+                        <select class="form-control" th:id="'coupon-' + ${item.id}" th:name="'coupon-' + ${item.id}">
+                            <option value="0">미사용</option>
                             <option value="1">생일 축하 쿠폰 3000원</option>
                             <option value="2">소설 카테고리 5% 할인 쿠폰</option>
                             <option value="3">플래티넘 등급 20% 할인 쿠폰</option>
@@ -63,9 +62,8 @@
                     <td>
                         25000원
                     </td>
-                    <div th:id="'wrap-info-' + ${item.id}" hidden>
-                        a
-                    </div>
+                    <input type="text" th:id="'wrap-info-' + ${item.id}" hidden th:name="'wrap-info-' + ${item.id}" />
+                    <input type="number" th:id="'quantity-' + ${item.id}" hidden th:name="'quantity-' + ${item.id}" th:value="${item.quantity}" />
                 </tr>
             </tbody>
         </table>
@@ -74,11 +72,13 @@
 
         <h4>결제 정보</h4>
         <p>총 가격: <span id="totalPrice" th:text="'50,000'"></span>원</p>
-        <button class="btn btn-primary mb-4" id="paymentButton">결제하기</button>
+
+        <!-- 결제하기 버튼 -->
+        <button type="submit" class="btn btn-primary mb-4" id="payment-button">결제하기</button>
 
         <br>
         <br>
-    </div>
+    </form>
 
     <footer class="bg-dark text-white text-center py-3">
         © 2024 no24 Bookstore. All rights reserved.
@@ -94,9 +94,6 @@
             integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
 
     <script>
-        function openPopup() {
-        }
-
         document.querySelectorAll('[id^="wrap-input-"]').forEach(function(btn) {
             btn.addEventListener("click", function () {
                 // 팝업창을 열기 위한 코드
@@ -107,7 +104,7 @@
                     // 전달받은 값이 있다면 처리
                     if (event.data) {
                         console.log(event.data);
-                        document.getElementById('wrap-info-' + btn.id.split("-")[2]).innerHTML = event.data;
+                        document.getElementById('wrap-info-' + btn.id.split("-")[2]).value = event.data;
                     }
                 });
             });

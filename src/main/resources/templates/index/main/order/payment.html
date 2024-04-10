@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>no24 Bookstore</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" th:href="@{'/css/style.css'}" />
+    <script src="https://js.tosspayments.com/v1/payment-widget"></script>
+</head>
+<body>
+    <div th:replace="./nav/header.html"></div>
+    <div th:replace="./nav/menu.html"></div>
+
+    <!-- 카트 페이지 -->
+    <div class="container mb-4">
+        <h3 class="my-4"><strong>결제</strong></h3>
+
+        <hr>
+
+        <h4><strong id="order_title">주문 요약</strong></h4>
+        <p>주문 명 : <span th:text="${orderTitle}"></span></p>
+        <p>총 금액 : <span th:text="'50,000'"></span>원</p>
+        <p>배송지 : <span th:text="'대전광역시 유성구 궁동 99 정보화본부 N2-1 1303호'"></span></p>
+        <p id="order_id" th:text="${orderId}" hidden></p>
+        <p id="amount" th:text="${amount}" hidden></p>
+        <p id="customer_email" th:text="${customerEmail}" hidden></p>
+        <p id="customer_name" th:text="${customerName}" hidden></p>
+        <p id="customer_mobile_phone" th:text="${customerMobilePhone}" hidden></p>
+
+        <hr>
+
+        <!-- 결제 UI, 이용약관 UI 영역 -->
+        <div id="payment-method"></div>
+        <div id="agreement"></div>
+
+        <!-- 결제하기 버튼 -->
+        <button class="btn btn-primary mb-4" id="payment-button">결제하기</button>
+
+        <br>
+        <br>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-3">
+        © 2024 no24 Bookstore. All rights reserved.
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+            crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+            integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
+
+    <!-- toss payments API -->
+    <script>
+        const generateRandomString = () => window.btoa(Math.random()).slice(0, 20);
+
+        const coupon = document.getElementById("coupon-box");
+        const button = document.getElementById("payment-button");
+        const amount = 50000;
+
+        // 구매자의 고유 아이디를 불러와서 customerKey로 설정하세요.
+        // 이메일・전화번호와 같이 유추가 가능한 값은 안전하지 않습니다.
+        const widgetClientKey = "test_ck_6BYq7GWPVv96aly0eNE53NE5vbo1";
+        const customerKey = "BCE9ZbJcr4yZlEI8wwgWl";
+        // const paymentWidget = PaymentWidget(widgetClientKey, customerKey); // 회원 결제
+        const paymentWidget = PaymentWidget(widgetClientKey, PaymentWidget.ANONYMOUS) // 비회원 결제
+
+        const paymentMethodWidget = paymentWidget.renderPaymentMethods(
+            "#payment-method",
+            { value: amount },
+            { variantKey: "DEFAULT" }
+        );
+
+        paymentWidget.renderAgreement(
+            "#agreement",
+            { variantKey: "AGREEMENT" }
+        );
+
+        button.addEventListener("click", function () {
+            // 결제를 요청하기 전에 orderId, amount를 서버에 저장하세요.
+            // 결제 과정에서 악의적으로 결제 금액이 바뀌는 것을 확인하는 용도입니다.
+            paymentWidget.requestPayment({
+                orderId: document.getElementById("order_id").innerText,
+                orderName: document.getElementById("order_title").innerText,
+                successUrl: window.location.origin + "/order/success",
+                failUrl: window.location.origin + "/order/fail",
+                customerEmail: document.getElementById("customer_email").innerText,
+                customerName: document.getElementById("customer_name").innerText,
+                customerMobilePhone: document.getElementById("customer_mobile_phone").innerText
+            });
+        });
+    </script>
+
+    <script>
+        document.querySelectorAll('[id^="wrap-input-"]').forEach(function(btn) {
+            btn.addEventListener("click", function () {
+                // 팝업창을 열기 위한 코드
+                let popup = window.open('/order/input/wrap', 'popup', 'width=800, height=500');
+
+                // 팝업창이 닫힐 때 값을 전달받기 위한 이벤트 리스너
+                window.addEventListener('message', function (event) {
+                    // 전달받은 값이 있다면 처리
+                    if (event.data) {
+                        console.log(event.data);
+                        document.getElementById('wrap-info-' + btn.id.split("-")[2]).innerHTML = event.data;
+                    }
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>
