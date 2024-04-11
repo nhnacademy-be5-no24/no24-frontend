@@ -65,6 +65,8 @@ public class PaymentController {
             // todo: 총 금액 계산 Logic 필요. (Shop service 사용)
         }
 
+        System.out.println(itemList);
+
         String orderId = generateRandomString();
 
         try {
