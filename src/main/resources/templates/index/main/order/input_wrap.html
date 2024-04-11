@@ -104,20 +104,16 @@
 
             rows.forEach(function (row) {
                 let wrap = row.querySelector('.packaging-select');
-                let wrap_id = wrap.options[wrap.selectedIndex].value;
-                let quantity = row.querySelector('.quantity').value;
-
-                console.log(wrap_id + ": " + quantity);
+                let wrap_id = Number(wrap.options[wrap.selectedIndex].value);
+                let quantity = Number(row.querySelector('.quantity').value);
 
                 let item = {
-                    wrap_id: wrap_id,
+                    wrapId: wrap_id,
                     quantity: quantity
                 };
 
                 arr.push(item);
             });
-
-            console.log(arr);
 
             // 메인 페이지로 값을 전달
             window.opener.postMessage(JSON.stringify(arr), '*');
