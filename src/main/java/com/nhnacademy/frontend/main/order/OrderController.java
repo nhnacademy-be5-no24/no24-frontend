@@ -125,7 +125,7 @@ public class OrderController {
                 throw new RuntimeException("Can not load information");
             }
 
-//            System.out.println(value);
+            System.out.println(value);
 
             // todo: 주문 정보 확인 후 Shop service에서 쿠폰 사용 이력, 주문 이력, 책 수량, 포인트 적립 등 로직 수행 필요
 

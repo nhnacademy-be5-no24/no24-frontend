@@ -85,10 +85,36 @@ public class AdminController {
      * @return mav
      */
     @PostMapping("/book/modify/{bookIsbn}")
-    public ModelAndView saveManageBook(@PathVariable String bookIsbn, HttpServletRequest request) {
+    public ModelAndView modifyBook(@PathVariable String bookIsbn, HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("redirect:/admin/book");
 
         // todo: 저장 알고리즘 구현, modify_book.html name 수정 필요.
+
+        return mav;
+    }
+
+    /**
+     * get creating book page
+     * @Param none
+     * @return mav
+     */
+    @GetMapping("/book/add")
+    public ModelAndView getSaveBookPage() {
+        ModelAndView mav = new ModelAndView("index/admin/add_book");
+
+        return mav;
+    }
+
+    /**
+     * get creating book page
+     * @Param none
+     * @return mav
+     */
+    @PostMapping("/book/add")
+    public ModelAndView saveBook(HttpServletRequest request) {
+        ModelAndView mav = new ModelAndView("redirect:/admin/book");
+
+        // todo: 저장 알고리즘 구현, add_book.html name 수정 필요.
 
         return mav;
     }
