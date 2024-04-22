@@ -1,4 +1,4 @@
-package com.nhnacademy.shop.cart.dto.response;
+package com.nhnacademy.frontend.main.cart.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -11,9 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class CartResponseDto {
-    @JsonProperty("cart_id")
-    private Long cartId;
-
     @JsonProperty("book_isbn")
     private String bookIsbn;
 
@@ -29,12 +26,9 @@ public class CartResponseDto {
     @JsonProperty("book_status")
     private int bookStatus;
 
-//    @JsonProperty("book_quantity")
-//    private Long bookQuantity;
+    @JsonProperty("book_quantity")
+    private Long bookQuantity;  // 도서 구매 수량
 
     @JsonProperty("book_image")
     private String bookImage;
-
-    @JsonProperty("customer_no")
-    private Long customerNo;
 }
