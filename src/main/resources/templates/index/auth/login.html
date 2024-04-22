@@ -19,10 +19,10 @@
                 <div class="card mt-5">
                     <div class="card-body">
                         <h5 class="card-title">로그인</h5>
-                        <form method="post" action="/login">
+                        <form name="LoginDto" method="post" action="/login">
                             <div class="form-group">
                                 <label for="id">아이디</label>
-                                <input type="text" class="form-control" id="id" name="id" placeholder="아이디">
+                                <input type="text" class="form-control" id="id" name="username" placeholder="아이디">
                             </div>
                             <div class="form-group">
                                 <label for="password">비밀번호</label>
@@ -42,7 +42,7 @@
             <div class="col-md-4 offset-md-4">
                 <p style="margin-bottom: 5px">회원이 아니신가요?</p>
                 <!-- 회원가입 버튼 -->
-                <a href="#" class="btn btn-secondary btn-block">회원가입</a>
+                <a href="/registerPage" class="btn btn-secondary btn-block">회원가입</a>
             </div>
         </div>
         <div class="row mt-2">
