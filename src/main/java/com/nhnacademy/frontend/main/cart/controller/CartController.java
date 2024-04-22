@@ -72,18 +72,6 @@ public class CartController {
 
         hashOperations.put("cart", customerId, cart);
 
-//        CartResponseDto cartResponseDto = CartResponseDto.builder()
-//                // todo: 여기서 Book Entity에 대한 것들이 필요 => restTemplate 사용해서 가져오는 방법밖에 없음
-//                .bookIsbn(cartRequestDto.getBookIsbn())
-//                .bookTitle("test")
-//                .bookFixedPrice(20000)
-//                .bookSalePrice(19000)
-//                .bookStatus(0)
-//                .bookQuantity(cartRequestDto.getBookQuantity())
-//                .bookImage("1234.png")
-//                .build();
-
-//        return ResponseEntity.ok(cartResponseDto);
         return ResponseEntity.ok(customerId + "의 장바구니에 " + cartRequestDto.getBookIsbn() + "이/가 " + cartRequestDto.getBookQuantity() + "개 추가되었습니다.");
     }
 }
