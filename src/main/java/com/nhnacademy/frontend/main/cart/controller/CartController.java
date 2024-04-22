@@ -30,7 +30,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CartController {
     private final RedisTemplate<String, Object> redisTemplate;
-//    private final CookieUtils cookieUtils;
+    //    private final CookieUtils cookieUtils;
     private static final ObjectMapper mapper = new ObjectMapper();
 
     // todo 0: customerId는 cookie를 통해서 가져올 예정
@@ -73,5 +73,33 @@ public class CartController {
         hashOperations.put("cart", customerId, cart);
 
         return ResponseEntity.ok(customerId + "의 장바구니에 " + cartRequestDto.getBookIsbn() + "이/가 " + cartRequestDto.getBookQuantity() + "개 추가되었습니다.");
+    }
+
+    /**
+     * [PUT /cart/update/{customerId}]
+     * 사용자의 action으로 장바구니 상품 수량이 변경되는 경우
+     */
+    @PutMapping("/update/{customerId}")
+    public ResponseEntity<String> updateCart(@PathVariable String customerId, @RequestBody CartRequestDto cartRequestDto) {
+        String bookIsbn = cartRequestDto.getBookIsbn();
+        Long newQuantity = cartRequestDto.getBookQuantity();
+
+        HashOperations<String, String, Cart> hashOperations = redisTemplate.opsForHash();
+        Cart cart = hashOperations.get("cart", customerId);
+
+        if (cart != null) {
+            for (Cart.Book book : cart.getBooks()) {
+                if (book.getIsbn().equals(bookIsbn)) {
+                    book.setQuantity(newQuantity);
+                    break;
+                }
+            }
+
+            hashOperations.put("cart", customerId, cart);
+
+            return ResponseEntity.ok("장바구니 상품 수량이 성공적으로 업데이트 되었습니다.");
+        } else {
+            throw new CartNotFoundException(customerId);
+        }
     }
 }

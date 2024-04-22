@@ -208,6 +208,34 @@
             totalValue.innerHTML = totalPrice;
         }
 
+        // todo: 상품 수량 업데이트 하는 함수
+        // 상품 수량을 업데이트 하는 함수
+        function updateQuantity(itemId, newQuantity) {
+            // todo: customerId 가져오기 => jsessionId
+            // var customerId = {함수 정의}
+
+            fetch('/cart/update/{customerId}', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'customerId': customerId // customerId를 헤더에 추가
+                },
+                body : JSON.stringify({
+                    book_isbn: itemId,
+                    quantity: newQuantity
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("수량 업데이트 실패!");
+                    }
+                    console.log("수량 업데이트 성공!");
+                })
+                .catch(error => {
+                    console.error("수량 업데이트 error : " + error);
+                })
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             // 모든 증가 버튼에 대한 이벤트 리스너 추가
             document.querySelectorAll('[id^="increaseQty-"]').forEach(function(button) {
@@ -224,6 +252,10 @@
                         quantityInput.value = currentQuantity + 1;
                     }
 
+                    // 변경된 수량
+                    var newQuantity = parseInt(quantityInput.value);
+
+                    updateQuantity(itemId, newQuantity);
                     updateTotalPrice();
                 });
             });
@@ -242,6 +274,10 @@
                         quantityInput.value = currentQuantity - 1;
                     }
 
+                    // 변경된 수량
+                    var newQuantity = parseInt(quantityInput.value);
+
+                    updateQuantity(itemId, newQuantity);
                     updateTotalPrice();
                 });
             });
