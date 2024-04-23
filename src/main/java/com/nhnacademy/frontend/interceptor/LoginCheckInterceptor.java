@@ -41,6 +41,7 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         String refreshToken = (String) redisTemplate.opsForHash().get(jSessionId, "RefreshToken");
 
         if(token == null || token.equals("")) {
+            response.sendRedirect("/login");
             return false;
         }
 
