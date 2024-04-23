@@ -61,9 +61,9 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-1 d-flex align-items-center justify-content-center">
+                                    <div class="deleteCart">
                                         <!-- 삭제 버튼 추가 -->
-                                        <button type="button" class="btn btn-danger delete-button" th:attr="data-item-id=${item.id}">삭제</button>
+                                        <button type="button" class="btn btn-danger delete-button" th:attr="data-item-id=${item.id}">X</button>
                                     </div>
                                 </div>
                             </div>
@@ -218,7 +218,7 @@
             // todo: customerId 가져오기 => jsessionId
             // var customerId = {함수 정의}
 
-            fetch('/cart/update/{customerId}', {
+            fetch('/cart/update/' + customerId, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -300,6 +300,36 @@
                     updateTotalPrice();
                 });
             });
+
+            // 장바구니 삭제
+            document.addEventListener("DOMContentLoaded", function() {
+                // 삭제 버튼에 대한 클릭 이벤트 처리
+                document.querySelectorAll('.delete-button').forEach(function(button) {
+                    button.addEventListener('click', function() {
+                        var itemId = this.getAttribute('data-item-id');
+                        deleteCartBook(customerId, itemId);
+                    });
+                });
+            });
+
+            function deleteCartBook(customerId, bookIsbn) {
+                fetch('/cart/deleteOne/' + customerId + '?bookIsbn=' + bookIsbn, {
+                    method: 'DELETE'
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("상품 삭제 실패!");
+                        }
+                        console.log("상품 삭제 성공!");
+                        // // 삭제 성공 시 화면에서 해당 상품 제거
+                        // var itemElement = document.querySelector('[data-item-id="' + itemId + '"]').closest('.col-md-12');
+                        // itemElement.remove();
+                        updateTotalPrice();
+                    })
+                    .catch(error => {
+                        console.error("상품 삭제 error : " + error);
+                    });
+            }
         });
     </script>
 </body>
