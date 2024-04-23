@@ -4,12 +4,15 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.reflect.TypeToken;
 import com.nhnacademy.frontend.item.ItemDto;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.security.SecureRandom;
 import java.util.*;
 
@@ -25,8 +28,17 @@ import redis.clients.jedis.Jedis;
 @RestController
 @RequestMapping("/payment")
 public class PaymentController {
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    public PaymentController(RedisTemplate<String, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+
     @PostMapping
     public ModelAndView getPaymentPage(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        String jSessionId = session.getId();
+
         Gson gson = new Gson();
         List<ItemDto> itemList = new ArrayList<>();
         Set<String> itemIdList = new HashSet<>();
@@ -70,7 +82,7 @@ public class PaymentController {
         String orderId = generateRandomString();
 
         try {
-            saveOrderInRedis(orderId, itemList);
+            saveOrderInRedis(jSessionId, orderId, itemList);
         } catch(JsonProcessingException e) {
             System.out.println("error: " + e);
         }
@@ -92,20 +104,9 @@ public class PaymentController {
      * @Param String orderId
      * @Param List<ItemDto> itemDtoList
      */
-    public void saveOrderInRedis(String orderId, List<ItemDto> itemDtoList) throws JsonProcessingException {
-        // Redis 서버에 연결
-        Jedis jedis = new Jedis("133.186.223.228", 6379);
-        jedis.auth("*N2vya7H@muDTwdNMR!"); // 비밀번호 인증
-
-        jedis.select(41);
-
-        ObjectMapper mapper = new ObjectMapper();
-
-        // 정보 저장
-        jedis.setex(orderId, 300, mapper.writeValueAsString(itemDtoList));
-
-        // 연결 종료
-        jedis.close();
+    public void saveOrderInRedis(String jSessionId, String orderId, List<ItemDto> itemDtoList) throws JsonProcessingException {
+        HashOperations<String, String, List<ItemDto>> hashOperations = redisTemplate.opsForHash();
+        hashOperations.put(jSessionId, orderId, itemDtoList);
     }
 
 
