@@ -330,6 +330,40 @@
                         console.error("상품 삭제 error : " + error);
                     });
             }
+
+            // 결제하기 버튼 클릭 시, 선택된 상품 정보 redis에 저장
+            document.addEventListener("DOMContentLoaded", function() {
+                document.getElementById('submit-button').addEventListener('click', function () {
+                    var selectedBooks = [];
+                    document.querySelectorAll('.item-checkbox').forEach(function (checkbox) {
+                        var bookIsbn = checkbox.getAttribute('data-item-id');
+                        var quantity = parseInt(document.getElementById('quantity-' + itemId).value);
+                        selectedBooks.push({bookIsbn: bookIsbn, quantity: quantity});
+                    });
+
+                    createOrder(selectedBooks);
+                });
+            });
+
+            function createOrder(books) {
+                fetch('/cartOrder/create/redis', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'customerId': customerId // customerId를 헤더에 추가
+                    },
+                    body: JSON.stringify({customerId: customerId, book: books})
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('주문 생성 실패!');
+                        }
+                        return response.json();
+                    })
+                    .catch(error => {
+                        console.error('주문 생성 오류 : ' + error);
+                    })
+            }
         });
     </script>
 </body>
