@@ -34,6 +34,7 @@ public class CartController {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     // todo 0: customerId는 cookie를 통해서 가져올 예정
+
     /**
      * [POST /cart/create]
      * 장바구니에 상품을 추가하는 Post 메소드
@@ -113,7 +114,7 @@ public class CartController {
             Cart cart = hashOperations.get("cart", customerId);
             cart.getBooks().removeIf(book -> book.getIsbn().equals(bookIsbn));
             hashOperations.put("cart", customerId, cart);
-            return ResponseEntity.ok(bookIsbn) + "이 장바구니에서 삭제되었습니다.");
+            return ResponseEntity.ok(bookIsbn + "이 장바구니에서 삭제되었습니다.");
         } else {
             throw new CartNotFoundException(customerId);
         }
