@@ -1,10 +1,11 @@
 package com.nhnacademy.frontend.interceptor;
 
 import com.nhnacademy.frontend.auth.dto.LoginDto;
+import com.nhnacademy.frontend.auth.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -12,6 +13,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,6 +39,10 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         String jSessionId = session.getId();
         String token = (String) redisTemplate.opsForHash().get(jSessionId, "Authorization");
         String refreshToken = (String) redisTemplate.opsForHash().get(jSessionId, "RefreshToken");
+
+        if(token == null || token.equals("")) {
+            return false;
+        }
 
         return true;
     }
