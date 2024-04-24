@@ -215,14 +215,14 @@
         // todo: 상품 수량 업데이트 하는 함수
         // 상품 수량을 업데이트 하는 함수
         function updateQuantity(itemId, newQuantity) {
-            // todo: customerId 가져오기 => jsessionId
-            // var customerId = {함수 정의}
+            // todo: customerNo 가져오기
+            // var customerNo = {함수 정의}
 
-            fetch('/cart/update/' + customerId, {
+            fetch('shop/cart/update/', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'customerId': customerId // customerId를 헤더에 추가
+                    'customerNo': customerNo
                 },
                 body : JSON.stringify({
                     book_isbn: itemId,
@@ -307,13 +307,13 @@
                 document.querySelectorAll('.delete-button').forEach(function(button) {
                     button.addEventListener('click', function() {
                         var itemId = this.getAttribute('data-item-id');
-                        deleteCartBook(customerId, itemId);
+                        deleteCartBook(customerNo, itemId);
                     });
                 });
             });
 
-            function deleteCartBook(customerId, bookIsbn) {
-                fetch('/cart/deleteOne/' + customerId + '?bookIsbn=' + bookIsbn, {
+            function deleteCartBook(customerNo, bookIsbn) {
+                fetch('/shop/cart/deleteOne/' + customerNo + '?bookIsbn=' + bookIsbn, {
                     method: 'DELETE'
                 })
                     .then(response => {
@@ -346,13 +346,13 @@
             });
 
             function createOrder(books) {
-                fetch('/cartOrder/create/redis', {
+                fetch('/cartOrder/create', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'customerId': customerId // customerId를 헤더에 추가
+                        'customerNo': customerNo // customerId를 헤더에 추가
                     },
-                    body: JSON.stringify({customerId: customerId, book: books})
+                    body: JSON.stringify({customerNo: customerNo, book: books})
                 })
                     .then(response => {
                         if (!response.ok) {
