@@ -2,9 +2,9 @@ package com.nhnacademy.frontend.main.cartOrder.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.frontend.main.cart.domain.Cart;
-import com.nhnacademy.frontend.main.cart.dto.request.CartRequestDto;
 import com.nhnacademy.frontend.main.cart.exception.CartNotFoundException;
 import com.nhnacademy.frontend.main.cartOrder.domain.CartOrder;
+import com.nhnacademy.frontend.main.cartOrder.dto.request.CartOrderRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -26,15 +26,15 @@ public class CartOrderController {
      * FE에서 선택한 상품만 받아와 주문 내역에 등록하는 Post 메소드
      */
     @PostMapping("/create")
-    public ResponseEntity<String> addToCart(@RequestHeader("customerNo") Long customerNo, @RequestBody List<CartRequestDto> cartRequestDtoList) {
+    public ResponseEntity<String> addToCart(@RequestHeader("customerNo") Long customerNo, @RequestBody List<CartOrderRequestDto> cartOrderRequestDtoList) {
         HashOperations<String, String, CartOrder> hashOperations = redisTemplate.opsForHash();
         CartOrder order = new CartOrder();
         order.setCustomerNo(customerNo);
 
-        for (CartRequestDto cartRequestDto : cartRequestDtoList) {
+        for (CartOrderRequestDto cartOrderRequestDto : cartOrderRequestDtoList) {
             CartOrder.Book book = CartOrder.Book.builder()
-                    .isbn(cartRequestDto.getBookIsbn())
-                    .quantity(cartRequestDto.getBookQuantity())
+                    .isbn(cartOrderRequestDto.getBookIsbn())
+                    .quantity(cartOrderRequestDto.getBookQuantity())
                     .build();
             order.getBooks().add(book);
         }
