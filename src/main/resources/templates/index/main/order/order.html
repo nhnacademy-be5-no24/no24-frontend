@@ -110,6 +110,46 @@
             });
         });
 
+        document.getElementById("payment-button").addEventListener("click", function(event) {
+            var recipientAddress = document.querySelector("p:nth-child(8) span").innerText;
+            var price = document.getElementById("totalPrice").innerText;
+            var bookTitle = "";
+            var totalQuantity = 0;
+
+            document.querySelectorAll("tbody tr").forEach(function(row, index) {
+                if (index === 0) {
+                    bookTitle = row.querySelector("td:nth-child(1)").innerText;
+                }
+                totalQuantity += parseInt(row.querySelector("td:nth-child(2)").innerText);
+            });
+
+            var orderData = {
+                firstBookTitle: bookTitle,
+                numberOfBook: totalQuantity,
+                totalPrice: price,
+                deliveryAddress: recipientAddress
+            }
+
+            fetch("/order/create", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "customerNo" : customerNo
+                },
+                body: JSON.stringify(orderData)
+            })
+                .then(function(response) {
+                    if (response.ok) {
+                        console.log("주문 저장 성공!");
+                    } else {
+                        console.error("주문 저장 실패!");
+                        // 실패 시 처리 코드 작성
+                    }
+                })
+                .catch(function(error) {
+                    console.error("주문 저장 중 오류 발생:", error);
+                });
+        });
     </script>
 </body>
 </html>

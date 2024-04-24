@@ -1,14 +1,15 @@
 package com.nhnacademy.frontend.main.order;
 
+import com.nhnacademy.frontend.main.order.domain.Order;
+import com.nhnacademy.frontend.main.order.dto.request.OrderRequestDto;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import redis.clients.jedis.Jedis;
 
@@ -34,6 +35,8 @@ import java.util.List;
 @Controller
 @RequestMapping("/order")
 public class OrderController {
+    private final RedisTemplate<String, Object> redisTemplate;
+
     // todo: delete example Class
     private class Item {
         public String id;
@@ -201,5 +204,25 @@ public class OrderController {
 
         // 연결 종료
         jedis.close();
+    }
+
+    /**
+     * [POST /order/create]
+     *
+     * 주문 내역을 redis에 저장하는 POST 메서드
+     */
+    @PostMapping("/create")
+    public ResponseEntity<String> saveOrder(@RequestHeader("customerNo") Long customerNo, @RequestBody OrderRequestDto orderRequestDto) {
+
+        HashOperations<String, String, Order> hashOperations = redisTemplate.opsForHash();
+        Order order = new Order();
+        order.setCustomerNo(customerNo);
+        order.setOrderName(orderRequestDto.getFirstBookTitle() + " 외 " + orderRequestDto.getNumberOfBook() + "권");
+        order.setTotalPrice(orderRequestDto.getTotalPrice());
+        order.setDeliveryAddress(orderRequestDto.getDeliveryAddress());
+
+        hashOperations.put("order", String.valueOf(customerNo), order);
+
+        return ResponseEntity.ok(customerNo + "의 주문 내역이 추가되었습니다.");
     }
 }
