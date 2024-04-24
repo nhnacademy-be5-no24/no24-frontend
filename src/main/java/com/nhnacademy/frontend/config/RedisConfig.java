@@ -28,7 +28,7 @@ public class RedisConfig {
 
     @Value("${spring.redis.database}")
     private int dbIndex;
-
+  
     @Value("${spring.redis.password}")
     private String password;
 

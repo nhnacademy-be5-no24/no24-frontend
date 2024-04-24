@@ -61,6 +61,10 @@
                                             </div>
                                         </div>
                                     </div>
+                                    <div class="deleteCart">
+                                        <!-- 삭제 버튼 추가 -->
+                                        <button type="button" class="btn btn-danger delete-button" th:attr="data-item-id=${item.id}">X</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -208,6 +212,34 @@
             totalValue.innerHTML = totalPrice;
         }
 
+        // todo: 상품 수량 업데이트 하는 함수
+        // 상품 수량을 업데이트 하는 함수
+        function updateQuantity(itemId, newQuantity) {
+            // todo: customerNo 가져오기
+            // var customerNo = {함수 정의}
+
+            fetch('shop/cart/update/', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'customerNo': customerNo
+                },
+                body : JSON.stringify({
+                    book_isbn: itemId,
+                    quantity: newQuantity
+                })
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("수량 업데이트 실패!");
+                    }
+                    console.log("수량 업데이트 성공!");
+                })
+                .catch(error => {
+                    console.error("수량 업데이트 error : " + error);
+                })
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             // 모든 증가 버튼에 대한 이벤트 리스너 추가
             document.querySelectorAll('[id^="increaseQty-"]').forEach(function(button) {
@@ -224,6 +256,10 @@
                         quantityInput.value = currentQuantity + 1;
                     }
 
+                    // 변경된 수량
+                    var newQuantity = parseInt(quantityInput.value);
+
+                    updateQuantity(itemId, newQuantity);
                     updateTotalPrice();
                 });
             });
@@ -242,6 +278,10 @@
                         quantityInput.value = currentQuantity - 1;
                     }
 
+                    // 변경된 수량
+                    var newQuantity = parseInt(quantityInput.value);
+
+                    updateQuantity(itemId, newQuantity);
                     updateTotalPrice();
                 });
             });
@@ -260,6 +300,70 @@
                     updateTotalPrice();
                 });
             });
+
+            // 장바구니 삭제
+            document.addEventListener("DOMContentLoaded", function() {
+                // 삭제 버튼에 대한 클릭 이벤트 처리
+                document.querySelectorAll('.delete-button').forEach(function(button) {
+                    button.addEventListener('click', function() {
+                        var itemId = this.getAttribute('data-item-id');
+                        deleteCartBook(customerNo, itemId);
+                    });
+                });
+            });
+
+            function deleteCartBook(customerNo, bookIsbn) {
+                fetch('/shop/cart/deleteOne/' + customerNo + '?bookIsbn=' + bookIsbn, {
+                    method: 'DELETE'
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("상품 삭제 실패!");
+                        }
+                        console.log("상품 삭제 성공!");
+                        // // 삭제 성공 시 화면에서 해당 상품 제거
+                        // var itemElement = document.querySelector('[data-item-id="' + itemId + '"]').closest('.col-md-12');
+                        // itemElement.remove();
+                        updateTotalPrice();
+                    })
+                    .catch(error => {
+                        console.error("상품 삭제 error : " + error);
+                    });
+            }
+
+            // 결제하기 버튼 클릭 시, 선택된 상품 정보 redis에 저장
+            document.addEventListener("DOMContentLoaded", function() {
+                document.getElementById('submit-button').addEventListener('click', function () {
+                    var selectedBooks = [];
+                    document.querySelectorAll('.item-checkbox').forEach(function (checkbox) {
+                        var bookIsbn = checkbox.getAttribute('data-item-id');
+                        var quantity = parseInt(document.getElementById('quantity-' + itemId).value);
+                        selectedBooks.push({bookIsbn: bookIsbn, quantity: quantity});
+                    });
+
+                    createOrder(selectedBooks);
+                });
+            });
+
+            function createOrder(books) {
+                fetch('/cartOrder/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'customerNo': customerNo // customerId를 헤더에 추가
+                    },
+                    body: JSON.stringify({customerNo: customerNo, book: books})
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('주문 생성 실패!');
+                        }
+                        return response.json();
+                    })
+                    .catch(error => {
+                        console.error('주문 생성 오류 : ' + error);
+                    })
+            }
         });
     </script>
 </body>
