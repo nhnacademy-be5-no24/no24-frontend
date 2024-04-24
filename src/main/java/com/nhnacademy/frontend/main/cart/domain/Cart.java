@@ -17,7 +17,7 @@ import java.util.List;
 @RedisHash(value = "cart")
 public class Cart implements Serializable {
     @Id
-    private String customerId;
+    private Long customerNo;
 
     private List<Book> books = new ArrayList<>();
 
@@ -30,6 +30,6 @@ public class Cart implements Serializable {
         private String isbn;
 
         @JsonProperty("book_quantity")
-        private Long quantity;  // 도서 구매 수량
+        private int quantity;  // 도서 구매 수량
     }
 }
