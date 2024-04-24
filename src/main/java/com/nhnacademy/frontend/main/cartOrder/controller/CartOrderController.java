@@ -39,7 +39,7 @@ public class CartOrderController {
             order.getBooks().add(book);
         }
 
-        hashOperations.put("order", String.valueOf(customerNo), order);
+        hashOperations.put("cartOrder", String.valueOf(customerNo), order);
 
         return ResponseEntity.ok("주문 내역에 " + customerNo + "의 주문이 추가되었습니다.");
     }
@@ -52,8 +52,8 @@ public class CartOrderController {
     public ResponseEntity<String> deleteOrder(@PathVariable Long customerNo) {
         HashOperations<String, String, Cart> hashOperations = redisTemplate.opsForHash();
 
-        if (hashOperations.hasKey("order", customerNo)) {
-            hashOperations.delete("order", customerNo);
+        if (hashOperations.hasKey("cartOrder", customerNo)) {
+            hashOperations.delete("cartOrder", customerNo);
             return ResponseEntity.ok(customerNo + "의 주문 내역이 삭제되었습니다.");
         } else {
             throw new CartNotFoundException(customerNo);
