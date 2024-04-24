@@ -8,10 +8,10 @@
 <!--                        <strong><a class="nav-link text-muted current" href="#">도서</a></strong>-->
                         <strong><a id="book-nav" th:class="${#httpServletRequest.requestURI.contains('/book') ? 'nav-link text-muted current' : (#httpServletRequest.requestURI.equals('/') ? 'nav-link text-muted current' : 'nav-link text-muted')}">도서</a></strong>
                         <div class="sub-menu navbar-nav">
-                            <strong><a class="nav-link text-muted" href="/book/1">국내도서</a></strong>
-                            <strong><a class="nav-link text-muted" href="/book/2">외국도서</a></strong>
-                            <strong><a class="nav-link text-muted" href="/book/3">신간도서</a></strong>
-                            <strong><a class="nav-link text-muted" href="/book/4">인기도서</a></strong>
+                            <strong><a class="nav-link text-muted" th:href="'/book/' + ${domesticCategoryId}">국내도서</a></strong>
+<!--                            <strong><a class="nav-link text-muted" th:href="'/book/' + ${domesticCategoryId}">외국도서</a></strong>-->
+<!--                            <strong><a class="nav-link text-muted" th:href="'/book/' + ${domesticCategoryId}">신간도서</a></strong>-->
+<!--                            <strong><a class="nav-link text-muted" th:href="'/book/' + ${domesticCategoryId}">인기도서</a></strong>-->
                         </div>
                         <strong><a th:class="${#httpServletRequest.requestURI.contains('/cart') ? 'nav-link text-muted current' : 'nav-link text-muted'}" href="/cart">장바구니</a></strong>
                         <strong><a class="nav-link text-muted" href="/info/order">주문내역</a></strong>
