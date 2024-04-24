@@ -2,6 +2,7 @@ package com.nhnacademy.frontend.main.order;
 
 import com.nhnacademy.frontend.main.order.domain.Order;
 import com.nhnacademy.frontend.main.order.dto.request.OrderRequestDto;
+import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -34,6 +35,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/order")
+@RequiredArgsConstructor
 public class OrderController {
     private final RedisTemplate<String, Object> redisTemplate;
 
