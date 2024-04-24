@@ -38,7 +38,6 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/order")
-@RequiredArgsConstructor
 public class OrderController {
     private final RedisTemplate<String, Object> redisTemplate;
 

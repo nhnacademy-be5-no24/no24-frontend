@@ -42,6 +42,14 @@ public class BookController {
     @GetMapping("/book/{categoryId}/{bookIsbn}")
     public ModelAndView getBookPage(@PathVariable("categoryId") Long categoryId,
                                     @PathVariable("bookIsbn") Long bookIsbn) {
+        // 하위 카테고리 조회
+        ResponseEntity<ParentCategoryResponseDto> categoryResponseEntity = restTemplate.getForEntity(
+                requestUrl + ":" + port +  "/shop/categories/parents/" + categoryId,
+                ParentCategoryResponseDto.class
+        );
+
+        ParentCategoryResponseDto parentCategoryResponseDto = categoryResponseEntity.getBody();
+
         // 부모 카테고리 조회
         ResponseEntity<CategoryInfoResponseList> parentCategoryResponseEntity = restTemplate.getForEntity(
                 requestUrl + ":" + port +  "/shop/categories/all-parents/" + categoryId,
@@ -61,6 +69,7 @@ public class BookController {
 
         ModelAndView mav = new ModelAndView("index/main/book/book");
 
+        mav.addObject("childCategories", parentCategoryResponseDto.getChildCategories());
         mav.addObject("allParentCategories", categoryInfoResponseDtoList);
         mav.addObject("domesticCategoryId", domesticCategoryId);
         mav.addObject("bookInfo", bookResponseDto);
