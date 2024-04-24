@@ -5,31 +5,41 @@
             <div class="row menu-nav justify-content-between">
                 <div class="col-xs-6">
                     <div class="row">
-                        <strong><a class="nav-link text-muted current" href="#">도서</a></strong>
+<!--                        <strong><a class="nav-link text-muted current" href="#">도서</a></strong>-->
+                        <strong><a id="book-nav" th:class="${#httpServletRequest.requestURI.contains('/book') ? 'nav-link text-muted current' : (#httpServletRequest.requestURI.equals('/') ? 'nav-link text-muted current' : 'nav-link text-muted')}">도서</a></strong>
                         <div class="sub-menu navbar-nav">
-                            <strong><a class="nav-link text-muted" href="/book/1">국내도서</a></strong>
-                            <strong><a class="nav-link text-muted" href="/book/2">외국도서</a></strong>
-                            <strong><a class="nav-link text-muted" href="/book/3">신간도서</a></strong>
-                            <strong><a class="nav-link text-muted" href="/book/4">인기도서</a></strong>
+                            <strong><a class="nav-link text-muted" th:href="'/book/' + ${domesticCategoryId}">국내도서</a></strong>
+<!--                            <strong><a class="nav-link text-muted" th:href="'/book/' + ${domesticCategoryId}">외국도서</a></strong>-->
+<!--                            <strong><a class="nav-link text-muted" th:href="'/book/' + ${domesticCategoryId}">신간도서</a></strong>-->
+<!--                            <strong><a class="nav-link text-muted" th:href="'/book/' + ${domesticCategoryId}">인기도서</a></strong>-->
                         </div>
-                        <strong><a class="nav-link text-muted" href="/cart">장바구니</a></strong>
+                        <strong><a th:class="${#httpServletRequest.requestURI.contains('/cart') ? 'nav-link text-muted current' : 'nav-link text-muted'}" href="/cart">장바구니</a></strong>
                         <strong><a class="nav-link text-muted" href="/info/order">주문내역</a></strong>
-                        <strong><a class="nav-link text-muted" href="/coupon">쿠폰발급</a></strong>
+                        <strong><a th:class="${#httpServletRequest.requestURI.contains('/coupon') ? 'nav-link text-muted current' : 'nav-link text-muted'}" href="/coupon">쿠폰발급</a></strong>
                     </div>
                 </div>
                 <div class="col-xs-6 ml-auto">
                     <div class="row">
-                        <strong><a class="nav-link text-muted" href="/login">로그인</a></strong>
-                        <strong><a class="nav-link text-muted" href="/info">마이페이지</a></strong>
+                        <!-- 세션이 로그인되어 있는 경우 -->
+                        <th:block th:if="${@loginCheckInterceptor.isLoggedIn(#request.getSession().getId())}">
+                            <strong><a class="nav-link text-muted" href="/logout">로그아웃</a></strong>
+                        </th:block>
+                        <!-- 세션이 로그인되어 있지 않은 경우 -->
+                        <th:block th:unless="${@loginCheckInterceptor.isLoggedIn(#request.getSession().getId())}">
+                            <strong><a class="nav-link text-muted" href="/login">로그인</a></strong>
+                        </th:block>
+<!--                        <strong><a th:class="${#httpServletRequest.requestURI.contains('/login') ? 'nav-link text-muted current' : 'nav-link text-muted'}" href="/login">로그인</a></strong>-->
+<!--                        <strong><a th:class="${#httpServletRequest.requestURI.contains('/logout') ? 'nav-link text-muted current' : 'nav-link text-muted'}" href="/logout">로그아웃</a></strong>-->
+                        <strong><a th:class="${#httpServletRequest.requestURI.contains('/info') ? 'nav-link text-muted current' : 'nav-link text-muted'}" href="/info">마이페이지</a></strong>
                         <!-- todo: 관리자 전용. 예외처리 필요 -->
-                        <strong><a class="nav-link text-muted" href="/admin">관리자페이지</a></strong>
+                        <strong><a th:class="${#httpServletRequest.requestURI.contains('/admin') ? 'nav-link text-muted current' : 'nav-link text-muted'}" href="/admin">관리자페이지</a></strong>
                     </div>
                 </div>
             </div>
         </div>
         <script>
             document.addEventListener("DOMContentLoaded", function(){
-                const bookNav = document.querySelector('.nav-link[href="#"]');
+                const bookNav = document.querySelector('#book-nav');
                 const subMenu = document.querySelector('.sub-menu');
                 bookNav.addEventListener('mouseover', function(){
                     subMenu.style.display = 'flex';

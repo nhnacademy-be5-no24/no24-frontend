@@ -1,8 +1,11 @@
 package com.nhnacademy.frontend.main.order;
 
+
 import com.nhnacademy.frontend.main.order.domain.Order;
 import com.nhnacademy.frontend.main.order.dto.request.OrderRequestDto;
 import lombok.RequiredArgsConstructor;
+import com.nhnacademy.frontend.item.ItemDto;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -12,9 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import redis.clients.jedis.Jedis;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -54,6 +57,10 @@ public class OrderController {
             this.price = price;
             this.discount = discount;
         }
+    }
+
+    public OrderController(RedisTemplate<String, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
     }
 
     /**
@@ -110,7 +117,10 @@ public class OrderController {
     }
 
     @PostMapping(value = "/confirm")
-    public ResponseEntity<JSONObject> confirmPayment(@RequestBody String jsonBody) throws Exception {
+    public ResponseEntity<JSONObject> confirmPayment(@RequestBody String jsonBody, HttpServletRequest request) throws Exception {
+        HttpSession session = request.getSession();
+        String jSessionId = session.getId();
+
         JSONParser parser = new JSONParser();
         String orderId;
         String amount;
@@ -124,7 +134,7 @@ public class OrderController {
             amount = (String) requestData.get("amount");
 
             // redis에 저장된 주문 정보를 가져오는 로직.
-            String value = getOrderInRedis(orderId);
+            String value = getOrderInRedis(jSessionId, orderId);
 
             if(value == null) {
                 throw new RuntimeException("Can not load information");
@@ -135,9 +145,9 @@ public class OrderController {
             // todo: 주문 정보 확인 후 Shop service에서 쿠폰 사용 이력, 주문 이력, 책 수량, 포인트 적립 등 로직 수행 필요
 
             // todo: 로직 수행 이후, redis 내 orderId에 해당하는 정보 지우기.
-            deleteOrderInRedis(orderId);
+            deleteOrderInRedis(jSessionId, orderId);
 
-            System.out.println("after delete: " + getOrderInRedis(orderId));
+            System.out.println("after delete: " + getOrderInRedis(jSessionId, orderId));
         } catch (ParseException e) {
             throw new RuntimeException(e);
         };
@@ -178,34 +188,16 @@ public class OrderController {
     }
 
 
-    public String getOrderInRedis(String orderId) {
-        // Redis 서버에 연결
-        Jedis jedis = new Jedis("133.186.223.228", 6379);
-        jedis.auth("*N2vya7H@muDTwdNMR!"); // 패스워드 설정
-
-        jedis.select(41);
-
-        // Redis에서 특정 키에 저장된 값 불러오기
-        String value = jedis.get(orderId);
-
-        // 연결 종료
-        jedis.close();
+    public String getOrderInRedis(String jSessionId, String orderId) {
+        String value = (String) redisTemplate.opsForHash().get(jSessionId, orderId);
 
         return value;
     }
 
-    public void deleteOrderInRedis(String orderId) {
-        // Redis 서버에 연결
-        Jedis jedis = new Jedis("133.186.223.228", 6379);
-        jedis.auth("*N2vya7H@muDTwdNMR!"); // 패스워드 설정
+    public void deleteOrderInRedis(String jSessionId, String orderId) {
+        HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
 
-        jedis.select(41);
-
-        // 특정 키 삭제
-        jedis.del(orderId);
-
-        // 연결 종료
-        jedis.close();
+        hashOperations.delete(jSessionId, orderId);
     }
 
     /**
