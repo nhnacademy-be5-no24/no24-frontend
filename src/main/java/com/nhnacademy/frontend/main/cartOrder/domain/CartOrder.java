@@ -17,7 +17,7 @@ import java.util.List;
 @RedisHash(value = "cartOrder")
 public class CartOrder {
     @Id
-    private String customerId;
+    private Long customerNo;
 
     private List<Book> books = new ArrayList<>();
 

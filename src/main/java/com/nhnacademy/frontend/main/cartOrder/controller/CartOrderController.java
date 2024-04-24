@@ -22,14 +22,14 @@ public class CartOrderController {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     /**
-     * [POST /order/create/redis]
+     * [POST /cartOrder/create]
      * FE에서 선택한 상품만 받아와 주문 내역에 등록하는 Post 메소드
      */
-    @PostMapping("/create/redis")
-    public ResponseEntity<String> addToCart(@RequestHeader("customerId") String customerId, @RequestBody List<CartRequestDto> cartRequestDtoList) {
+    @PostMapping("/create")
+    public ResponseEntity<String> addToCart(@RequestHeader("customerNo") Long customerNo, @RequestBody List<CartRequestDto> cartRequestDtoList) {
         HashOperations<String, String, CartOrder> hashOperations = redisTemplate.opsForHash();
         CartOrder order = new CartOrder();
-        order.setCustomerId(customerId);
+        order.setCustomerNo(customerNo);
 
         for (CartRequestDto cartRequestDto : cartRequestDtoList) {
             CartOrder.Book book = CartOrder.Book.builder()
@@ -39,24 +39,24 @@ public class CartOrderController {
             order.getBooks().add(book);
         }
 
-        hashOperations.put("order", customerId, order);
+        hashOperations.put("order", String.valueOf(customerNo), order);
 
-        return ResponseEntity.ok("주문 내역에 " + customerId + "의 주문이 추가되었습니다.");
+        return ResponseEntity.ok("주문 내역에 " + customerNo + "의 주문이 추가되었습니다.");
     }
 
     /**
-     * [DELETE /order/delete/redis/{customerId}]
+     * [DELETE /cartOrder/delete/{customerNo}]
      * 결제 완료 후, redis에서 customerId의 주문 내역을 삭제하는 DELETE 메서드
      */
-    @DeleteMapping("/delete/redis/{customerId}")
-    public ResponseEntity<String> deleteOrder(@PathVariable String customerId) {
+    @DeleteMapping("/delete/{customerNo}")
+    public ResponseEntity<String> deleteOrder(@PathVariable Long customerNo) {
         HashOperations<String, String, Cart> hashOperations = redisTemplate.opsForHash();
 
-        if (hashOperations.hasKey("order", customerId)) {
-            hashOperations.delete("order", customerId);
-            return ResponseEntity.ok(customerId + "의 주문 내역이 삭제되었습니다.");
+        if (hashOperations.hasKey("order", customerNo)) {
+            hashOperations.delete("order", customerNo);
+            return ResponseEntity.ok(customerNo + "의 주문 내역이 삭제되었습니다.");
         } else {
-            throw new CartNotFoundException(customerId);
+            throw new CartNotFoundException(customerNo);
         }
     }
 }
