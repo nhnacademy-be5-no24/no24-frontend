@@ -1,6 +1,8 @@
 package com.nhnacademy.frontend.main.order;
 
 
+import com.nhnacademy.frontend.auth.dto.LoginDto;
+import com.nhnacademy.frontend.auth.dto.TokenDto;
 import com.nhnacademy.frontend.main.order.domain.Order;
 import com.nhnacademy.frontend.main.order.dto.request.OrderRequestDto;
 import lombok.RequiredArgsConstructor;
@@ -9,11 +11,14 @@ import com.nhnacademy.frontend.item.ItemDto;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +44,14 @@ import java.util.List;
 @Controller
 @RequestMapping("/order")
 public class OrderController {
+    @Value("${request.url}")
+    private String requestUrl;
+
+    @Value("${request.port}")
+    private String port;
+
     private final RedisTemplate<String, Object> redisTemplate;
+    private final RestTemplate restTemplate;
 
     // todo: delete example Class
     private class Item {
@@ -58,7 +70,8 @@ public class OrderController {
         }
     }
 
-    public OrderController(RedisTemplate<String, Object> redisTemplate) {
+    public OrderController(RestTemplate restTemplate, RedisTemplate<String, Object> redisTemplate) {
+        this.restTemplate = restTemplate;
         this.redisTemplate = redisTemplate;
     }
 
@@ -205,7 +218,31 @@ public class OrderController {
      * 주문 내역을 redis에 저장하는 POST 메서드
      */
     @PostMapping("/create")
-    public ResponseEntity<String> saveOrder(@RequestHeader("customerNo") Long customerNo, @RequestBody OrderRequestDto orderRequestDto) {
+    public ResponseEntity<String> saveOrder(@RequestBody OrderRequestDto orderRequestDto, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        String jSessionId = session.getId();
+
+        // get user information
+        HashOperations<String, String, String> authHashOperations = redisTemplate.opsForHash();
+        String authorization = authHashOperations.get(jSessionId, "Authorization");
+        String refreshToken = authHashOperations.get(jSessionId, "RefreshToken");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", authorization);
+        headers.add("RefreshToken", refreshToken);
+
+        // get customerNo
+        ResponseEntity<Long> responseEntity = restTemplate.postForEntity(
+                requestUrl + ":" + port +  "/auth/get/customerNo",
+                new HttpEntity<>(null, headers),
+                Long.class
+        );
+
+        if(responseEntity.getStatusCode() == HttpStatus.UNAUTHORIZED) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+
+        Long customerNo = responseEntity.getBody();
 
         HashOperations<String, String, Order> hashOperations = redisTemplate.opsForHash();
         Order order = new Order();
