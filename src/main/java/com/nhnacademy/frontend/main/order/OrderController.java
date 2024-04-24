@@ -3,8 +3,15 @@ package com.nhnacademy.frontend.main.order;
 
 import com.nhnacademy.frontend.auth.dto.LoginDto;
 import com.nhnacademy.frontend.auth.dto.TokenDto;
+import com.nhnacademy.frontend.book.dto.BookResponseDto;
+import com.nhnacademy.frontend.category.dto.CategoryInfoResponseList;
+import com.nhnacademy.frontend.main.cartOrder.domain.CartOrder;
+import com.nhnacademy.frontend.main.cartOrder.dto.request.CartOrderRequestDto;
+import com.nhnacademy.frontend.main.cartOrder.dto.request.CartPaymentRequestDto;
+import com.nhnacademy.frontend.main.cartOrder.dto.response.CartPaymentResponseDto;
 import com.nhnacademy.frontend.main.order.domain.Order;
 import com.nhnacademy.frontend.main.order.dto.request.OrderRequestDto;
+import com.nhnacademy.frontend.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import com.nhnacademy.frontend.item.ItemDto;
 
@@ -83,26 +90,56 @@ public class OrderController {
     public ModelAndView getOrderPage(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("index/main/order/order");
 
-        // Item Id와 갯수 추출
-        // todo: id -> Isbn으로 수정 필요
+        Long customerNo = AuthUtil.getCustomerNo(
+                requestUrl,
+                port,
+                request,
+                redisTemplate,
+                restTemplate
+        );
+
+        List<CartPaymentRequestDto.BookInfo> bookInfos = new ArrayList<>();
+
+        // Book Isbn과 개수 추출
+        // Book Info 저장.
         for (Iterator<String> it = request.getParameterNames().asIterator(); it.hasNext(); ) {
             String field = it.next();
 
             if(field.contains("item-checkbox-")) {
-                String itemId = field.split("-")[2];
+                String bookIsbn = field.split("-")[2];
 
-                System.out.println("item id(" + itemId + ") : " + request.getParameter("quantity-" + itemId));
+                // book info 수집.
+                ResponseEntity<BookResponseDto> bookResponseEntity = restTemplate.getForEntity(
+                        requestUrl + ":" + port +  "/shop/books/isbn/" + bookIsbn,
+                        BookResponseDto.class
+                );
+
+                BookResponseDto bookResponseDto = bookResponseEntity.getBody();
+
+                CartPaymentRequestDto.BookInfo bookInfo = CartPaymentRequestDto.BookInfo.builder()
+                        .bookIsbn(bookIsbn)
+                        .quantity(Long.parseLong(request.getParameter("quantity-" + bookIsbn)))
+                        .bookSalePrice(bookResponseDto.getBookSalePrice())
+                        .build();
+
+                bookInfos.add(bookInfo);
             }
         }
 
-        // todo: delete example data.
-        List<Item> cart = new ArrayList<>();
-        cart.add(new Item("KNB001", "example item 1", 5L, 5000L, 1000L));
-        cart.add(new Item("KNB002", "example item 2", 5L, 5000L, 1000L));
-        cart.add(new Item("KNB003", "example item 3", 5L, 5000L, 1000L));
-        cart.add(new Item("KNB004", "example item 4", 5L, 5000L, 1000L));
+        CartPaymentRequestDto cartPaymentRequestDto = CartPaymentRequestDto.builder()
+                .bookInfos(bookInfos)
+                .customerNo(customerNo)
+                .build();
 
-        mav.addObject("cart", cart);
+        // 주문 정보 수집.
+        ResponseEntity<CartPaymentResponseDto> response = restTemplate.postForEntity(
+                requestUrl + ":" + port +  "/shop/orders/cart",
+                cartPaymentRequestDto,
+                CartPaymentResponseDto.class
+        );
+        CartPaymentResponseDto cartInfo = response.getBody();
+
+        mav.addObject("cartInfo", cartInfo);
 
         return mav;
     }
@@ -219,30 +256,13 @@ public class OrderController {
      */
     @PostMapping("/create")
     public ResponseEntity<String> saveOrder(@RequestBody OrderRequestDto orderRequestDto, HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        String jSessionId = session.getId();
-
-        // get user information
-        HashOperations<String, String, String> authHashOperations = redisTemplate.opsForHash();
-        String authorization = authHashOperations.get(jSessionId, "Authorization");
-        String refreshToken = authHashOperations.get(jSessionId, "RefreshToken");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", authorization);
-        headers.add("RefreshToken", refreshToken);
-
-        // get customerNo
-        ResponseEntity<Long> responseEntity = restTemplate.postForEntity(
-                requestUrl + ":" + port +  "/auth/get/customerNo",
-                new HttpEntity<>(null, headers),
-                Long.class
+        Long customerNo = AuthUtil.getCustomerNo(
+                requestUrl,
+                port,
+                request,
+                redisTemplate,
+                restTemplate
         );
-
-        if(responseEntity.getStatusCode() == HttpStatus.UNAUTHORIZED) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-        }
-
-        Long customerNo = responseEntity.getBody();
 
         HashOperations<String, String, Order> hashOperations = redisTemplate.opsForHash();
         Order order = new Order();

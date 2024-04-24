@@ -41,7 +41,7 @@ public class BookController {
 
     @GetMapping("/book/{categoryId}/{bookIsbn}")
     public ModelAndView getBookPage(@PathVariable("categoryId") Long categoryId,
-                                    @PathVariable("bookIsbn") Long bookIsbn) {
+                                    @PathVariable("bookIsbn") String bookIsbn) {
         // 하위 카테고리 조회
         ResponseEntity<ParentCategoryResponseDto> categoryResponseEntity = restTemplate.getForEntity(
                 requestUrl + ":" + port +  "/shop/categories/parents/" + categoryId,

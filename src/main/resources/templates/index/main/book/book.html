@@ -186,31 +186,31 @@
     document.getElementById("cart-button").addEventListener("click", function(event) {
           var url = window.location.href.split('/');
           var bookIsbn = url[url.length - 1];
-          var quantity = document.getElementById("quantity").value;
+          var quantity = document.querySelector("#quantity").value;
 
           var cart = {
               bookIsbn: bookIsbn,
-              quantity: quantity
+              bookQuantity: quantity
           };
 
-          fetch("/shop/cart/create", {
+          fetch("/cart/create", {
               method: "POST",
               headers: {
                   "Content-Type": "application/json"
               },
               body: JSON.stringify(cart)
           })
-              .then(function(response) {
-                  if (response.ok) {
-                      console.log("장바구니 추가 성공!");
-                  } else {
-                      console.error("장바구니 추가 실패!");
-                      // 실패 시 처리 코드 작성
-                  }
-              })
-              .catch(function(error) {
-                  console.error("장바구니 추가 중 오류 발생:", error);
-              });
+          .then(function(response) {
+              if (response.ok) {
+                  console.log("장바구니 추가 성공!");
+              } else {
+                  console.error("장바구니 추가 실패!");
+                  // 실패 시 처리 코드 작성
+              }
+          })
+          .catch(function(error) {
+              console.error("장바구니 추가 중 오류 발생:", error);
+          });
       });
 </script>
 </body>

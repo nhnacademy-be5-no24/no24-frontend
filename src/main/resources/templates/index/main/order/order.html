@@ -18,16 +18,16 @@
         <hr>
 
         <h4>구매자 정보</h4>
-        <p>이름: <span th:text="'John Doe'"></span></p>
-        <p>이메일: <span th:text="'john.doe@example.com'"></span></p>
-        <p>전화번호: <span th:text="'123-456-7890'"></span></p>
+        <p>이름: <span th:text="${cartInfo.customerName}"></span></p>
+        <p>이메일: <input type="text" th:value="'이메일 추가 필요'"></p>
+        <p>전화번호: <input type="text" th:value="${cartInfo.customerPhoneNumber}"></p>
 
         <hr>
 
         <h4>받는 사람 정보</h4>
-        <p>이름: <span th:text="'Jane Doe'"></span></p>
-        <p>주소: <span th:text="'123 Main St, City, Country'"></span></p>
-        <p>전화번호: <span th:text="'987-654-3210'"></span></p>
+        <p>이름: <span th:text="${cartInfo.customerName}"></span></p>
+        <p>주소: <input type="text" th:value="'주소 추가 필요'"></p>
+        <p>전화번호: <input type="text" th:value="${cartInfo.customerPhoneNumber}"></p>
 
         <hr>
 
@@ -44,26 +44,27 @@
             </tr>
             </thead>
             <tbody>
-                <tr th:each="item, itemStat : ${cart}">
-                    <td th:text="${item.title}" />
+                <tr th:each="item : ${cartInfo.getBookInfos()}">
+                    <td th:text="${item.bookTitle}" />
                     <td th:text="${item.quantity}" />
-                    <td th:text="${item.price}" />
+                    <td th:text="${item.bookSalePrice}" />
                     <td>
-                        <select class="form-control" th:id="'coupon-' + ${item.id}" th:name="'coupon-' + ${item.id}">
-                            <option value="0">미사용</option>
-                            <option value="1">생일 축하 쿠폰 3000원</option>
-                            <option value="2">소설 카테고리 5% 할인 쿠폰</option>
-                            <option value="3">플래티넘 등급 20% 할인 쿠폰</option>
+                        <select class="form-control" th:id="'coupon-' + ${item.bookIsbn}" th:name="'coupon-' + ${item.bookIsbn}">
+                            <option value="0">미구현</option>
+<!--                            <option value="1">생일 축하 쿠폰 3000원</option>-->
+<!--                            <option value="2">소설 카테고리 5% 할인 쿠폰</option>-->
+<!--                            <option value="3">플래티넘 등급 20% 할인 쿠폰</option>-->
                         </select>
                     </td>
                     <td>
-                        <a th:id="'wrap-input-' + ${item.id}">포장지 설정</a>
+                        <a th:id="'wrap-input-' + ${item.bookIsbn}">포장지 설정(미구현)</a>
                     </td>
                     <td>
-                        25000원
+                        <span th:id="'total-price-' + ${item.bookIsbn}" th:text="${item.quantity * item.bookSalePrice}"></span>
+                        원
                     </td>
-                    <input type="text" th:id="'wrap-info-' + ${item.id}" hidden th:name="'wrap-info-' + ${item.id}" />
-                    <input type="number" th:id="'quantity-' + ${item.id}" hidden th:name="'quantity-' + ${item.id}" th:value="${item.quantity}" />
+                    <input type="text" th:id="'wrap-info-' + ${item.bookIsbn}" hidden th:name="'wrap-info-' + ${item.bookIsbn}" />
+                    <input type="number" th:id="'quantity-' + ${item.bookIsbn}" hidden th:name="'quantity-' + ${item.bookIsbn}" th:value="${item.quantity}" />
                 </tr>
             </tbody>
         </table>
@@ -71,7 +72,7 @@
         <hr>
 
         <h4>결제 정보</h4>
-        <p>총 가격: <span id="totalPrice" th:text="'50,000'"></span>원</p>
+        <p>총 가격: <span id="totalPrice" th:text="'50000'"></span>원</p>
 
         <!-- 결제하기 버튼 -->
         <button type="submit" class="btn btn-primary mb-4" id="payment-button">결제하기</button>
@@ -94,6 +95,19 @@
             integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let totalPriceDiv = document.querySelector("#totalPrice");
+            let totalPrice = 0;
+
+            document.querySelectorAll('[id^="total-price-"]').forEach(function(text) {
+                console.log(text.innerText);
+                totalPrice += parseFloat(text.innerText);
+            });
+
+            if(totalPrice < 30000) totalPrice += 3000;
+            totalPriceDiv.innerText = totalPrice;
+        });
+
         document.querySelectorAll('[id^="wrap-input-"]').forEach(function(btn) {
             btn.addEventListener("click", function () {
                 // 팝업창을 열기 위한 코드
