@@ -1,25 +1,20 @@
 package com.nhnacademy.frontend.main.order;
 
 
-import com.nhnacademy.frontend.auth.dto.LoginDto;
-import com.nhnacademy.frontend.auth.dto.TokenDto;
 import com.nhnacademy.frontend.book.dto.BookResponseDto;
-import com.nhnacademy.frontend.category.dto.CategoryInfoResponseList;
-import com.nhnacademy.frontend.main.cartOrder.domain.CartOrder;
-import com.nhnacademy.frontend.main.cartOrder.dto.request.CartOrderRequestDto;
 import com.nhnacademy.frontend.main.cartOrder.dto.request.CartPaymentRequestDto;
 import com.nhnacademy.frontend.main.cartOrder.dto.response.CartPaymentResponseDto;
-import com.nhnacademy.frontend.main.order.domain.Order;
-import com.nhnacademy.frontend.main.order.dto.request.OrderRequestDto;
+import com.nhnacademy.frontend.main.order.dto.request.OrderDetailDto;
+import com.nhnacademy.frontend.main.order.dto.request.OrderDto;
+import com.nhnacademy.frontend.main.order.dto.request.OrdersCreateRequestDto;
 import com.nhnacademy.frontend.util.AuthUtil;
-import lombok.RequiredArgsConstructor;
-import com.nhnacademy.frontend.item.ItemDto;
 
+import com.nhnacademy.frontend.util.exception.NotFoundToken;
+import com.nhnacademy.frontend.util.exception.UnauthorizedTokenException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
@@ -31,12 +26,12 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Iterator;
@@ -57,7 +52,7 @@ public class OrderController {
     @Value("${request.port}")
     private String port;
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate redisTemplate;
     private final RestTemplate restTemplate;
 
     // todo: delete example Class
@@ -151,9 +146,18 @@ public class OrderController {
         return mav;
     }
 
+    @GetMapping("/payment/attempt")
+    public ModelAndView getAttemptPage() {
+        ModelAndView mav = new ModelAndView("index/main/order/payment_attempt");
+
+        return mav;
+    }
+
     @GetMapping("/success")
-    public ModelAndView getSuccessPage() {
+    public ModelAndView getSuccessPage(@RequestParam String orderId) {
         ModelAndView mav = new ModelAndView("index/main/order/success");
+
+        mav.addObject("orderId", orderId);
 
         return mav;
     }
@@ -167,8 +171,22 @@ public class OrderController {
 
     @PostMapping(value = "/confirm")
     public ResponseEntity<JSONObject> confirmPayment(@RequestBody String jsonBody, HttpServletRequest request) throws Exception {
+        HashOperations<String, String, OrderDto> hashOperations = redisTemplate.opsForHash();
         HttpSession session = request.getSession();
         String jSessionId = session.getId();
+        Long customerNo = null;
+        ResponseEntity<OrdersCreateRequestDto> response = null;
+
+        try {
+            customerNo = AuthUtil.getCustomerNo(
+                    requestUrl,
+                    port,
+                    request,
+                    redisTemplate,
+                    restTemplate
+            );
+        } catch(NotFoundToken | UnauthorizedTokenException e) {}
+
 
         JSONParser parser = new JSONParser();
         String orderId;
@@ -182,23 +200,60 @@ public class OrderController {
             orderId = (String) requestData.get("orderId");
             amount = (String) requestData.get("amount");
 
-            // redis에 저장된 주문 정보를 가져오는 로직.
-            String value = getOrderInRedis(jSessionId, orderId);
+            OrderDto orderDto = null;
 
-            if(value == null) {
+            // redis에 저장된 주문 정보를 가져오는 로직.
+            if(customerNo != null)
+                orderDto = hashOperations.get("order", customerNo.toString());
+            else
+                orderDto = hashOperations.get("order", jSessionId);
+
+            if(orderDto == null) {
                 throw new RuntimeException("Can not load information");
             }
 
-            System.out.println(value);
+            System.out.println(orderDto);
 
             // todo: 주문 정보 확인 후 Shop service에서 쿠폰 사용 이력, 주문 이력, 책 수량, 포인트 적립 등 로직 수행 필요
 
             // todo: 로직 수행 이후, redis 내 orderId에 해당하는 정보 지우기.
-            deleteOrderInRedis(jSessionId, orderId);
+            if(customerNo != null)
+                hashOperations.delete("order", customerNo.toString());
+            else
+                hashOperations.delete("order", jSessionId);
 
-            System.out.println("after delete: " + getOrderInRedis(jSessionId, orderId));
+            // shop service에서 order 저장 요청.
+            OrdersCreateRequestDto ordersCreateRequestDto = OrdersCreateRequestDto.builder()
+                    .orderId(orderDto.getOrderId())
+                    .orderDate(LocalDateTime.now())
+                    .orderState(OrdersCreateRequestDto.OrderState.COMPLETE_PAYMENT)
+                    .deliveryFee(orderDto.getDeliveryFee())
+                    .paymentId(1L)
+                    .customerNo(customerNo)
+                    .jSessionId(jSessionId)
+                    .receiverName(orderDto.getReceiverName())
+                    .receiverPhoneNumber(orderDto.getReceiverPhoneNumber())
+                    .zipcode(orderDto.getPostcode())
+                    .address(orderDto.getAddress())
+                    .addressDetail(orderDto.getAddressDetail())
+                    .req("")
+                    .orderDetailDtoList(orderDto.getOrderDetailDto())
+                    .build();
+
+
+            response = restTemplate.postForEntity(
+                    requestUrl + ":" + port + "/shop/orders",
+                    ordersCreateRequestDto,
+                    OrdersCreateRequestDto.class
+            );
+
+            for(OrderDetailDto orderDetailDto : orderDto.getOrderDetailDto()) {
+                restTemplate.delete(requestUrl + ":" + port +
+                        "/shop/cart/deleteOne/" + customerNo + "?bookIsbn=" + orderDetailDto.getBookIsbn());
+            }
+
         } catch (ParseException e) {
-            throw new RuntimeException(e);
+            return ResponseEntity.badRequest().body(null);
         };
         JSONObject obj = new JSONObject();
         obj.put("orderId", orderId);
@@ -229,9 +284,23 @@ public class OrderController {
         InputStream responseStream = isSuccess ? connection.getInputStream() : connection.getErrorStream();
 
         // 결제 성공 및 실패 비즈니스 로직을 구현하세요.
-        Reader reader = new InputStreamReader(responseStream, StandardCharsets.UTF_8);
-        JSONObject jsonObject = (JSONObject) parser.parse(reader);
         responseStream.close();
+
+        JSONObject jsonObject = new JSONObject();
+
+        jsonObject.put("orderId", response.getBody().getOrderId());
+        jsonObject.put("orderDate", response.getBody().getOrderDate());
+        jsonObject.put("orderState", response.getBody().getOrderState());
+        jsonObject.put("deliveryFee", response.getBody().getDeliveryFee());
+        jsonObject.put("paymentId", response.getBody().getPaymentId());
+        jsonObject.put("customerNo", response.getBody().getCustomerNo());
+        jsonObject.put("jSessionId", response.getBody().getJSessionId());
+        jsonObject.put("receiverName", response.getBody().getReceiverName());
+        jsonObject.put("receiverPhoneNumber", response.getBody().getReceiverPhoneNumber());
+        jsonObject.put("zipcode", response.getBody().getZipcode());
+        jsonObject.put("address", response.getBody().getAddress());
+        jsonObject.put("addressDetail", response.getBody().getAddressDetail());
+        jsonObject.put("req", response.getBody().getReq());
 
         return ResponseEntity.status(code).body(jsonObject);
     }
@@ -251,28 +320,28 @@ public class OrderController {
 
     /**
      * [POST /order/create]
-     *
+     * todo: moved to paymentcontroller
      * 주문 내역을 redis에 저장하는 POST 메서드
      */
-    @PostMapping("/create")
-    public ResponseEntity<String> saveOrder(@RequestBody OrderRequestDto orderRequestDto, HttpServletRequest request) {
-        Long customerNo = AuthUtil.getCustomerNo(
-                requestUrl,
-                port,
-                request,
-                redisTemplate,
-                restTemplate
-        );
-
-        HashOperations<String, String, Order> hashOperations = redisTemplate.opsForHash();
-        Order order = new Order();
-        order.setCustomerNo(customerNo);
-        order.setOrderName(orderRequestDto.getFirstBookTitle() + " 외 " + orderRequestDto.getNumberOfBook() + "권");
-        order.setTotalPrice(orderRequestDto.getTotalPrice());
-        order.setDeliveryAddress(orderRequestDto.getDeliveryAddress());
-
-        hashOperations.put("order", String.valueOf(customerNo), order);
-
-        return ResponseEntity.ok(customerNo + "의 주문 내역이 추가되었습니다.");
-    }
+//    @PostMapping("/create")
+//    public ResponseEntity<String> saveOrder(@RequestBody OrderRequestDto orderRequestDto, HttpServletRequest request) {
+//        Long customerNo = AuthUtil.getCustomerNo(
+//                requestUrl,
+//                port,
+//                request,
+//                redisTemplate,
+//                restTemplate
+//        );
+//
+//        HashOperations<String, String, Order> hashOperations = redisTemplate.opsForHash();
+//        Order order = new Order();
+//        order.setCustomerNo(customerNo);
+//        order.setOrderName(orderRequestDto.getFirstBookTitle() + " 외 " + orderRequestDto.getNumberOfBook() + "권");
+//        order.setTotalPrice(orderRequestDto.getTotalPrice());
+//        order.setDeliveryAddress(orderRequestDto.getDeliveryAddress());
+//
+//        hashOperations.put("order", String.valueOf(customerNo), order);
+//
+//        return ResponseEntity.ok(customerNo + "의 주문 내역이 추가되었습니다.");
+//    }
 }

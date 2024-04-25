@@ -3,6 +3,7 @@ package com.nhnacademy.frontend.main.cart;
 import com.nhnacademy.frontend.main.cart.domain.Cart;
 import com.nhnacademy.frontend.main.cart.dto.CartListResponseDto;
 import com.nhnacademy.frontend.main.cart.dto.CartRequestDto;
+import com.nhnacademy.frontend.main.cart.dto.CartResponseDto;
 import com.nhnacademy.frontend.util.AuthUtil;
 import com.nhnacademy.frontend.util.exception.NotFoundToken;
 import com.nhnacademy.frontend.util.exception.UnauthorizedTokenException;
@@ -65,7 +66,13 @@ public class CartController {
                     CartListResponseDto.class
             );
 
-            mav.addObject("cart", response.getBody().getCartResponseDtoList());
+            List<CartResponseDto> cartList = response.getBody().getCartResponseDtoList();
+
+            if(cartList == null || cartList.isEmpty()) {
+                mav.addObject("cart", new ArrayList<>());
+            }
+            else
+                mav.addObject("cart", cartList);
 
         } catch(UnauthorizedTokenException | NotFoundToken e) {
             HttpSession session = request.getSession();
@@ -76,7 +83,14 @@ public class CartController {
                     CartListResponseDto.class
             );
 
-            mav.addObject("cart", response.getBody().getCartResponseDtoList());
+
+            List<CartResponseDto> cartList = response.getBody().getCartResponseDtoList();
+
+            if(cartList == null || cartList.isEmpty()) {
+                mav.addObject("cart", new ArrayList<>());
+            }
+            else
+                mav.addObject("cart", cartList);
         }
 
         return mav;

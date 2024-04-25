@@ -72,7 +72,7 @@
             </thead>
             <tbody>
                 <tr th:each="item : ${cartInfo.getBookInfos()}">
-                    <td th:text="${item.bookTitle}" />
+                    <td th:text="${item.bookTitle}" th:id="'title-' + ${item.bookIsbn}" th:name="'title-' + ${item.bookIsbn}"/>
                     <td th:text="${item.quantity}" />
                     <td th:text="${item.bookSalePrice}" />
                     <td>
