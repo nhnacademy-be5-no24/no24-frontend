@@ -61,36 +61,29 @@ public class CartController {
                     restTemplate
             );
 
-            ResponseEntity<CartListResponseDto> response = restTemplate.getForEntity(
-                    requestUrl + ":" + port + "/shop/cart/" + customerNo,
-                    CartListResponseDto.class
-            );
-
-            List<CartResponseDto> cartList = response.getBody().getCartResponseDtoList();
-
-            if(cartList == null || cartList.isEmpty()) {
+            try {
+                ResponseEntity<CartListResponseDto> response = restTemplate.getForEntity(
+                        requestUrl + ":" + port + "/shop/cart/" + customerNo,
+                        CartListResponseDto.class
+                );
+                mav.addObject("cart", response.getBody().getCartResponseDtoList());
+            } catch(Exception e) {
                 mav.addObject("cart", new ArrayList<>());
             }
-            else
-                mav.addObject("cart", cartList);
 
         } catch(UnauthorizedTokenException | NotFoundToken e) {
             HttpSession session = request.getSession();
             String jSessionId = session.getId();
 
-            ResponseEntity<CartListResponseDto> response = restTemplate.getForEntity(
-                    requestUrl + ":" + port + "/shop/cart/" + jSessionId,
-                    CartListResponseDto.class
-            );
-
-
-            List<CartResponseDto> cartList = response.getBody().getCartResponseDtoList();
-
-            if(cartList == null || cartList.isEmpty()) {
+            try {
+                ResponseEntity<CartListResponseDto> response = restTemplate.getForEntity(
+                        requestUrl + ":" + port + "/shop/cart/" + jSessionId,
+                        CartListResponseDto.class
+                );
+                mav.addObject("cart", response.getBody().getCartResponseDtoList());
+            } catch(Exception ex) {
                 mav.addObject("cart", new ArrayList<>());
             }
-            else
-                mav.addObject("cart", cartList);
         }
 
         return mav;
