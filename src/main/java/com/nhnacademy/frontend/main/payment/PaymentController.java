@@ -4,11 +4,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.reflect.TypeToken;
 import com.nhnacademy.frontend.item.ItemDto;
+import com.nhnacademy.frontend.main.order.domain.Order;
+import com.nhnacademy.frontend.util.AuthUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,81 +27,99 @@ import redis.clients.jedis.Jedis;
 /**
  * 결제 Controller
  *
- * @Author : 박병휘
+ * @Author : 박병휘, 진지원
  * @Date : 2024/04/10
  */
 @RestController
 @RequestMapping("/payment")
 public class PaymentController {
-    private final RedisTemplate<String, Object> redisTemplate;
+    @Value("${request.url}")
+    private String requestUrl;
 
-    public PaymentController(RedisTemplate<String, Object> redisTemplate) {
+    @Value("${request.port}")
+    private String port;
+
+    private final RedisTemplate redisTemplate;
+    private final RestTemplate restTemplate;
+
+    public PaymentController(RedisTemplate redisTemplate, RestTemplate restTemplate) {
         this.redisTemplate = redisTemplate;
+        this.restTemplate = restTemplate;
     }
 
     @PostMapping
     public ModelAndView getPaymentPage(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        String jSessionId = session.getId();
+        Long customerNo = AuthUtil.getCustomerNo(
+                requestUrl,
+                port,
+                request,
+                redisTemplate,
+                restTemplate
+        );
 
-        Gson gson = new Gson();
-        List<ItemDto> itemList = new ArrayList<>();
-        Set<String> itemIdList = new HashSet<>();
-
-        for (Iterator<String> it = request.getParameterNames().asIterator(); it.hasNext(); ) {
-            String name = it.next();
-            String itemId = name.split("-")[name.split("-").length - 1];
-
-            itemIdList.add(itemId);
-        }
-
-        for(String itemId : itemIdList) {
-            String wrapJson = request.getParameter("wrap-info-" + itemId);
-            List<ItemDto.Wrap> wraps = new ArrayList<>();
-
-            if(wrapJson != null && wrapJson.length() != 0) {
-                wraps = gson.fromJson(wrapJson, new TypeToken<ArrayList<ItemDto.Wrap>>() {}.getType());
-            }
-
-
-            for (ItemDto.Wrap wrap : wraps) {
-                System.out.println("Wrap ID: " + wrap
-                        .getWrapId());
-                System.out.println("Quantity: " + wrap.getQuantity());
-            }
-
-            ItemDto item = ItemDto.builder()
-                    .itemId(itemId)
-                    .quantity(Long.parseLong(request.getParameter("quantity-" + itemId)))
-                    .couponId(Long.parseLong(request.getParameter("coupon-" + itemId)))
-                    .wraps(wraps)
-                    .build();
-
-            itemList.add(item);
-
-            // todo: 총 금액 계산 Logic 필요. (Shop service 사용)
-        }
-
-        System.out.println(itemList);
-
-        String orderId = generateRandomString();
-
-        try {
-            saveOrderInRedis(jSessionId, orderId, itemList);
-        } catch(JsonProcessingException e) {
-            System.out.println("error: " + e);
-        }
+//        HashOperations<String, String, Order> hashOperations = redisTemplate.opsForHash();
+//        Order order = new Order();
+//        order.setCustomerNo(customerNo);
+//        order.setOrderName(orderRequestDto.getFirstBookTitle() + " 외 " + orderRequestDto.getNumberOfBook() + "권");
+//        order.setTotalPrice(orderRequestDto.getTotalPrice());
+//        order.setDeliveryAddress(orderRequestDto.getDeliveryAddress());
+//
+//        hashOperations.put("order", String.valueOf(customerNo), order);
+//
+//        System.out.println(itemList);
+//
+//        String orderId = generateRandomString();
+//
+//        try {
+//            saveOrderInRedis(jSessionId, orderId, itemList);
+//        } catch(JsonProcessingException e) {
+//            System.out.println("error: " + e);
+//        }
 
         // todo: 필요내용 추가 필요
         ModelAndView mav = new ModelAndView("index/main/order/payment");
-        mav.addObject("orderId", orderId);
-        mav.addObject("orderTitle", "example1 외 5권");
-        mav.addObject("amount", 50000);
-        mav.addObject("customerEmail", "example@gmail.com");
-        mav.addObject("customerName", "홍길동");
-        mav.addObject("customerMobilePhone", "01012345678");
+//        mav.addObject("orderId", orderId);
+//        mav.addObject("orderTitle", "example1 외 5권");
+//        mav.addObject("amount", 50000);
+//        mav.addObject("customerEmail", "example@gmail.com");
+//        mav.addObject("customerName", "홍길동");
+//        mav.addObject("customerMobilePhone", "01012345678");
 
         return mav;
+
+//        for (Iterator<String> it = request.getParameterNames().asIterator(); it.hasNext(); ) {
+//            String name = it.next();
+//            String itemId = name.split("-")[name.split("-").length - 1];
+//
+//            itemIdList.add(itemId);
+//        }
+//
+//        for(String itemId : itemIdList) {
+//            String wrapJson = request.getParameter("wrap-info-" + itemId);
+//            List<ItemDto.Wrap> wraps = new ArrayList<>();
+//
+//            if(wrapJson != null && wrapJson.length() != 0) {
+//                wraps = gson.fromJson(wrapJson, new TypeToken<ArrayList<ItemDto.Wrap>>() {}.getType());
+//            }
+//
+//
+//            for (ItemDto.Wrap wrap : wraps) {
+//                System.out.println("Wrap ID: " + wrap
+//                        .getWrapId());
+//                System.out.println("Quantity: " + wrap.getQuantity());
+//            }
+//
+//            ItemDto item = ItemDto.builder()
+//                    .itemId(itemId)
+//                    .quantity(Long.parseLong(request.getParameter("quantity-" + itemId)))
+//                    .couponId(Long.parseLong(request.getParameter("coupon-" + itemId)))
+//                    .wraps(wraps)
+//                    .build();
+//
+//            itemList.add(item);
+//
+//            // todo: 총 금액 계산 Logic 필요. (Shop service 사용)
+//        }
     }
 
     /**

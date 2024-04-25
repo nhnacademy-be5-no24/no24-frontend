@@ -17,6 +17,7 @@ public class CartPaymentResponseDto {
     private Long customerNo;
     private String customerName;
     private String customerPhoneNumber;
+    private String customerEmail;
     //주문
     private String receiverName;
     private String receiverPhoneNumber;
