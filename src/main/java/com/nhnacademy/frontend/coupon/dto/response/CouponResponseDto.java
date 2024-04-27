@@ -1,5 +1,8 @@
-package com.nhnacademy.frontend.coupon.dto;
+package com.nhnacademy.frontend.coupon.dto.response;
 
+import com.nhnacademy.frontend.coupon.dto.CouponTarget;
+import com.nhnacademy.frontend.coupon.dto.CouponType;
+import com.nhnacademy.frontend.coupon.dto.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

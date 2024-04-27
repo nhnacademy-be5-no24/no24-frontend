@@ -3,11 +3,14 @@ package com.nhnacademy.frontend.main.payment;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.nhnacademy.frontend.book.dto.BookResponseDto;
+import com.nhnacademy.frontend.coupon.dto.CouponType;
+import com.nhnacademy.frontend.coupon.dto.response.CouponResponseDto;
 import com.nhnacademy.frontend.main.order.dto.request.OrderDetailDto;
 import com.nhnacademy.frontend.main.order.dto.request.OrderDto;
 import com.nhnacademy.frontend.util.AuthUtil;
 import com.nhnacademy.frontend.util.exception.NotFoundToken;
 import com.nhnacademy.frontend.util.exception.UnauthorizedTokenException;
+import com.nhnacademy.frontend.wrap.dto.WrapResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,6 +23,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -100,7 +105,7 @@ public class PaymentController {
      * @throws Exception (BookIsbn 검색이 안되는 경우, 예외처리)
      */
     public OrderDto createOrder(HttpServletRequest request, String customerNo) throws Exception {
-        List<OrderDetailDto> OrderDetailDtoList = new ArrayList<>();
+        List<OrderDetailDto> orderDetailDtoList = new ArrayList<>();
         Set<String> isbnList = new HashSet<>();
         Gson gson = new Gson();
         String firstBookName = "";
@@ -135,11 +140,6 @@ public class PaymentController {
                     }.getType());
                 }
 
-                for (OrderDetailDto.WrapDto wrap : wraps) {
-                    System.out.println("Wrap ID: " + wrap
-                            .getWrapId());
-                    System.out.println("Quantity: " + wrap.getQuantity());
-                }
 
                 OrderDetailDto orderDetailDto = OrderDetailDto.builder()
                         .bookIsbn(isbn)
@@ -149,11 +149,46 @@ public class PaymentController {
                         .wraps(wraps)
                         .build();
 
-                OrderDetailDtoList.add(orderDetailDto);
+                orderDetailDtoList.add(orderDetailDto);
 
-                // total price 계산
-                // todo: coupon 및 포장지 계산 필요
-                totalPrice += (orderDetailDto.getPrice() * orderDetailDto.getQuantity());
+                // book price 계산
+                long bookPrice = (orderDetailDto.getPrice() * orderDetailDto.getQuantity());
+
+                // 포장지 계산
+                for (OrderDetailDto.WrapDto wrap : wraps) {
+                    ResponseEntity<WrapResponseDto> wrapResponseEntity = restTemplate.getForEntity(
+                            requestUrl + ":" + port + "/shop/wraps/id/" + wrap.getWrapId(),
+                            WrapResponseDto.class
+                    );
+                    Long cost = wrapResponseEntity.getBody().getWrapCost();
+
+                    bookPrice += (cost * wrap.getQuantity());
+                }
+
+                if(orderDetailDto.getCouponId() != 0L) {
+                    // 쿠폰 계산
+                    ResponseEntity<Long> couponIdResponseEntity = restTemplate.getForEntity(
+                            requestUrl + ":" + port + "/shop/coupon/member/couponMemberId/" + orderDetailDto.getCouponId(),
+                            Long.class
+                    );
+
+                    ResponseEntity<CouponResponseDto> couponResponseEntity = restTemplate.getForEntity(
+                            requestUrl + ":" + port + "/shop/coupon/" + couponIdResponseEntity.getBody(),
+                            CouponResponseDto.class
+                    );
+                    CouponResponseDto couponResponseDto = couponResponseEntity.getBody();
+
+                    if (couponResponseDto.getCouponType() == CouponType.AMOUNT) {
+                        bookPrice -= couponResponseDto.getDiscountPrice();
+                    } else {
+                        long discountBookPrice = bookPrice * couponResponseDto.getDiscountRate() / 100;
+                        discountBookPrice = Math.min(discountBookPrice, couponResponseDto.getMaxDiscountPrice());
+
+                        bookPrice -= discountBookPrice;
+                    }
+                }
+
+                totalPrice += bookPrice;
                 i++;
             }
         } catch(Exception e) {
@@ -170,7 +205,9 @@ public class PaymentController {
 
         OrderDto orderDto = new OrderDto();
         orderDto.setOrderId(generateRandomString());
+        orderDto.setShipDate(LocalDate.parse(request.getParameter("shipDate"), DateTimeFormatter.ISO_DATE));
         orderDto.setCustomerNo(customerNo);
+        orderDto.setCustomerName(request.getParameter("customerName"));
         orderDto.setCustomerEmail(request.getParameter("customerEmail"));
         orderDto.setCustomerPhoneNumber(request.getParameter("customerPhoneNumber"));
         orderDto.setCustomerName(request.getParameter("customerName"));
@@ -182,7 +219,7 @@ public class PaymentController {
         orderDto.setPostcode(request.getParameter("receiverPostcode"));
         orderDto.setAddress(request.getParameter("receiverAddress"));
         orderDto.setAddressDetail(request.getParameter("receiverDetailAddress"));
-        orderDto.setOrderDetailDto(OrderDetailDtoList);
+        orderDto.setOrderDetailDto(orderDetailDtoList);
 
         return orderDto;
     }

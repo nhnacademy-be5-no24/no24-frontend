@@ -22,9 +22,10 @@ public class OrderDetailDto {
     Long couponId;
     List<WrapDto> wraps;
 
-    @Getter
     @Data
-    public class WrapDto {
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class WrapDto {
         Long wrapId;
         Long quantity;
     }

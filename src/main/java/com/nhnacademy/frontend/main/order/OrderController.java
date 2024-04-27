@@ -7,10 +7,12 @@ import com.nhnacademy.frontend.main.cartOrder.dto.response.CartPaymentResponseDt
 import com.nhnacademy.frontend.main.order.dto.request.OrderDetailDto;
 import com.nhnacademy.frontend.main.order.dto.request.OrderDto;
 import com.nhnacademy.frontend.main.order.dto.request.OrdersCreateRequestDto;
+import com.nhnacademy.frontend.main.order.dto.response.WrapResponseDtoList;
 import com.nhnacademy.frontend.util.AuthUtil;
 
 import com.nhnacademy.frontend.util.exception.NotFoundToken;
 import com.nhnacademy.frontend.util.exception.UnauthorizedTokenException;
+import com.nhnacademy.frontend.wrap.dto.WrapResponseDto;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -133,15 +135,26 @@ public class OrderController {
                 CartPaymentResponseDto.class
         );
         CartPaymentResponseDto cartInfo = response.getBody();
+        System.out.println(cartInfo);
 
         mav.addObject("cartInfo", cartInfo);
+        mav.addObject("tomorrow", LocalDate.now().plusDays(1));
 
         return mav;
     }
 
-    @GetMapping("/input/wrap")
-    public ModelAndView getWrapPopupPage() {
+    @GetMapping("/input/wrap/{bookIsbn}")
+    public ModelAndView getWrapPopupPage(@PathVariable String bookIsbn) {
         ModelAndView mav = new ModelAndView("index/main/order/input_wrap");
+
+        ResponseEntity<WrapResponseDtoList> response = restTemplate.getForEntity(
+                requestUrl + ":" + port +  "/shop/wraps",
+                WrapResponseDtoList.class
+        );
+
+        List<WrapResponseDto> wrapList = response.getBody().getWrapResponseDtoList();
+
+        mav.addObject("wrapList", wrapList);
 
         return mav;
     }
@@ -215,7 +228,6 @@ public class OrderController {
             System.out.println(orderDto);
 
             // todo: 주문 정보 확인 후 Shop service에서 쿠폰 사용 이력, 주문 이력, 책 수량, 포인트 적립 등 로직 수행 필요
-
             // todo: 로직 수행 이후, redis 내 orderId에 해당하는 정보 지우기.
             if(customerNo != null)
                 hashOperations.delete("order", customerNo.toString());
@@ -227,6 +239,8 @@ public class OrderController {
                     .orderId(orderDto.getOrderId())
                     .orderDate(LocalDateTime.now())
                     .orderState(OrdersCreateRequestDto.OrderState.COMPLETE_PAYMENT)
+                    .shipDate(orderDto.getShipDate())
+                    .totalFee(orderDto.getTotalPrice())
                     .deliveryFee(orderDto.getDeliveryFee())
                     .paymentId(1L)
                     .customerNo(customerNo)
@@ -247,12 +261,13 @@ public class OrderController {
                     OrdersCreateRequestDto.class
             );
 
+            // 카트 정보 지우기
             for(OrderDetailDto orderDetailDto : orderDto.getOrderDetailDto()) {
                 restTemplate.delete(requestUrl + ":" + port +
                         "/shop/cart/deleteOne/" + customerNo + "?bookIsbn=" + orderDetailDto.getBookIsbn());
             }
 
-        } catch (ParseException e) {
+        } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
         };
         JSONObject obj = new JSONObject();
@@ -291,6 +306,7 @@ public class OrderController {
         jsonObject.put("orderId", response.getBody().getOrderId());
         jsonObject.put("orderDate", response.getBody().getOrderDate());
         jsonObject.put("orderState", response.getBody().getOrderState());
+        jsonObject.put("shipDate", response.getBody().getShipDate());
         jsonObject.put("deliveryFee", response.getBody().getDeliveryFee());
         jsonObject.put("paymentId", response.getBody().getPaymentId());
         jsonObject.put("customerNo", response.getBody().getCustomerNo());

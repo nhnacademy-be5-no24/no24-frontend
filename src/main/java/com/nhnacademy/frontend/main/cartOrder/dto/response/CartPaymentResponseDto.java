@@ -1,6 +1,6 @@
 package com.nhnacademy.frontend.main.cartOrder.dto.response;
 
-import com.nhnacademy.frontend.coupon.dto.CouponResponseDto;
+import com.nhnacademy.frontend.coupon.dto.response.CouponMemberResponseDto;
 import com.nhnacademy.frontend.wrap.dto.WrapResponseDto;
 import lombok.Builder;
 import lombok.Getter;
@@ -33,7 +33,7 @@ public class CartPaymentResponseDto {
         private String bookTitle;
         private Long bookSalePrice;
         private Long quantity;
-        private List<CouponResponseDto> coupons;
+        private List<CouponMemberResponseDto> coupons;
         private List<WrapResponseDto> wraps;
 
     }
