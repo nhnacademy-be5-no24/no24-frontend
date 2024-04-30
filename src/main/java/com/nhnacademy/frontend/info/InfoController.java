@@ -51,6 +51,14 @@ public class InfoController {
     public ModelAndView info(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("index/info/main");
 
+        Long customerNo = AuthUtil.getCustomerNo(requestUrl, port, request, redisTemplate, restTemplate);
+
+        ResponseEntity<Long> point = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/point/" + customerNo,
+                Long.class);
+
+        mav.addObject("point", point.getBody());
+
         return mav;
     }
 
@@ -60,7 +68,7 @@ public class InfoController {
      * @return mav
      */
     @GetMapping("/user")
-    public ModelAndView userInfoPage() {
+    public ModelAndView userInfoPage(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("index/info/check");
 
         return mav;
