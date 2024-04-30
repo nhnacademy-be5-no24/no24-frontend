@@ -196,6 +196,7 @@ public class PaymentController {
         }
 
         int deliveryFee = 3000;
+        totalPrice -= Long.parseLong(request.getParameter("usedPoint"));
 
         if(totalPrice >= 30000L) {
             deliveryFee = 0;
@@ -215,6 +216,7 @@ public class PaymentController {
         orderDto.setReceiverPhoneNumber(request.getParameter("receiverPhoneNumber"));
         orderDto.setOrderName(firstBookName + " 외 " + (isbnList.size() - 1) + "건");
         orderDto.setTotalPrice(totalPrice);
+        orderDto.setUsedPoint(Long.parseLong(request.getParameter("usedPoint")));
         orderDto.setDeliveryFee(deliveryFee);
         orderDto.setPostcode(request.getParameter("receiverPostcode"));
         orderDto.setAddress(request.getParameter("receiverAddress"));

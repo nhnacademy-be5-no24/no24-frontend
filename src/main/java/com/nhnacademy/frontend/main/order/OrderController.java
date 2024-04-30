@@ -136,8 +136,13 @@ public class OrderController {
         CartPaymentResponseDto cartInfo = response.getBody();
         System.out.println(cartInfo);
 
+        ResponseEntity<Long> point = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/point/" + customerNo,
+                Long.class);
+
         mav.addObject("cartInfo", cartInfo);
         mav.addObject("tomorrow", LocalDate.now().plusDays(1));
+        mav.addObject("point", point.getBody());
 
         return mav;
     }
@@ -250,6 +255,7 @@ public class OrderController {
                     .addressDetail(orderDto.getAddressDetail())
                     .req("")
                     .orderDetailDtoList(orderDto.getOrderDetailDto())
+                    .usedPoint(orderDto.getUsedPoint())
                     .build();
 
 

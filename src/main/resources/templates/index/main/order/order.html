@@ -103,6 +103,14 @@
             </tbody>
         </table>
 
+        <hr>
+
+        <h4>포인트 사용</h4>
+        <div class="form-group">
+            <label for="usedPoint" th:text="'포인트 사용(' + ${point} + ' 포인트 사용 가능)'"></label>
+            <input type="number" class="form-control" id="usedPoint" name="usedPoint" min="0" th:max="${point}" value="0">
+        </div>
+
         <div th:id="'book-coupon-info-' + ${item.getBookIsbn()}" th:each="item : ${cartInfo.getBookInfos()}" hidden>
             <div th:id="'coupon-info-' + ${coupon.getCouponMemberId()}" th:each="coupon : ${item.getCoupons()}">
                 <p class="coupon-member-id" th:text="${coupon.couponMemberId}"></p>
@@ -120,6 +128,8 @@
         <div hidden th:each="item : ${cartInfo.getBookInfos()}">
             <p th:each="wrap : ${item.getWraps()}" th:id="'wrap-price-' + ${wrap.getWrapId()}" th:text="${wrap.getWrapCost()}"></p>
         </div>
+
+        <p id="user_point" name="maxUserPoint" th:text="${point}" hidden />
 
         <hr>
 
@@ -178,6 +188,7 @@
         const couponMember = new Map();
         const bookInfo = new Map();
         const wrapInfo = new Map();
+        let maxUserPoint = 0;
 
         const updatePrice = () => {
             const selectedCoupon = new Set();
@@ -227,6 +238,7 @@
                 div.innerText = bookPrice;
                 totalPrice += bookPrice;
             });
+            totalPrice -= Number(document.querySelector("#usedPoint").value);
             // 가격 업데이트
             if(totalPrice < 30000) totalPrice += 3000;
             totalPriceDiv.innerText = totalPrice;
@@ -244,6 +256,8 @@
         }
 
         document.addEventListener("DOMContentLoaded", function() {
+            maxUserPoint = Number(document.querySelector("#user_point").innerText);
+
             document.querySelectorAll('[id^="book-coupon-info-"]').forEach(function(div) {
                 div.querySelectorAll('[id^="coupon-info-"]').forEach(function(couponInfo) {
                     let couponMemberId = couponInfo.querySelector('.coupon-member-id').innerText;
@@ -283,6 +297,17 @@
 
             updatePrice();
         });
+
+        document.querySelector("#usedPoint").addEventListener("change", restrictValue);
+
+        function restrictValue() {
+            console.log("hi");
+            if(this.value > Number(maxUserPoint)) {
+
+                this.value = maxUserPoint;
+            }
+            updatePrice();
+        };
 
         document.querySelectorAll('[id^="coupon-"]').forEach(function(couponDiv) {
             couponDiv.addEventListener("change", function() {
