@@ -3,12 +3,13 @@ package com.nhnacademy.frontend.main.order.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
 @Getter
-@Builder
+@Setter
 public class OrdersResponseDto {
     public enum OrderState {
         COMPLETE_PAYMENT, WAITING, SHIPPING, COMPLETED, RETURNS, ORDER_CANCELED, PURCHASE_CONFIRMED
@@ -28,6 +29,7 @@ public class OrdersResponseDto {
     private String address;
     private String addressDetail;
     private OrderState orderState;
+    private Long totalPrice;
 
     public OrdersResponseDto(String orderId,
                              String bookTitle,
@@ -52,4 +54,6 @@ public class OrdersResponseDto {
         this.addressDetail = addressDetail;
         this.orderState = orderState;
     }
+
+    private String orderTitle;
 }

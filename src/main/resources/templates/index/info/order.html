@@ -26,6 +26,35 @@
                 <h4 class="mb-3"><strong>주문/배송 목록</strong></h4>
 
 
+                <div th:each="order: ${orderList}" class="col-sm-12 card mt-2" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
+                    <div class="row justify-content-between">
+                        <div class="col-sm-8 p-3">
+<!--                             주문 리스트 -->
+                            <h5><strong th:text="'주문번호 : ' + ${order.getOrderId()}"></strong></h5>
+                            <p class="m-0"th:text="'주문일시 : '  + ${order.getOrderDate()}"></p>
+                            <p class="m-0"th:text="'주문상품 : '  + ${order.getBookTitle()}"></p>
+                            <p class="m-0"th:text="'받는 사람 : ' + ${order.getReceiverName()} + '(' + ${order.getReceiverPhoneNumber()} + ')'"/>
+                            <p class="m-0"th:text="'주소 : ' + ${order.getAddress()} + ' ' + ${order.getAddressDetail()}"/>
+                            <p class="m-0"th:text="'결제 금액' + ${order.getTotalPrice()}"></p>
+<!--                            <p class="m-0"th:text="'배송 상태' + ${order.}"></p>-->
+                        </div>
+                        <div class="col-xs-2 m-3">
+                            <div class="row-md-12">
+                                <form method="post" action="/info/order/detail">
+                                    <input type="text" name="order_id" value="order_id" hidden>
+                                    <button type="submit" class="btn btn-primary btn-block">주문 상세</button>
+                                </form>
+                            </div>
+                            <div class="row-md-12 mt-2">
+                                <form method="post" action="/info/order/delete">
+                                    <input type="text" name="order_id" value="order_id" hidden>
+                                    <button class="btn btn-danger btn-block">주문 취소</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="col-sm-12 card mt-2" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
                     <div class="row justify-content-between">
                         <div class="col-sm-8 p-3">

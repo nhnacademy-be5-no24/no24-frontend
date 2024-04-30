@@ -5,6 +5,9 @@ import com.nhnacademy.frontend.address.dto.request.AddressModifyRequestDto;
 import com.nhnacademy.frontend.address.dto.response.AddressResponseDto;
 import com.nhnacademy.frontend.address.dto.response.AddressResponseDtoList;
 import com.nhnacademy.frontend.coupon.dto.response.CouponMemberResponseDtoList;
+import com.nhnacademy.frontend.main.order.dto.response.OrdersResponseDtoList;
+import com.nhnacademy.frontend.point.dto.PointResponseDto;
+import com.nhnacademy.frontend.point.dto.PointResponseDtoList;
 import com.nhnacademy.frontend.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * User info Controller
@@ -102,10 +106,26 @@ public class InfoController {
      * @return mav
      */
     @PostMapping("/address/save")
-    public ModelAndView userAddressSave(AddressCreateRequestDto addressCreateRequestDto) {
+    public ModelAndView userAddressSave(HttpServletRequest request,
+                                        AddressCreateRequestDto addressCreateRequestDto) {
         ModelAndView mav = new ModelAndView("redirect:/info/address");
+        boolean isDefault = request.getParameter("defaultAddress").equals("on");
 
-        System.out.println(addressCreateRequestDto);
+        Long customerNo = AuthUtil.getCustomerNo(
+                requestUrl,
+                port,
+                request,
+                redisTemplate,
+                restTemplate);
+
+        addressCreateRequestDto.setIsDefault(isDefault);
+        addressCreateRequestDto.setCustomerNo(customerNo);
+
+        restTemplate.postForEntity(
+                requestUrl + ":" + port + "/shop/address/create",
+                addressCreateRequestDto,
+                null
+        );
 
         return mav;
     }
@@ -116,10 +136,17 @@ public class InfoController {
      * @return mav
      */
     @PostMapping("/address/modify")
-    public ModelAndView userAddressModify(AddressModifyRequestDto addressModifyRequestDto) {
+    public ModelAndView userAddressModify(HttpServletRequest request,
+                                          AddressModifyRequestDto addressModifyRequestDto) {
         ModelAndView mav = new ModelAndView("redirect:/info/address");
+        boolean isDefault = request.getParameter("defaultAddress").equals("on");
 
-        System.out.println(addressModifyRequestDto);
+        addressModifyRequestDto.setIsDefault(isDefault);
+
+        restTemplate.put(
+                requestUrl + ":" + port + "/shop/address/modify/" + request.getParameter("addressId"),
+                addressModifyRequestDto
+        );
 
         return mav;
     }
@@ -147,8 +174,6 @@ public class InfoController {
     public ModelAndView modifyUserAddressPage(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("index/info/address_save");
 
-        System.out.println(request.getParameter("address_id"));
-
         Long addressId = Long.parseLong(request.getParameter("address_id"));
 
         ResponseEntity<AddressResponseDto> addressResponseEntity = restTemplate.getForEntity(
@@ -171,7 +196,11 @@ public class InfoController {
     public ModelAndView deleteUserAddress(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("redirect:/info/address");
 
-        // todo: address_id에 대한 삭제 처리 필요
+        Long addressId = Long.parseLong(request.getParameter("address_id"));
+
+        restTemplate.delete(
+                requestUrl + ":" + port + "/shop/address/delete/" + addressId
+        );
 
         return mav;
     }
@@ -186,8 +215,27 @@ public class InfoController {
     public ModelAndView setDefaultUserAddress(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("redirect:/info/address");
 
-        // todo: address_id의 default address 설정 처리 필요
-//        System.out.println("modify to default!");
+        Long addressId = Long.parseLong(request.getParameter("address_id"));
+
+        AddressResponseDto addressResponseDto = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/address/" + addressId,
+                AddressResponseDto.class
+        ).getBody();
+
+        AddressModifyRequestDto addressModifyRequestDto = AddressModifyRequestDto.builder()
+                .alias(addressResponseDto.getAlias())
+                .receiverName(addressResponseDto.getReceiverName())
+                .receiverPhoneNumber(addressResponseDto.getReceiverPhoneNumber())
+                .zipcode(addressResponseDto.getZipcode())
+                .address(addressResponseDto.getAddress())
+                .addressDetail(addressResponseDto.getAddressDetail())
+                .isDefault(true)
+                .build();
+
+        restTemplate.put(
+                requestUrl + ":" + port + "/shop/address/modify/" + addressId,
+                addressModifyRequestDto
+        );
 
         return mav;
     }
@@ -247,8 +295,16 @@ public class InfoController {
      * @return mav
      */
     @GetMapping("/point")
-    public ModelAndView getUserPointPage() {
+    public ModelAndView getUserPointPage(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("index/info/point");
+        Long customerNo = AuthUtil.getCustomerNo(requestUrl, port, request, redisTemplate, restTemplate);
+
+        List<PointResponseDto> response = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/points/" + customerNo + "?page=0&size=10",
+                PointResponseDtoList.class
+        ).getBody().getPointResponseDtoList();
+
+        mav.addObject("pointList", response);
 
         return mav;
     }
@@ -259,8 +315,17 @@ public class InfoController {
      * @return mav
      */
     @GetMapping("/order")
-    public ModelAndView getUserOrderPage() {
+    public ModelAndView getUserOrderPage(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("index/info/order");
+
+        Long customerNo = AuthUtil.getCustomerNo(requestUrl, port, request, redisTemplate, restTemplate);
+
+        OrdersResponseDtoList ordersReponseDtoList = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/orders/customer/" + customerNo,
+                OrdersResponseDtoList.class
+        ).getBody();
+
+        mav.addObject("orderList", ordersReponseDtoList.getOrdersResponseDtos());
 
         return mav;
     }
