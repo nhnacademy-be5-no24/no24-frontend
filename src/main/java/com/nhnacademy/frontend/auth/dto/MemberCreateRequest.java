@@ -26,6 +26,7 @@ public class MemberCreateRequest {
     private String customerEmail;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate customerBirthday;
-
-    private Long gradeId;
+    private String customerPostcode;
+    private String customerAddress;
+    private String customerDetailAddress;
 }

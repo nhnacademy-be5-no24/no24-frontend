@@ -19,14 +19,14 @@
         <hr>
 
         <h4><strong id="order_title">주문 요약</strong></h4>
-        <p>주문 명 : <span th:text="${orderTitle}"></span></p>
-        <p>총 금액 : <span th:text="'50,000'"></span>원</p>
-        <p>배송지 : <span th:text="'대전광역시 유성구 궁동 99 정보화본부 N2-1 1303호'"></span></p>
-        <p id="order_id" th:text="${orderId}" hidden></p>
-        <p id="amount" th:text="${amount}" hidden></p>
-        <p id="customer_email" th:text="${customerEmail}" hidden></p>
-        <p id="customer_name" th:text="${customerName}" hidden></p>
-        <p id="customer_mobile_phone" th:text="${customerMobilePhone}" hidden></p>
+        <p>주문 명 : <span th:text="${order.orderName}"></span></p>
+        <p>총 금액 : <span th:text="${order.totalPrice}"></span>원</p>
+        <p>배송지 : <span th:text="${order.address} + ' ' + ${order.addressDetail} + '(' + ${order.postcode} + ')'"></span></p>
+        <p id="order_id" th:text="${order.orderId}" hidden></p>
+        <p id="amount" th:text="${order.totalPrice}" hidden></p>
+        <p id="customer_email" th:text="${order.customerPhoneNumber}" hidden></p>
+        <p id="customer_name" th:text="${order.customerName}" hidden></p>
+        <p id="customer_mobile_phone" th:text="${order.customerPhoneNumber}" hidden></p>
 
         <hr>
 
@@ -60,7 +60,7 @@
 
         const coupon = document.getElementById("coupon-box");
         const button = document.getElementById("payment-button");
-        const amount = 50000;
+        const amount = document.getElementById("amount").innerText;
 
         // 구매자의 고유 아이디를 불러와서 customerKey로 설정하세요.
         // 이메일・전화번호와 같이 유추가 가능한 값은 안전하지 않습니다.
@@ -86,8 +86,8 @@
             paymentWidget.requestPayment({
                 orderId: document.getElementById("order_id").innerText,
                 orderName: document.getElementById("order_title").innerText,
-                successUrl: window.location.origin + "/order/success",
-                failUrl: window.location.origin + "/order/fail",
+                successUrl: window.location.origin + "/order/payment/attempt",
+                failUrl: window.location.origin + "/cart",
                 customerEmail: document.getElementById("customer_email").innerText,
                 customerName: document.getElementById("customer_name").innerText,
                 customerMobilePhone: document.getElementById("customer_mobile_phone").innerText

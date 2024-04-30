@@ -18,17 +18,52 @@
         <hr>
 
         <h4>구매자 정보</h4>
-        <p>이름: <span th:text="'John Doe'"></span></p>
-        <p>이메일: <span th:text="'john.doe@example.com'"></span></p>
-        <p>전화번호: <span th:text="'123-456-7890'"></span></p>
+        <div class="form-group col-3 pl-0">
+            <label for="receiverName">이름</label>
+            <input type="text" class="form-control" id="customerName" name="customerName" th:value="${cartInfo.customerName}"
+                   placeholder="이름" disabled>
+        </div>
+        <div class="form-group col-3 pl-0">
+            <label for="customerEmail">이메일</label>
+            <input type="text" class="form-control" id="customerEmail" name="customerEmail" th:value="${cartInfo.customerEmail}"
+                   placeholder="이메일">
+        </div>
+        <div class="form-group col-3 pl-0">
+            <label for="customerPhoneNumber">전화번호</label>
+            <input type="tel" class="form-control" id="customerPhoneNumber" name="customerPhoneNumber"
+                   placeholder="전화번호" th:value="${cartInfo.customerPhoneNumber}">
+        </div>
 
         <hr>
 
         <h4>받는 사람 정보</h4>
-        <p>이름: <span th:text="'Jane Doe'"></span></p>
-        <p>주소: <span th:text="'123 Main St, City, Country'"></span></p>
-        <p>전화번호: <span th:text="'987-654-3210'"></span></p>
+        <div class="form-group col-3 pl-0">
+            <label for="receiverName">이름</label>
+            <input type="text" class="form-control" id="receiverName" name="receiverName"
+                   placeholder="이름" th:value="${cartInfo.receiverName}">
+        </div>
+        <div class="form-group col-3 pl-0">
+            주소
+            <input type="text" class="form-control" id="receiverPostcode" name="receiverPostcode" placeholder="우편번호" th:value="${cartInfo.zipcode}"
+                   onclick="sample6_execDaumPostcode()" autocomplete="off" />
+            <input type="text" class="form-control" id="receiverAddress" name="receiverAddress" placeholder="주소" th:value="${cartInfo.address}"
+                   onclick="sample6_execDaumPostcode()" />
+            <input type="text" class="form-control" id="receiverDetailAddress" name="receiverDetailAddress" placeholder="상세주소" th:value="${cartInfo.addressDetail}"
+                   autocomplete="off" />
+        </div>
+        <div class="form-group col-3 pl-0">
+            <label for="receiverPhoneNumber">전화번호</label>
+            <input type="text" class="form-control" id="receiverPhoneNumber" name="receiverPhoneNumber" th:value="${cartInfo.customerPhoneNumber}">
+        </div>
 
+        <hr>
+
+        <h4>배송 예정 날짜 선택</h4>
+            <div class="form-group">
+                <label for="shipDate">배송일자 설정</label>
+                <input type="date" class="form-control" id="shipDate" name="shipDate"
+                       placeholder="yyyy-mm-dd" th:min="${tomorrow}" th:value="${tomorrow}">
+            </div>
         <hr>
 
         <h4>상품 리스트</h4>
@@ -44,34 +79,52 @@
             </tr>
             </thead>
             <tbody>
-                <tr th:each="item, itemStat : ${cart}">
-                    <td th:text="${item.title}" />
+                <tr th:each="item : ${cartInfo.getBookInfos()}">
+                    <td th:text="${item.bookTitle}" th:id="'title-' + ${item.bookIsbn}" th:name="'title-' + ${item.bookIsbn}"/>
                     <td th:text="${item.quantity}" />
-                    <td th:text="${item.price}" />
+                    <td th:text="${item.bookSalePrice}" />
                     <td>
-                        <select class="form-control" th:id="'coupon-' + ${item.id}" th:name="'coupon-' + ${item.id}">
-                            <option value="0">미사용</option>
-                            <option value="1">생일 축하 쿠폰 3000원</option>
-                            <option value="2">소설 카테고리 5% 할인 쿠폰</option>
-                            <option value="3">플래티넘 등급 20% 할인 쿠폰</option>
+                        <select class="form-control" th:id="'coupon-' + ${item.bookIsbn}" th:name="'coupon-' + ${item.bookIsbn}">
+                            <option value="0">미선택</option>
+                            <option th:class="'coupon-member-' + ${coupon.getCouponMemberId()}" th:each="coupon : ${item.getCoupons()}" th:value="${coupon.getCouponMemberId()}" th:text="${coupon.getCouponName()}"></option>
                         </select>
                     </td>
                     <td>
-                        <a th:id="'wrap-input-' + ${item.id}">포장지 설정</a>
+                        <p th:if="${item.getWraps().isEmpty()}">포장 미지원 도서</p>
+                        <a th:unless="${item.getWraps().isEmpty()}" th:id="'wrap-input-' + ${item.bookIsbn}">포장지 설정</a>
                     </td>
                     <td>
-                        25000원
+                        <span th:id="'total-price-' + ${item.bookIsbn}" th:text="${item.quantity * item.bookSalePrice}"></span>
+                        원
                     </td>
-                    <input type="text" th:id="'wrap-info-' + ${item.id}" hidden th:name="'wrap-info-' + ${item.id}" />
-                    <input type="number" th:id="'quantity-' + ${item.id}" hidden th:name="'quantity-' + ${item.id}" th:value="${item.quantity}" />
+                    <input type="text" th:id="'wrap-info-' + ${item.bookIsbn}" hidden th:name="'wrap-info-' + ${item.bookIsbn}" />
+                    <input type="number" th:id="'quantity-' + ${item.bookIsbn}" hidden th:name="'quantity-' + ${item.bookIsbn}" th:value="${item.quantity}" />
                 </tr>
             </tbody>
         </table>
 
+        <div th:id="'book-coupon-info-' + ${item.getBookIsbn()}" th:each="item : ${cartInfo.getBookInfos()}" hidden>
+            <div th:id="'coupon-info-' + ${coupon.getCouponMemberId()}" th:each="coupon : ${item.getCoupons()}">
+                <p class="coupon-member-id" th:text="${coupon.couponMemberId}"></p>
+                <p class="discount-price" th:text="${coupon.discountPrice}"></p>
+                <p class="discount-rate" th:text="${coupon.discountRate}"></p>
+                <p class="max-discount-price" th:text="${coupon.maxDiscountPrice}"></p>
+            </div>
+        </div>
+
+        <!-- 책 정보 -->
+        <p hidden th:each="item : ${cartInfo.getBookInfos()}" th:id="'book-price-' + ${item.getBookIsbn()}" th:text="${item.getBookSalePrice()}"></p>
+        <p hidden th:each="item : ${cartInfo.getBookInfos()}" th:id="'book-quantity-' + ${item.getBookIsbn()}" th:text="${item.getQuantity()}"></p>
+
+        <!-- 포장 정보 -->
+        <div hidden th:each="item : ${cartInfo.getBookInfos()}">
+            <p th:each="wrap : ${item.getWraps()}" th:id="'wrap-price-' + ${wrap.getWrapId()}" th:text="${wrap.getWrapCost()}"></p>
+        </div>
+
         <hr>
 
         <h4>결제 정보</h4>
-        <p>총 가격: <span id="totalPrice" th:text="'50,000'"></span>원</p>
+        <p>총 가격: <span id="totalPrice"></span>원</p>
 
         <!-- 결제하기 버튼 -->
         <button type="submit" class="btn btn-primary mb-4" id="payment-button">결제하기</button>
@@ -93,18 +146,170 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
             integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
 
+    <!-- 카카오 도로명 주소 API -->
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
     <script>
+        function sample6_execDaumPostcode() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+                    // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+                    // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+                    var addr = ''; // 주소 변수
+                    var extraAddr = ''; // 참고항목 변수
+
+                    // 사용자가 어떤 주소를 선택하든 저장되는 주소는 도로명 주소 !
+                    addr = data.roadAddress;
+
+                    // 우편번호와 주소 정보를 해당 필드에 넣는다.
+                    document.getElementById('receiverPostcode').value = data.zonecode;
+                    document.getElementById("receiverAddress").value = addr;
+                    // 커서를 상세주소 필드로 이동한다.
+                    document.getElementById("receiverDetailAddress").focus();
+                }
+            }).open();
+        }
+    </script>
+
+    <!-- 가격 업데이트 -->
+    <script>
+        const couponMember = new Map();
+        const bookInfo = new Map();
+        const wrapInfo = new Map();
+
+        const updatePrice = () => {
+            const selectedCoupon = new Set();
+            let totalPriceDiv = document.querySelector("#totalPrice");
+            let totalPrice = 0;
+
+            document.querySelectorAll('[id^="total-price-"]').forEach(function(div) {
+                let bookIsbn = div.id.split("-")[div.id.split("-").length - 1];
+                let couponId = document.querySelector(`#coupon-${bookIsbn}`).value;
+                let book = bookInfo.get(bookIsbn);
+                let bookPrice = bookInfo.get(bookIsbn).get("quantity") * bookInfo.get(bookIsbn).get("price");
+
+                let wraps = document.querySelector(`#wrap-info-${bookIsbn}`).value;
+
+                if(wraps !== "") {
+                    JSON.parse(wraps).forEach(function(wrap) {
+                        let wrapId = wrap["wrapId"];
+                        let quantity = Number(wrap["quantity"]);
+                        let wrapCost = wrapInfo.get(wrapId + "");
+
+                        console.log(wrapId + " " + quantity + " " + wrapCost);
+
+                        bookPrice += (quantity * wrapCost);
+                    });
+                }
+
+                // let wrapCost = wrapInfo.get(wrapId);
+
+                if(couponId != 0) {
+                    let coupon = couponMember.get(couponId);
+                    let discountPrice = coupon.get("discountPrice");
+                    let discountRate = coupon.get("discountRate");
+                    let maxDiscountPrice = coupon.get("maxDiscountPrice");
+
+                    if(discountPrice != 0) {
+                        bookPrice -= discountPrice;
+                    }
+                    else {
+                        discountPrice = Math.floor(bookPrice * discountRate / 100);
+                        discountPrice = Math.min(discountPrice, maxDiscountPrice);
+
+                        bookPrice -= discountPrice;
+                    }
+
+                    selectedCoupon.add(couponId);
+                }
+                div.innerText = bookPrice;
+                totalPrice += bookPrice;
+            });
+            // 가격 업데이트
+            if(totalPrice < 30000) totalPrice += 3000;
+            totalPriceDiv.innerText = totalPrice;
+
+            // select option 조정
+            document.querySelectorAll('[class^="coupon-member-"]').forEach(function(div) {
+                div.hidden = false;
+            })
+
+            selectedCoupon.forEach((value) => {
+                document.querySelectorAll(`.coupon-member-${value}`).forEach(function(div) {
+                    div.hidden = true;
+                })
+            })
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('[id^="book-coupon-info-"]').forEach(function(div) {
+                div.querySelectorAll('[id^="coupon-info-"]').forEach(function(couponInfo) {
+                    let couponMemberId = couponInfo.querySelector('.coupon-member-id').innerText;
+                    let discountPrice = Number(couponInfo.querySelector('.discount-price').innerText);
+                    let discountRate = Number(couponInfo.querySelector('.discount-rate').innerText);
+                    let maxDiscountPrice = Number(couponInfo.querySelector('.max-discount-price').innerText);
+
+                    const coupon = new Map();
+
+                    coupon.set("discountPrice", discountPrice);
+                    coupon.set("discountRate", discountRate);
+                    coupon.set("maxDiscountPrice", maxDiscountPrice);
+
+                    couponMember.set(couponMemberId, coupon);
+                });
+            });
+
+            document.querySelectorAll('[id^="book-price-"]').forEach(function(bookPrice) {
+                let bookIsbn = bookPrice.id.split("-")[bookPrice.id.split("-").length - 1];
+                let quantity = document.querySelector(`#book-quantity-${bookIsbn}`).innerText;
+
+                const book = new Map();
+
+                book.set("price", Number(bookPrice.innerText));
+                book.set("quantity", Number(quantity));
+
+                bookInfo.set(bookIsbn, book);
+            });
+
+            document.querySelectorAll('[id^="wrap-price-"]').forEach(function(wrap) {
+                let wrapId = wrap.id.split("-")[wrap.id.split("-").length - 1];
+                let cost = Number(wrap.innerText);
+                Number(wrap.innerText);
+
+                wrapInfo.set(wrapId, cost);
+            })
+
+            updatePrice();
+        });
+
+        document.querySelectorAll('[id^="coupon-"]').forEach(function(couponDiv) {
+            couponDiv.addEventListener("change", function() {
+                updatePrice();
+            });
+        });
+
         document.querySelectorAll('[id^="wrap-input-"]').forEach(function(btn) {
             btn.addEventListener("click", function () {
+                let bookIsbn = btn.id.split("-")[2];
                 // 팝업창을 열기 위한 코드
-                let popup = window.open('/order/input/wrap', 'popup', 'width=800, height=500');
+                let popup = window.open('/order/input/wrap/' + bookIsbn, 'popup', 'width=800, height=500');
 
                 // 팝업창이 닫힐 때 값을 전달받기 위한 이벤트 리스너
                 window.addEventListener('message', function (event) {
                     // 전달받은 값이 있다면 처리
                     if (event.data) {
-                        console.log(event.data);
-                        document.getElementById('wrap-info-' + btn.id.split("-")[2]).value = event.data;
+                        if(event.data.toString().split("-")[0] === bookIsbn) {
+                            if(event.data.toString().split("-")[1] === "cancel") {
+                                document.getElementById('wrap-info-' + bookIsbn).value = "";
+                            }
+                            else {
+                                document.getElementById('wrap-info-' + bookIsbn).value =
+                                    event.data.toString().split("-")[1];
+                            }
+                        }
+                        updatePrice();
                     }
                 });
             });

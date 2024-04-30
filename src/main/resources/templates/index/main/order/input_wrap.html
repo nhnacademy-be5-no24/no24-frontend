@@ -25,8 +25,7 @@
             <tr class="packaging-table-row">
                 <td>
                     <select class="form-control packaging-select">
-                        <option value="1">고급 포장지</option>
-                        <option value="2">일반 포장지</option>
+                        <option th:each="wrap : ${wrapList}" th:value="${wrap.getWrapId()}" th:text="${wrap.getWrapName()}"></option>
                     </select>
                 </td>
                 <td class="price align-middle">500</td>
@@ -37,9 +36,15 @@
             </tbody>
         </table>
 
+        <div hidden>
+            <p th:each="wrap : ${wrapList}" th:id="'wrap-' + ${wrap.getWrapId()}" th:text="${wrap.getWrapCost()}"></p>
+        </div>
+
         <button class="btn btn-success" id="add-row">행 추가</button>
 
         <button class="btn btn-primary" id="submit-btn" onclick="sendMessage()">적용하기</button>
+
+        <button class="btn btn-danger" id="submit-none" onclick="cancel()">포장 취소</button>
     </div>
 
 
@@ -53,30 +58,32 @@
             integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
 
     <script>
+        let count = 1;
+        let maxCount = document.querySelectorAll('[id^="wrap-"]').length;
+
         $(document).ready(function() {
             // Add Row Button Click Event
-            $("#add-row").click(function() {
-                var newRow = `
-                <tr class="packaging-table-row">
-                    <td>
-                        <select class="form-control packaging-select">
-                            <option value="1">고급 포장지</option>
-                            <option value="2">일반 포장지</option>
-                        </select>
-                    </td>
-                    <td class="price align-middle">500</td>
-                    <td><input type="number" class="form-control quantity" value="1" min="1"></td>
-                    <td class="total align-middle">0</td>
-                    <td><button class="btn btn-danger delete-row">포장 삭제</button></td>
-                </tr>
-            `;
-                $("#packaging-table tbody").append(newRow);
+            $('#add-row').click(function() {
+                if(count >= maxCount) {
+                    alert("포장지 개수가 최대입니다.");
+                    return;
+                }
+                let newRow = $('.packaging-table-row').first().clone(); // 첫 번째 행 복제
+                newRow.find('.quantity').val('1'); // 수량 초기화
+                newRow.find('.total').text(''); // 총 금액 초기화
+                $('#packaging-table tbody').append(newRow); // 테이블에 새로운 행 추가
                 calculateTotal();
+                count++;
             });
 
             // Delete Row Button Click Event
             $(document).on("click", ".delete-row", function() {
+                if(count <= 1) {
+                    alert("포장지 개수가 최소입니다.");
+                    return;
+                }
                 $(this).closest("tr").remove();
+                count--;
             });
 
             // Calculate Total Price
@@ -89,6 +96,17 @@
                 });
             }
 
+            $(document).on("change", ".packaging-select", function(e) {
+                let currentDiv = e.target;
+                let priceDiv = document.querySelector(`#wrap-${currentDiv.value}`);
+                console.log(currentDiv.parentElement.parentElement);
+                let targetDiv = currentDiv.parentElement.parentElement.querySelector('.price');
+                let price = Number(priceDiv.innerText);
+                // console.log(targetDiv);
+
+                targetDiv.innerText = price;
+            })
+
             // Calculate Total on Change
             $(document).on("change", ".packaging-select, .quantity", function() {
                 calculateTotal();
@@ -97,6 +115,16 @@
             // Initial Calculation
             calculateTotal();
         });
+
+        function cancel() {
+            let match = window.location.href.match(/\/wrap\/([0-9a-zA-Z]+)/);
+            let bookIsbn = match ? match[1] : null;
+            // 메인 페이지로 값을 전달
+            window.opener.postMessage(bookIsbn + "-cancel", "*");
+
+            // 팝업창 닫기
+            window.close();
+        }
 
         function sendMessage() {
             let arr = [];
@@ -115,8 +143,10 @@
                 arr.push(item);
             });
 
+            let match = window.location.href.match(/\/wrap\/([0-9a-zA-Z]+)/);
+            let bookIsbn = match ? match[1] : null;
             // 메인 페이지로 값을 전달
-            window.opener.postMessage(JSON.stringify(arr), '*');
+            window.opener.postMessage(bookIsbn + "-" + JSON.stringify(arr), '*');
 
             // 팝업창 닫기
             window.close();

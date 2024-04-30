@@ -33,37 +33,37 @@
 
                     <div class="col-md-8">
                         <!-- 아이템 -->
-                        <div class="col-md-12" th:each="item : ${cart}">
+                        <div class="col-md-12" th:each="item : ${cart}" th:id="'item-box-' + ${item.bookIsbn}">
                             <div class="card mb-3">
                                 <div class="row no-gutters">
                                     <div class="col-md-1 d-flex align-items-center justify-content-center">
                                         <!-- 개별 선택 체크박스 -->
-                                        <input type="checkbox" th:name="'item-checkbox-' + ${item.id}" class="item-checkbox" style="width: 25px; height: 25px;">
+                                        <input type="checkbox" th:name="'item-checkbox-' + ${item.bookIsbn}" class="item-checkbox" style="width: 25px; height: 25px;">
                                     </div>
                                     <div class="col-md-2 pt-4 pb-4 justify-content-center">
-                                        <img th:src="@{/img/book1.jpg}" alt="Book Image" style="width: 100%; height: auto; margin: 0 auto;">
+                                        <img th:src="'https://kr1-api-object-storage.nhncloudservice.com/v1/AUTH_fcb81f74e379456b8ca0e091d351a7af/no24/' + ${item.getBookImage()}" th:alt="${item.getBookTitle()}" style="width: 100%; height: auto; margin: 0 auto;">
                                     </div>
                                     <div class="col-md-8">
                                         <div class="card-body">
-                                            <h5 class="card-title" th:text="${item.title}"></h5>
+                                            <h5 class="card-title" th:text="${item.bookTitle}"></h5>
                                             <p class="card-text">배송 예정: <span>2 ~ 3일 소요</span></p>
-                                            <p class="card-text">가격: <span th:text="${item.price}"/>원 (<span th:text="${item.discount}"/> 원 할인)</p>
+                                            <p class="card-text">할인가: <span th:text="${item.bookSalePrice}"/>원 (정가: <span th:text="${item.bookFixedPrice}"/>)</p>
 
                                             <!-- 개수 수정 input -->
                                             <div class="col-md-3 input-group p-0">
                                                 <div class="input-group-prepend">
-                                                    <button class="btn btn-outline-secondary" type="button" th:id="'decreaseQty-' + ${item.id}">-</button>
+                                                    <button class="btn btn-outline-secondary" type="button" th:id="'decreaseQty-' + ${item.bookIsbn}">-</button>
                                                 </div>
-                                                <input type="number" class="form-control" th:value="${item.quantity}" th:id="'quantity-' + ${item.id}" th:name="'quantity-' + ${item.id}" min="1" style="text-align: center;">
+                                                <input type="number" class="form-control" th:value="${item.bookQuantity}" th:id="'quantity-' + ${item.bookIsbn}" th:name="'quantity-' + ${item.bookIsbn}" min="1" style="text-align: center;">
                                                 <div class="input-group-append">
-                                                    <button class="btn btn-outline-secondary" type="button" th:id="'increaseQty-' + ${item.id}">+</button>
+                                                    <button class="btn btn-outline-secondary" type="button" th:id="'increaseQty-' + ${item.bookIsbn}">+</button>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="deleteCart">
                                         <!-- 삭제 버튼 추가 -->
-                                        <button type="button" class="btn btn-danger delete-button" th:attr="data-item-id=${item.id}">X</button>
+                                        <button type="button" class="btn btn-danger delete-button" th:id="'deleteBtn-' + ${item.bookIsbn}">X</button>
                                     </div>
                                 </div>
                             </div>
@@ -187,15 +187,14 @@
                     console.log(itemElements);
 
                     let itemPrice = parseFloat(itemElements[1].textContent);
-                    let itemDiscount = parseFloat(itemElements[2].textContent);
+                    let itemFixedPrice = parseFloat(itemElements[2].textContent);
                     let itemQuantity = checkbox.parentElement.parentElement.querySelectorAll('[id^="quantity-"]')[0].value;
+                    let itemDiscount = itemFixedPrice - itemPrice;
 
                     total += (itemPrice * itemQuantity);
                     discount += (itemDiscount * itemQuantity);
                 }
             });
-
-            total -= discount;
 
             let deliveryFee = total >= 30000 ? 0 : total != 0 ? 3000 : 0;
             let totalPrice = total + deliveryFee;
@@ -218,15 +217,14 @@
             // todo: customerNo 가져오기
             // var customerNo = {함수 정의}
 
-            fetch('shop/cart/update/', {
+            fetch('/cart/update', {
                 method: 'PUT',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'customerNo': customerNo
+                    'Content-Type': 'application/json'
                 },
                 body : JSON.stringify({
-                    book_isbn: itemId,
-                    quantity: newQuantity
+                    bookIsbn: itemId,
+                    bookQuantity: newQuantity
                 })
             })
                 .then(response => {
@@ -301,19 +299,19 @@
                 });
             });
 
-            // 장바구니 삭제
-            document.addEventListener("DOMContentLoaded", function() {
-                // 삭제 버튼에 대한 클릭 이벤트 처리
-                document.querySelectorAll('.delete-button').forEach(function(button) {
-                    button.addEventListener('click', function() {
-                        var itemId = this.getAttribute('data-item-id');
-                        deleteCartBook(customerNo, itemId);
-                    });
+            // 삭제 버튼에 대한 클릭 이벤트 처리
+            document.querySelectorAll('[id^="deleteBtn-"]').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    // todo: delete tmp console
+                    console.log("try delete!");
+                    // 해당 버튼의 ID에서 아이템 ID를 추출
+                    var itemId = this.id.split("-")[1];
+                    deleteCartBook(itemId);
                 });
             });
 
-            function deleteCartBook(customerNo, bookIsbn) {
-                fetch('/shop/cart/deleteOne/' + customerNo + '?bookIsbn=' + bookIsbn, {
+            function deleteCartBook(bookIsbn) {
+                fetch('/cart/delete/' + bookIsbn, {
                     method: 'DELETE'
                 })
                     .then(response => {
@@ -321,9 +319,10 @@
                             throw new Error("상품 삭제 실패!");
                         }
                         console.log("상품 삭제 성공!");
-                        // // 삭제 성공 시 화면에서 해당 상품 제거
-                        // var itemElement = document.querySelector('[data-item-id="' + itemId + '"]').closest('.col-md-12');
-                        // itemElement.remove();
+                        // 삭제 성공 시 화면에서 해당 상품 제거
+                        var itemElement = document.querySelector('#item-box-' + bookIsbn);
+                        itemElement.remove();
+
                         updateTotalPrice();
                     })
                     .catch(error => {
@@ -332,25 +331,22 @@
             }
 
             // 결제하기 버튼 클릭 시, 선택된 상품 정보 redis에 저장
-            document.addEventListener("DOMContentLoaded", function() {
-                document.getElementById('submit-button').addEventListener('click', function () {
-                    var selectedBooks = [];
-                    document.querySelectorAll('.item-checkbox').forEach(function (checkbox) {
-                        var bookIsbn = checkbox.getAttribute('data-item-id');
-                        var quantity = parseInt(document.getElementById('quantity-' + itemId).value);
-                        selectedBooks.push({bookIsbn: bookIsbn, quantity: quantity});
-                    });
-
-                    createOrder(selectedBooks);
+            document.getElementById('submit-button').addEventListener('click', function () {
+                var selectedBooks = [];
+                document.querySelectorAll('.item-checkbox').forEach(function (checkbox) {
+                    var bookIsbn = checkbox.getAttribute('data-item-id');
+                    var quantity = parseInt(document.getElementById('quantity-' + itemId).value);
+                    selectedBooks.push({bookIsbn: bookIsbn, quantity: quantity});
                 });
+
+                createOrder(selectedBooks);
             });
 
             function createOrder(books) {
                 fetch('/cartOrder/create', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'customerNo': customerNo // customerId를 헤더에 추가
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({customerNo: customerNo, book: books})
                 })

@@ -41,9 +41,9 @@ public class LoginController {
     private String port;
 
     private final RestTemplate restTemplate;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate redisTemplate;
 
-    public LoginController(RestTemplate restTemplate, RedisTemplate<String, Object> redisTemplate) {
+    public LoginController(RestTemplate restTemplate, RedisTemplate redisTemplate) {
         this.restTemplate = restTemplate;
         this.redisTemplate = redisTemplate;
     }
