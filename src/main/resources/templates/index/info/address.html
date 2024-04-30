@@ -25,32 +25,32 @@
             <div class="col-10 mt-4 mb-4">
                 <h4><strong>배송주소 관리</strong></h4>
                 <!-- 배송주소 수정 -->
-                <div class="col-sm-12 card mt-2" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
+                <div th:each="address: ${addressList}" class="col-sm-12 card mt-2" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
                     <div class="row justify-content-between">
                         <div class="col-sm-8 p-3">
                             <!-- 주소 리스트 -->
-                            <h5><strong>우리 집</strong></h5>
-                            <p class="m-0">받는 사람 : Test User (010-1234-4556)</p>
-                            <p class="m-0">주소 : 대전광역시 유성구 궁동 99 정보화본부 N2-1 1306호</p>
-                            <p class="m-0">기본 배송지 O</p>
+                            <h5><strong th:text="${address.getAlias()}">우리 집</strong></h5>
+                            <p class="m-0" th:text="'받는 사람 : ' + ${address.getReceiverName()} + '(' + ${address.getReceiverPhoneNumber()} + ')'"></p>
+                            <p class="m-0" th:text="'주소 : ' + ${address.getAddress()} + ' ' + ${address.getAddressDetail()} + ' (' + ${address.getZipcode()} + ')'"></p>
+                            <b><p class="m-0" th:if="${address.getIsDefault()}">기본 배송지</p></b>
                         </div>
                         <div class="col-xs-2 m-3">
                             <div class="row-md-12">
-                                <form method="post" action="/info/address/modify">
-                                    <input type="text" name="address_id" value="address_id" hidden>
+                                <form method="post" action="/info/address/modify/page">
+                                    <input type="text" name="address_id" th:value="${address.getAddressId()}" hidden>
                                     <button type="submit" class="btn btn-primary btn-block">배송지 수정</button>
                                 </form>
                             </div>
                             <div class="row-md-12 mt-2">
                                 <form method="post" action="/info/address/set/default">
-                                    <input type="text" name="address_id" value="address_id" hidden>
-                                    <button class="btn btn-success btn-block">기본 배송지 설정</button>
+                                    <input type="text" name="address_id" th:value="${address.getAddressId()}" hidden>
+                                    <button class="btn btn-success btn-block" th:disabled="${address.getIsDefault()}">기본 배송지 설정</button>
                                 </form>
                             </div>
                             <div class="row-md-12 mt-2">
                                 <form method="post" action="/info/address/delete">
-                                    <input type="text" name="address_id" value="address_id" hidden>
-                                    <button class="btn btn-danger btn-block">삭제</button>
+                                    <input type="text" name="address_id" th:value="${address.getAddressId()}" hidden>
+                                    <button class="btn btn-danger btn-block" th:disabled="${addressList.size() == 1}">삭제</button>
                                 </form>
                             </div>
                         </div>

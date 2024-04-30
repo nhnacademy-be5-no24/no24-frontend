@@ -1,14 +1,26 @@
 package com.nhnacademy.frontend.admin;
 
+import com.nhnacademy.frontend.category.dto.CategoryResponseDto;
+import com.nhnacademy.frontend.coupon.dto.CouponTarget;
+import com.nhnacademy.frontend.coupon.dto.Status;
+import com.nhnacademy.frontend.coupon.dto.request.CouponRequestDto;
+import com.nhnacademy.frontend.coupon.dto.response.CouponMemberResponseDtoList;
+import com.nhnacademy.frontend.coupon.dto.response.CouponResponseDto;
+import com.nhnacademy.frontend.coupon.dto.response.CouponResponseDtoList;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Admin Page Controller
@@ -18,7 +30,17 @@ import java.util.Iterator;
  */
 @Controller
 @RequestMapping("/admin")
+@RequiredArgsConstructor
+@Slf4j
 public class AdminController {
+    @Value("${request.url}")
+    private String requestUrl;
+
+    @Value("${request.port}")
+    private String port;
+
+    private final RestTemplate restTemplate;
+
     /**
      * get Admin Main Page
      * @Param none
@@ -128,6 +150,77 @@ public class AdminController {
     public ModelAndView getAdminCoupon() {
         ModelAndView mav = new ModelAndView("index/admin/coupon");
 
+        ResponseEntity<CouponResponseDtoList> couponResponseDto = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/coupon?pageSize=0&offset=10",
+                CouponResponseDtoList.class
+        );
+        List<CouponResponseDto> couponList = couponResponseDto.getBody().getCouponResponseDtoList();
+
+        mav.addObject("couponList", couponList);
+
+        return mav;
+    }
+
+    /**
+     * get managing coupon page
+     * @Param none
+     * @return mav
+     */
+    @GetMapping("/coupon/add")
+    public ModelAndView getAddCouponPage() {
+        ModelAndView mav = new ModelAndView("index/admin/add_coupon");
+        mav.addObject("tomorrow", LocalDate.now().plusDays(1));
+
+        return mav;
+    }
+
+    /**
+     * save coupon
+     * @Param none
+     * @return mav
+     */
+    @PostMapping("/coupon/add")
+    public ModelAndView saveCoupon(HttpServletRequest request, CouponRequestDto couponRequestDto) {
+        ModelAndView mav = new ModelAndView("redirect:/admin/coupon");
+
+        // get data
+        String couponName = request.getParameter("couponName");
+        String deadline = request.getParameter("expirationDate");
+
+        String couponType = request.getParameter("couponType");
+        String discountAmount = request.getParameter("discountAmount");
+        String minOrderAmount = request.getParameter("minOrderAmount");
+        String discountPercentage = request.getParameter("discountPercentage");
+        String maxDiscountAmount = request.getParameter("maxDiscountAmount");
+
+        String couponTarget = request.getParameter("couponTarget");
+        String bookISBN = request.getParameter("bookISBN");
+        String categoryName = request.getParameter("categoryName");
+
+        // Dto 기본 세팅
+        couponRequestDto.setCouponStatus(Status.ACTIVE);
+
+        if(couponRequestDto.getCouponTarget() == CouponTarget.CATEGORY) {
+            try {
+                ResponseEntity<CategoryResponseDto> categoryResponseEntity = restTemplate.getForEntity(
+                        requestUrl + ":" + port + "/shop/categories/name/" + categoryName,
+                        CategoryResponseDto.class
+                );
+                couponRequestDto.setCategoryId(categoryResponseEntity.getBody().getCategoryId());
+            } catch (Exception e) {
+                log.error("카테고리 이름이 없습니다.");
+                mav.setViewName("redirect:/error");
+
+                return mav;
+            }
+        }
+
+        ResponseEntity<CouponResponseDto> couponResponseEntity = restTemplate.postForEntity(
+                requestUrl + ":" + port + "/shop/coupon/create",
+                couponRequestDto,
+                CouponResponseDto.class
+        );
+
         return mav;
     }
 
@@ -140,11 +233,25 @@ public class AdminController {
     public ModelAndView getManageCoupon(@PathVariable Long couponId) {
         ModelAndView mav = new ModelAndView("index/admin/modify_coupon");
 
+        ResponseEntity<CouponResponseDto> couponResponseEntity = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/coupon/" + couponId,
+                CouponResponseDto.class
+        );
+
+        LocalDate deadline = couponResponseEntity.getBody().getDeadline()
+                        .toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate();
+
+        mav.addObject("tomorrow", LocalDate.now().plusDays(1));
+        mav.addObject("coupon", couponResponseEntity.getBody());
+        mav.addObject("couponDeadline", deadline);
+
         return mav;
     }
 
     /**
-     * get managing coupon page
+     * save coupon
      * @Param none
      * @return mav
      */

@@ -19,41 +19,19 @@
                 <h4 class="mb-3"><strong>쿠폰함</strong></h4>
                 <!-- todo: 쿠폰 이미지 고려 필요 -->
                 <div class="row">
-                    <div class="col-sm-5 card p-4 m-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
+                    <div th:each="coupon : ${couponList}" class="col-sm-5 card p-4 m-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
                         <div class="row">
                             <div class="col-md-5">
-                                <img src="/icon/coupon/coupon_3000.png" style="height:70px;">
+                                <img th:if="${coupon.getDiscountPrice() != null}" th:src="'/icon/coupon/coupon_' + ${coupon.getDiscountPrice()} + '.png'" style="height:70px;">
+                                <img th:if="${coupon.getDiscountRate() != null}" th:src="'/icon/coupon/coupon_' + ${coupon.getDiscountRate()} + 'percent.png'" style="height:70px;">
                             </div>
                             <div class="col-md-7">
-                                <h4><strong>생일 축하 쿠폰</strong></h4>
-                                <p>도서 3,000원 할인</p>
+                                <h4><strong th:text="${coupon.getCouponName()}"></strong></h4>
+                                <p th:if="${coupon.getDiscountPrice() != null}" th:text="'도서 ' + ${coupon.getDiscountPrice()} + '원 할인'">도서 3,000원 할인</p>
+                                <p th:if="${coupon.getDiscountRate() != null}" th:text="'도서 ' + ${coupon.getDiscountRate()} + '% 할인 (최대금액: ' + ${coupon.getMaxDiscountPrice()} + '원 할인)'">도서 3,000원 할인</p>
                             </div>
                         </div>
-                        <button class="btn btn-primary">쿠폰 발급받기</button>
-                    </div>
-                    <div class="col-sm-5 card p-4 m-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
-                        <div class="row">
-                            <div class="col-md-5">
-                                <img src="/icon/coupon/coupon_3000.png" style="height:70px;">
-                            </div>
-                            <div class="col-md-7">
-                                <h4><strong>생일 축하 쿠폰</strong></h4>
-                                <p>도서 3,000원 할인</p>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary">쿠폰 발급받기</button>
-                    </div>
-                    <div class="col-sm-5 card p-4 m-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
-                        <div class="row">
-                            <div class="col-md-5">
-                                <img src="/icon/coupon/coupon_3000.png" style="height:70px;">
-                            </div>
-                            <div class="col-md-7">
-                                <h4><strong>생일 축하 쿠폰</strong></h4>
-                                <p>도서 3,000원 할인</p>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary">쿠폰 발급받기</button>
+                        <a th:href="'/coupon/issue/' + ${coupon.getCouponId()}" class="btn btn-primary">쿠폰 발급받기</a>
                     </div>
                 </div>
 

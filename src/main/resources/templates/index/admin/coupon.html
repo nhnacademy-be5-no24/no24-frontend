@@ -28,11 +28,14 @@
             <span class="text-muted"> * 각 쿠폰을 클릭하면 쿠폰 정책 수정페이지로 이동합니다.</span>
 
             <form class="row mt-3">
-                <div class="col-9">
+                <div class="col-8">
                     <input class="form-control mr-sm-2" type="search" placeholder="쿠폰 검색" aria-label="Search">
                 </div>
                 <div class="col-2">
                     <button class="btn btn-outline-success btn-block" type="submit">쿠폰 검색</button>
+                </div>
+                <div class="col-2">
+                    <a href="/admin/coupon/add" class="btn btn-primary btn-block">쿠폰 추가</a>
                 </div>
             </form>
 
@@ -42,181 +45,45 @@
             <div class="col-md-12">
                 <div class="row admin-coupon">
                     <!-- todo: 쿠폰 종류 별 레이아웃 변경 필요 -->
-
-                    <!-- 금액 / 대상 없음 -->
-                    <a href="/admin/coupon/modify/1" class="col-sm-5 card p-4 m-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
-                        <h4><strong>생일 축하 쿠폰</strong></h4>
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <th scope="row">만료일</th>
-                                    <td>2099년 12월 31일</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">쿠폰 타입</th>
-                                    <td>금액 차감 쿠폰</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">할인 금액</th>
-                                    <td>3,000원</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">주문 최소 금액</th>
-                                    <td>3,000원</td>
-                                </tr>
-                                <tr>
-                                    <th scope="row">대상</th>
-                                    <td>없음</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </a>
-
-                    <!-- 할인율 / 대상 없음 -->
-                    <a href="/admin/coupon/modify/2" class="col-sm-5 card p-4 m-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
-                        <h4><strong>로얄 등급 쿠폰</strong></h4>
+                    <a th:each="coupon : ${couponList}" th:href="'/admin/coupon/modify/' + ${coupon.getCouponId()}" class="col-sm-5 card p-4 m-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
+                        <h4><strong th:text="${coupon.getCouponName()}">생일 축하 쿠폰</strong></h4>
                         <table>
                             <tbody>
                             <tr>
                                 <th scope="row">만료일</th>
-                                <td>2024년 5월 31일</td>
+                                <td th:text="${coupon.getDeadline()}"></td>
                             </tr>
                             <tr>
                                 <th scope="row">쿠폰 타입</th>
-                                <td>금액 대비 금액 차감 쿠폰</td>
+                                <td th:text="${coupon.getCouponType().toString().equals('AMOUNT') ? '금액 차감 쿠폰' : '금액 대비 금액 차감 쿠폰'}"></td>
                             </tr>
-                            <tr>
+                            <tr th:if="${coupon.getCouponTarget().toString().equals('AMOUNT')}">
+                                <th scope="row">할인 금액</th>
+                                <td th:text="${coupon.getDiscountPrice()} + '원'"></td>
+                            </tr>
+                            <tr th:if="${coupon.getCouponTarget().toString().equals('PERCENTAGE')}">
                                 <th scope="row">할인율</th>
-                                <td>10%</td>
+                                <td th:text="${coupon.getDiscountRate()} + '%'"></td>
                             </tr>
-                            <tr>
+                            <tr th:if="${coupon.getCouponTarget().toString().equals('PERCENTAGE')}">
                                 <th scope="row">최대 할인 금액</th>
-                                <td>3,000원</td>
+                                <td th:text="${coupon.getMaxDiscountPrice()} + '원'">3,000원</td>
                             </tr>
-                            <tr>
+                            <tr th:if="${coupon.getCouponType().toString().equals('BOOK')}">
+                                <th scope="row">대상</th>
+                                <td th:text="${coupon.getBookIsbn()}"></td>
+                            </tr>
+                            <tr th:if="${coupon.getCouponType().toString().equals('CATEGORY')}">
+                                <th scope="row">대상</th>
+                                <td th:text="${coupon.getCategoryId()}"></td>
+                            </tr>
+                            <tr th:if="${!coupon.getCouponType().toString().equals('CATEGORY') && !coupon.getCouponType().toString().equals('BOOK')}">
                                 <th scope="row">대상</th>
                                 <td>없음</td>
                             </tr>
                             </tbody>
                         </table>
                     </a>
-
-                    <!-- 금액 / 도서 -->
-                    <a href="/admin/coupon/modify/3" class="col-sm-5 card p-4 m-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
-                        <h4><strong>A 도서 특별 쿠폰</strong></h4>
-                        <table>
-                            <tbody>
-                            <tr>
-                                <th scope="row">만료일</th>
-                                <td>2024년 12월 31일</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">쿠폰 타입</th>
-                                <td>금액 차감 쿠폰</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">할인금액</th>
-                                <td>3,000원</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">주문 최소 금액</th>
-                                <td>3,000원</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">대상</th>
-                                <td>A도서</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </a>
-
-                    <!-- 할인율 / 도서 -->
-                    <a href="/admin/coupon/modify/4" class="col-sm-5 card p-4 m-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
-                        <h4><strong>B도서 쿠폰</strong></h4>
-                        <table>
-                            <tbody>
-                            <tr>
-                                <th scope="row">만료일</th>
-                                <td>2024년 12월 31일</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">쿠폰 타입</th>
-                                <td>금액 대비 금액 차감 쿠폰</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">할인율</th>
-                                <td>10%</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">최대 할인 금액</th>
-                                <td>3,000원</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">도서</th>
-                                <td>B도서</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </a>
-
-                    <!-- 금액 / 카테고리 -->
-                    <a href="/admin/coupon/modify/5" class="col-sm-5 card p-4 m-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
-                        <h4><strong>A 카테고리 특별 쿠폰</strong></h4>
-                        <table>
-                            <tbody>
-                            <tr>
-                                <th scope="row">만료일</th>
-                                <td>2024년 12월 31일</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">쿠폰 타입</th>
-                                <td>금액 차감 쿠폰</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">할인금액</th>
-                                <td>3,000원</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">주문 최소 금액</th>
-                                <td>3,000원</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">대상</th>
-                                <td>A카테고리</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </a>
-
-                    <!-- 할인율 / 카테고리 -->
-                    <a href="/admin/coupon/modify/6" class="col-sm-5 card p-4 m-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
-                        <h4><strong>B카테고리 쿠폰</strong></h4>
-                        <table>
-                            <tbody>
-                            <tr>
-                                <th scope="row">만료일</th>
-                                <td>2024년 12월 31일</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">쿠폰 타입</th>
-                                <td>금액 대비 금액 차감 쿠폰</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">할인율</th>
-                                <td>10%</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">최대 할인 금액</th>
-                                <td>3,000원</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">대상</th>
-                                <td>B카테고리</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </a>
-
                 </div>
             </div>
 

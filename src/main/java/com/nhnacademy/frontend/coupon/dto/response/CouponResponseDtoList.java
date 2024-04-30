@@ -2,21 +2,21 @@ package com.nhnacademy.frontend.coupon.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 /**
- * CouponMember의 응답 Dto List
+ * 쿠폰 정보 리스트를 담는 dto
  *
  * @Author : 박병휘
- * @Date : 2024/04/26
+ * @Date : 2024/04/29
  */
+@Data
 @Builder
-@Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CouponMemberResponseDtoList {
-    private List<CouponMemberResponseDto> couponMemberResponseDtoList;
+public class CouponResponseDtoList {
+    List<CouponResponseDto> couponResponseDtoList;
 }

@@ -25,32 +25,44 @@
             <div class="col-10 mt-4 mb-4">
                 <h4><strong th:text="${title}"></strong></h4>
 
-                <form method="post" action="/info/address/add">
+                <form method="post" th:action="'/info/address/' + ${address != null ? 'modify' : 'save'}">
+                    <input type="number" id="address_id" name="address_id" th:value="${address != null ? address.getAddressId() : null}" hidden>
                     <div class="form-group">
                         <label for="alias">별칭</label>
-                        <input type="text" class="form-control" id="alias" placeholder="주소 별칭">
+                        <input type="text" class="form-control" id="alias" name="alias" placeholder="주소 별칭"
+                               th:value="${address != null ? address.getAlias() : null}">
                     </div>
                     <div class="form-group">
                         <label for="receiver">받는 사람</label>
-                        <input type="text" class="form-control" id="receiver" placeholder="받는 사람">
+                        <input type="text" class="form-control" id="receiver" name="receiverName" placeholder="받는 사람"
+                               th:value="${address != null ? address.getReceiverName() : null}">
                     </div>
                     <div class="form-group">
                         <label for="phone_number">연락처</label>
-                        <input type="tel" class="form-control" id="phone_number" placeholder="연락처">
+                        <input type="tel" class="form-control" id="phone_number" name="receiverPhoneNumber" placeholder="연락처"
+                               th:value="${address != null ? address.getReceiverPhoneNumber() : null}">
                     </div>
                     <div class="form-group">
                         <label for="address">주소</label>
-                        <input type="text" class="form-control" id="address" placeholder="주소 입력">
+                        <input type="text" class="form-control" id="address" name="address" placeholder="주소 입력"
+                               th:value="${address != null ? address.getAddress() : null}" onclick="sample6_execDaumPostcode()">
                     </div>
                     <div class="form-group">
                         <label for="address_detail">상세 주소</label>
-                        <input type="text" class="form-control" id="address_detail" placeholder="상세 주소 입력">
+                        <input type="text" class="form-control" id="address_detail" name="addressDetail" placeholder="상세 주소 입력"
+                               th:value="${address != null ? address.getAddressDetail() : null}">
+                    </div>
+                    <div class="form-group">
+                        <label for="zipcode">우편번호</label>
+                        <input type="text" class="form-control" id="zipcode" name="zipcode" placeholder="우편번호 입력"
+                               th:value="${address != null ? address.getZipcode() : null}" onclick="sample6_execDaumPostcode()">
                     </div>
                     <div class="form-group form-check">
-                        <input type="checkbox" class="form-check-input" id="default_address">
+                        <input type="checkbox" class="form-check-input" id="default_address" name="defaultAddress"
+                               th:checked="${address != null ? address.getIsDefault() : false}">
                         <label class="form-check-label" for="default_address">기본 배송지 설정</label>
                     </div>
-                    <button type="submit" class="btn btn-primary">배송지 추가</button>
+                    <button type="submit" class="btn btn-primary" th:text="${address != null ? '배송지 저장' : '배송지 추가'}">배송지 추가</button>
                 </form>
             </div>
         </div>
@@ -68,5 +80,33 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
             integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
+
+
+    <!-- 카카오 주소 API -->
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
+    <script>
+        function sample6_execDaumPostcode() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+                    // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+                    // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+                    var addr = ''; // 주소 변수
+                    var extraAddr = ''; // 참고항목 변수
+
+                    // 사용자가 어떤 주소를 선택하든 저장되는 주소는 도로명 주소 !
+                    addr = data.roadAddress;
+
+                    // 우편번호와 주소 정보를 해당 필드에 넣는다.
+                    document.getElementById('zipcode').value = data.zonecode;
+                    document.getElementById("address").value = addr;
+                    // 커서를 상세주소 필드로 이동한다.
+                    document.getElementById("address_detail").focus();
+                }
+            }).open();
+        }
+    </script>
     </body>
 </html>

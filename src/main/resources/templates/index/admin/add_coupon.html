@@ -24,34 +24,34 @@
         </div>
 
         <div class="col-10 mt-4 mb-4">
-            <form method="post" th:action="'/admin/coupon/modify/' + ${coupon.couponId}">
-            <h4><strong>쿠폰 수정</strong></h4>
+            <form method="post" action="/admin/coupon/add">
+            <h4><strong>쿠폰 추가</strong></h4>
             <!-- 쿠폰 이름 -->
             <div class="form-group">
                 <label for="couponName">쿠폰 이름</label>
-                <input type="text" class="form-control" id="couponName" name="couponName" th:value="${coupon.couponName}">
+                <input type="text" class="form-control" id="couponName" name="couponName">
             </div>
 
             <!-- 만료일 -->
             <div class="form-group">
                 <label for="deadline">만료일</label>
                 <input type="date" class="form-control" id="deadline" name="deadline"
-                       placeholder="yyyy-mm-dd" th:min="${tomorrow}" th:value="${couponDeadline}">
+                       placeholder="yyyy-mm-dd" th:min="${tomorrow}" th:value="${tomorrow}">
             </div>
 
 
             <!-- 쿠폰 타입 설정 -->
             <div class="form-group">
                 <label for="couponType">쿠폰 발급 제한</label>
-                <input type="number" class="form-control" id="issueLimit" name="issueLimit" th:value="${coupon.getIssueLimit()}">
+                <input type="number" class="form-control" id="issueLimit" name="issueLimit">
             </div>
 
             <!-- 쿠폰 타입 설정 -->
             <div class="form-group">
                 <label for="couponType">쿠폰 타입 설정</label>
                 <select class="form-control" id="couponType" name="couponType">
-                    <option value="AMOUNT" th:selected="${coupon.getCouponType().toString().equals('AMOUNT')}">금액 차감 쿠폰</option>
-                    <option value="PERCENTAGE" th:selected="${coupon.getCouponType().toString().equals('PERCENTAGE')}">금액 대비 금액 차감 쿠폰(%)</option>
+                    <option value="AMOUNT">금액 차감 쿠폰</option>
+                    <option value="PERCENTAGE">금액 대비 금액 차감 쿠폰(%)</option>
                 </select>
             </div>
 
@@ -61,18 +61,18 @@
                 <div id="amountDeductionCouponSettings">
                     <div class="form-group">
                         <label for="discountPrice">할인금액</label>
-                        <input type="number" class="form-control" id="discountPrice" name="discountPrice" placeholder="할인금액 입력" th:value="${coupon.getDiscountPrice()}">
+                        <input type="number" class="form-control" id="discountPrice" name="discountPrice" placeholder="할인금액 입력">
                     </div>
                 </div>
                 <!-- 금액 대비 금액 차감 쿠폰(%)인 경우 -->
                 <div id="percentageDeductionCouponSettings" style="display: none;">
                     <div class="form-group">
                         <label for="discountRate">할인율(%)</label>
-                        <input type="number" class="form-control" id="discountRate" name="discountRate" placeholder="할인율 입력" th:value="${coupon.getDiscountRate()}">
+                        <input type="number" class="form-control" id="discountRate" name="discountRate" placeholder="할인율 입력">
                     </div>
                     <div class="form-group">
                         <label for="maxDiscountPrice">최대할인 금액</label>
-                        <input type="number" class="form-control" id="maxDiscountPrice" name="maxDiscountPrice" placeholder="최대할인 금액 입력" th:value="${coupon.getMaxDiscountPrice()}">
+                        <input type="number" class="form-control" id="maxDiscountPrice" name="maxDiscountPrice" placeholder="최대할인 금액 입력">
                     </div>
                 </div>
             </div>
@@ -81,9 +81,9 @@
             <div class="form-group">
                 <label for="couponTarget">쿠폰 대상 설정</label>
                 <select class="form-control" id="couponTarget" name="couponTarget">
-                    <option value="NORMAL" th:selected="${coupon.getCouponTarget().toString().equals('NORMAL')}">일반 쿠폰</option>
-                    <option value="CATEGORY" th:selected="${coupon.getCouponTarget().toString().equals('CATEGORY')}">카테고리 쿠폰</option>
-                    <option value="BOOK" th:selected="${coupon.getCouponTarget().toString().equals('BOOK')}">도서 쿠폰</option>
+                    <option value="NORMAL">일반 쿠폰</option>
+                    <option value="CATEGORY">카테고리 쿠폰</option>
+                    <option value="BOOK">도서 쿠폰</option>
                 </select>
             </div>
 
@@ -93,14 +93,14 @@
                 <div id="bookCouponSettings" style="display: none;">
                     <div class="form-group">
                         <label for="bookIsbn">도서 ISBN</label>
-                        <input type="text" class="form-control" id="bookIsbn" name="bookIsbn" placeholder="도서 ISBN 입력" th:value="${coupon.getBookIsbn()}">
+                        <input type="text" class="form-control" id="bookIsbn" name="bookIsbn" placeholder="도서 ISBN 입력">
                     </div>
                 </div>
                 <!-- 카테고리 쿠폰인 경우 -->
                 <div id="categoryCouponSettings" style="display: none;">
                     <div class="form-group">
                         <label for="categoryName">대상 카테고리 이름</label>
-                        <input type="text" class="form-control" id="categoryName" name="categoryName" placeholder="대상 카테고리 이름 입력" th:value="${coupon.getCategoryId()}">
+                        <input type="text" class="form-control" id="categoryName" name="categoryName" placeholder="대상 카테고리 이름 입력">
                     </div>
                 </div>
             </div>
@@ -126,31 +126,6 @@
         integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const couponType = document.querySelector("#couponType");
-        const couponTarget = document.querySelector("#couponTarget");
-
-        if(couponType.value === 'AMOUNT') {
-            $('#amountDeductionCouponSettings').show();
-            $('#percentageDeductionCouponSettings').hide();
-        }
-        else {
-            $('#amountDeductionCouponSettings').hide();
-            $('#percentageDeductionCouponSettings').show();
-        }
-
-        if (couponTarget.value === 'BOOK') {
-            $('#bookCouponSettings').show();
-            $('#categoryCouponSettings').hide();
-        } else if (couponTarget.value === 'CATEGORY') {
-            $('#bookCouponSettings').hide();
-            $('#categoryCouponSettings').show();
-        } else {
-            $('#bookCouponSettings').hide();
-            $('#categoryCouponSettings').hide();
-        }
-    });
-
     $(document).ready(function(){
         // 쿠폰 타입에 따른 설정 토글
         $('#couponType').change(function(){

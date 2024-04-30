@@ -225,7 +225,6 @@ public class OrderController {
                 throw new RuntimeException("Can not load information");
             }
 
-            System.out.println(orderDto);
 
             // todo: 주문 정보 확인 후 Shop service에서 쿠폰 사용 이력, 주문 이력, 책 수량, 포인트 적립 등 로직 수행 필요
             // todo: 로직 수행 이후, redis 내 orderId에 해당하는 정보 지우기.
@@ -277,7 +276,7 @@ public class OrderController {
 
         // 토스페이먼츠 API는 시크릿 키를 사용자 ID로 사용하고, 비밀번호는 사용하지 않습니다.
         // 비밀번호가 없다는 것을 알리기 위해 시크릿 키 뒤에 콜론을 추가합니다.
-        String widgetSecretKey = "test_sk_E92LAa5PVbPYmd6veANe87YmpXyJ";
+        String widgetSecretKey = "test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6";
         Base64.Encoder encoder = Base64.getEncoder();
         byte[] encodedBytes = encoder.encode((widgetSecretKey + ":").getBytes(StandardCharsets.UTF_8));
         String authorizations = "Basic " + new String(encodedBytes);

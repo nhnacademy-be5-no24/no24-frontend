@@ -1,10 +1,20 @@
 package com.nhnacademy.frontend.info;
 
+import com.nhnacademy.frontend.address.dto.request.AddressCreateRequestDto;
+import com.nhnacademy.frontend.address.dto.request.AddressModifyRequestDto;
+import com.nhnacademy.frontend.address.dto.response.AddressResponseDto;
+import com.nhnacademy.frontend.address.dto.response.AddressResponseDtoList;
+import com.nhnacademy.frontend.coupon.dto.response.CouponMemberResponseDtoList;
+import com.nhnacademy.frontend.util.AuthUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,14 +27,24 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Controller
 @RequestMapping("/info")
+@RequiredArgsConstructor
 public class InfoController {
+    private final RestTemplate restTemplate;
+    private final RedisTemplate redisTemplate;
+
+    @Value("${request.url}")
+    private String requestUrl;
+
+    @Value("${request.port}")
+    private String port;
+
     /**
      * get User information main page
      * @Param none.
      * @return mav
      */
     @GetMapping
-    public ModelAndView info() {
+    public ModelAndView info(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("index/info/main");
 
         return mav;
@@ -61,8 +81,17 @@ public class InfoController {
      * @return
      */
     @GetMapping("/address")
-    public ModelAndView userAddress() {
+    public ModelAndView userAddress(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("index/info/address");
+
+        Long customerNo = AuthUtil.getCustomerNo(requestUrl, port, request, redisTemplate, restTemplate);
+
+        ResponseEntity<AddressResponseDtoList> addressResponseEntity = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/address/customer/" + customerNo,
+                AddressResponseDtoList.class);
+
+        mav.addObject("addressList", addressResponseEntity.getBody().getAddressResponseDtoList());
+
 
         return mav;
     }
@@ -72,9 +101,25 @@ public class InfoController {
      * @Param AddressDto
      * @return mav
      */
-    @PostMapping("/address/add")
-    public ModelAndView userAddressPost() {
-        ModelAndView mav = new ModelAndView("index/info/address");
+    @PostMapping("/address/save")
+    public ModelAndView userAddressSave(AddressCreateRequestDto addressCreateRequestDto) {
+        ModelAndView mav = new ModelAndView("redirect:/info/address");
+
+        System.out.println(addressCreateRequestDto);
+
+        return mav;
+    }
+
+    /**
+     * add User Address
+     * @Param AddressDto
+     * @return mav
+     */
+    @PostMapping("/address/modify")
+    public ModelAndView userAddressModify(AddressModifyRequestDto addressModifyRequestDto) {
+        ModelAndView mav = new ModelAndView("redirect:/info/address");
+
+        System.out.println(addressModifyRequestDto);
 
         return mav;
     }
@@ -98,13 +143,21 @@ public class InfoController {
      * @Param HttpServletRequest request
      * @return mav
      */
-    @PostMapping("/address/modify")
+    @PostMapping("/address/modify/page")
     public ModelAndView modifyUserAddressPage(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("index/info/address_save");
 
-        // todo: mav.addObject() 설정 필요
         System.out.println(request.getParameter("address_id"));
+
+        Long addressId = Long.parseLong(request.getParameter("address_id"));
+
+        ResponseEntity<AddressResponseDto> addressResponseEntity = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/address/" + addressId,
+                AddressResponseDto.class
+        );
+
         mav.addObject("title", "배송주소 수정");
+        mav.addObject("address", addressResponseEntity.getBody());
 
         return mav;
     }
@@ -169,8 +222,21 @@ public class InfoController {
      * @return mav
      */
     @GetMapping("/coupon")
-    public ModelAndView getUserCouponPage() {
+    public ModelAndView getUserCouponPage(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("index/info/coupon");
+        Long customerNo = AuthUtil.getCustomerNo(requestUrl, port, request, redisTemplate, restTemplate);
+
+        try {
+            ResponseEntity<CouponMemberResponseDtoList> couponMemberResponseDtoListResponseEntity = restTemplate.getForEntity(
+                    requestUrl + ":" + port + "/shop/coupon/member/" + customerNo + "?pageSize=0&offset=10",
+                    CouponMemberResponseDtoList.class
+            );
+
+            mav.addObject("couponList", couponMemberResponseDtoListResponseEntity.getBody()
+                    .getCouponMemberResponseDtoList());
+        } catch(Exception e) {
+            mav.setViewName("redirect:/error");
+        }
 
         return mav;
     }
