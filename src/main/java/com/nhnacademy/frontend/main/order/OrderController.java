@@ -15,7 +15,6 @@ import com.nhnacademy.frontend.util.exception.UnauthorizedTokenException;
 import com.nhnacademy.frontend.wrap.dto.WrapResponseDto;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -148,11 +147,11 @@ public class OrderController {
         ModelAndView mav = new ModelAndView("index/main/order/input_wrap");
 
         ResponseEntity<WrapResponseDtoList> response = restTemplate.getForEntity(
-                requestUrl + ":" + port +  "/shop/wraps",
+                requestUrl + ":" + port +  "/shop/wraps?page=0&size=10",
                 WrapResponseDtoList.class
         );
 
-        List<WrapResponseDto> wrapList = response.getBody().getWrapResponseDtoList();
+        List<WrapResponseDto> wrapList = response.getBody().getWrapResponseDtos();
 
         mav.addObject("wrapList", wrapList);
 
