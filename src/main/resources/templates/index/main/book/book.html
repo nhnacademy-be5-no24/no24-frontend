@@ -70,7 +70,7 @@
                             </div>
                             <!-- 좋아요 개수 및 버튼 -->
                             <!-- 구매하기, 장바구니 버튼 -->
-                            <button type="button" class="btn btn-primary">구매하기</button>
+                            <button type="button" class="btn btn-primary" id="buyNow-button">구매하기</button>
                             <button type="button" class="btn btn-secondary ml-2" id="cart-button">장바구니</button>
                         </div>
 
@@ -205,13 +205,41 @@
                   console.log("장바구니 추가 성공!");
               } else {
                   console.error("장바구니 추가 실패!");
-                  // 실패 시 처리 코드 작성
               }
           })
           .catch(function(error) {
               console.error("장바구니 추가 중 오류 발생:", error);
           });
       });
+
+    document.getElementById("buyNow-button").addEventListener("click", function(event) {
+        var url = window.location.href.split('/');
+        var bookIsbn = url[url.length - 1];
+        var quantity = document.querySelector("#quantity").value;
+
+        var purchaseBook = {
+            bookIsbn: bookIsbn,
+            bookQuantity: quantity
+        };
+
+        fetch("/cartOrder/create/byBuyNow", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(purchaseBook)
+        })
+            .then(function(response) {
+                if (response.ok) {
+                    console.log("바로구매 성공!");
+                } else {
+                    console.error("바로구매 실패!");
+                }
+            })
+            .catch(function(error) {
+                console.error("바로구매 중 오류 발생:", error);
+            });
+    });
 </script>
 </body>
 </html>

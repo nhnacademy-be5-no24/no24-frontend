@@ -79,4 +79,74 @@ public class CartOrderController {
             throw new CartNotFoundException(customerNo);
         }
     }
+
+    /**
+     * [POST /cartOrder/create/byBuyNow]
+     * '바로구매 버튼 클릭 시, 주문 내역에 등록하는 Post 메서드'를 요청하는 Post 메서드
+     */
+    @PostMapping("/create/byBuyNow")
+    public ResponseEntity<String> buyNow(HttpServletRequest request,
+                                         @RequestBody CartOrderRequestDto cartOrderRequestDto) {
+        try {
+            Long customerNo = AuthUtil.getCustomerNo(
+                    requestUrl,
+                    port,
+                    request,
+                    redisTemplate,
+                    restTemplate
+            );
+
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    requestUrl + ":" + port + "/cartOrder/create/byBuyNow" + customerNo,
+                    cartOrderRequestDto,
+                    String.class
+            );
+
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(response.getBody());
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response.getBody());
+            }
+        } catch (UnauthorizedTokenException | NotFoundToken e) {
+            HttpSession session = request.getSession();
+            String jSessionId = session.getId();
+
+            ResponseEntity<String> response = restTemplate.postForEntity(
+                    requestUrl + ":" + port + "/cartOrder/create/byBuyNow" + jSessionId,
+                    cartOrderRequestDto,
+                    String.class
+            );
+
+            if (response.getStatusCode() == HttpStatus.OK) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(response.getBody());
+            }
+            else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response.getBody());
+            }
+        }
+    }
+
+    /**
+     * [POST /cartOrder/create/byBuyNow/{customerNo}]
+     * 바로구매 버튼 클릭 시, 주문 내역에 등록하는 Post 메서드
+     */
+    @PostMapping("/create/byBuyNow/{customerNo}")
+    public ResponseEntity<String> buyNowOrder(@PathVariable String customerNo,
+                                              @RequestBody CartOrderRequestDto cartOrderRequestDto) {
+        HashOperations<String, String, CartOrder> hashOperations = redisTemplate.opsForHash();
+        CartOrder order = new CartOrder();
+        order.setCustomerNo(customerNo);
+
+        CartOrder.Book book = CartOrder.Book.builder()
+                .isbn(cartOrderRequestDto.getBookIsbn())
+                .quantity(cartOrderRequestDto.getBookQuantity())
+                .build();
+
+        order.getBooks().add(book);
+
+        hashOperations.put("cartOrder", String.valueOf(customerNo), order);
+
+        return ResponseEntity.ok("주문 내역에 " + customerNo + "의 주문이 추가되었습니다.");
+    }
 }
