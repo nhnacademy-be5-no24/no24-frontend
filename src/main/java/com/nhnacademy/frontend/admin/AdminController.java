@@ -4,9 +4,15 @@ import com.nhnacademy.frontend.category.dto.CategoryResponseDto;
 import com.nhnacademy.frontend.coupon.dto.CouponTarget;
 import com.nhnacademy.frontend.coupon.dto.Status;
 import com.nhnacademy.frontend.coupon.dto.request.CouponRequestDto;
-import com.nhnacademy.frontend.coupon.dto.response.CouponMemberResponseDtoList;
 import com.nhnacademy.frontend.coupon.dto.response.CouponResponseDto;
 import com.nhnacademy.frontend.coupon.dto.response.CouponResponseDtoList;
+import com.nhnacademy.frontend.grade.dto.request.GradeRequestDto;
+import com.nhnacademy.frontend.grade.dto.response.GradeResponseDto;
+import com.nhnacademy.frontend.grade.dto.response.GradeResponseDtoList;
+import com.nhnacademy.frontend.main.order.dto.response.WrapResponseDtoList;
+import com.nhnacademy.frontend.wrap.dto.request.ModifyWrapRequestDto;
+import com.nhnacademy.frontend.wrap.dto.request.WrapRequestDto;
+import com.nhnacademy.frontend.wrap.dto.response.WrapResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +25,6 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -271,6 +276,14 @@ public class AdminController {
     public ModelAndView getAdminWrapping() {
         ModelAndView mav = new ModelAndView("index/admin/wrapping");
 
+        ResponseEntity<WrapResponseDtoList> wrapResponseDtoList = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/wraps?page=0&size=10",
+                WrapResponseDtoList.class
+        );
+        List<WrapResponseDto> wrapList = wrapResponseDtoList.getBody().getWrapResponseDtos();
+
+        mav.addObject("wrapList", wrapList);
+
         return mav;
     }
 
@@ -282,6 +295,62 @@ public class AdminController {
     @GetMapping("/wrap/modify/{wrapId}")
     public ModelAndView getManageWrapping(@PathVariable Long wrapId) {
         ModelAndView mav = new ModelAndView("index/admin/modify_wrapping");
+
+        ResponseEntity<WrapResponseDto> wrapResponseDto = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/wraps/id/" + wrapId,
+                WrapResponseDto.class
+        );
+
+        mav.addObject("wrap", wrapResponseDto.getBody());
+
+        return mav;
+    }
+
+    /**
+     * get managing wrapping page
+     * @Param none
+     * @return mav
+     */
+    @GetMapping("/wrap/add")
+    public ModelAndView getAddWrappingPage() {
+        ModelAndView mav = new ModelAndView("index/admin/add_wrapping");
+
+        return mav;
+    }
+
+    @PostMapping("/wrap/modify/{wrapId}")
+    public ModelAndView modifyWrapping(@PathVariable Long wrapId, HttpServletRequest request) {
+        ModelAndView mav = new ModelAndView("redirect:/admin/wrap");
+
+        ModifyWrapRequestDto modifyWrapRequestDto = ModifyWrapRequestDto.builder()
+                .wrapId(wrapId)
+                .wrapName(request.getParameter("wrapName"))
+                .wrapCost(Long.parseLong(request.getParameter("wrapCost")))
+                .build();
+
+        restTemplate.put(
+                requestUrl + ":" + port + "/shop/wraps",
+                modifyWrapRequestDto
+        );
+
+        return mav;
+    }
+
+
+    @PostMapping("/wrap/add")
+    public ModelAndView addWrapping(HttpServletRequest request) {
+        ModelAndView mav = new ModelAndView("redirect:/admin/wrap");
+
+        WrapRequestDto wrapRequestDto = WrapRequestDto.builder()
+                .wrapName(request.getParameter("wrapName"))
+                .wrapCost(Long.parseLong(request.getParameter("wrapCost")))
+                .build();
+
+        restTemplate.postForEntity(
+                requestUrl + ":" + port + "/shop/wraps",
+                wrapRequestDto,
+                null
+        );
 
         return mav;
     }
@@ -295,6 +364,13 @@ public class AdminController {
     public ModelAndView getAdminTier() {
         ModelAndView mav = new ModelAndView("index/admin/tier");
 
+        List<GradeResponseDto> gradeList = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/grade/all",
+                GradeResponseDtoList.class
+        ).getBody().getGradeResponseDtoList();
+
+        mav.addObject("gradeList", gradeList);
+
         return mav;
     }
 
@@ -307,6 +383,13 @@ public class AdminController {
     public ModelAndView getModifyTierPage(@PathVariable("tierId") Long tierId) {
         ModelAndView mav = new ModelAndView("index/admin/modify_tier");
 
+        GradeResponseDto grade = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/grade/id/" + tierId,
+                GradeResponseDto.class
+        ).getBody();
+
+        mav.addObject("grade", grade);
+
         return mav;
     }
 
@@ -316,8 +399,28 @@ public class AdminController {
      * @return mav
      */
     @PostMapping("/tier/modify/{tierId}")
-    public ModelAndView modifyTier(@PathVariable("tierId") Long tierId) {
+    public ModelAndView modifyTier(@PathVariable("tierId") Long tierId, HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("redirect:/admin/tier");
+
+        GradeResponseDto gradeResponseDto = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/grade/id/" + tierId,
+                GradeResponseDto.class
+        ).getBody();
+
+        GradeRequestDto gradeRequestDto = GradeRequestDto.builder()
+                .gradeId(tierId)
+                .gradeName(gradeResponseDto.getGradeName())
+                .gradeNameKor(gradeResponseDto.getGradeNameKor())
+                .accumulateRate(Long.parseLong(request.getParameter("accumulateRate")))
+                .tenPercentCoupon(Integer.parseInt(request.getParameter("tenPercentCoupon")))
+                .twentyPercentCoupon(Integer.parseInt(request.getParameter("twentyPercentCoupon")))
+                .requiredPayment(Long.parseLong(request.getParameter("requiredPayment")))
+                .build();
+
+        restTemplate.put(
+                requestUrl + ":" + port + "/shop/grade/update",
+                gradeRequestDto
+        );
 
         return mav;
     }

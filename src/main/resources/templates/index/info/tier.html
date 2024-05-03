@@ -27,99 +27,44 @@
                 <div class="col-sm-12 card mt-2 p-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
                     <div class="row">
                         <div class="col-md-3">
-                            <img src="/icon/tier_platinum.png" style="width:200px; height:200px;">
+                            <img th:src="'/icon/tier_' + ${myGrade.getGradeName().toLowerCase()} + '.png'" style="width:200px; height:200px;">
                         </div>
                         <div class="col-md-9">
-                            <h4><strong>플래티넘</strong></h4>
+                            <h4><strong th:text="${myGrade.getGradeNameKor()}"></strong></h4>
                             <h5 class="mt-3"><strong>혜택</strong></h5>
                             <ul>
-                                <li>도서 주문 시 4% 포인트 적립</li>
-                                <li>10% 할인 쿠폰 2장</li>
-                                <li>20% 할인 쿠폰 1장</li>
+                                <li th:text="'도서 주문 시 ' + ${myGrade.getAccumulateRate()} + '% 포인트 적립'"/>
+                                <li th:if="${myGrade.getTenPercentCoupon() != 0}" th:text="'10% 할인 쿠폰 ' + ${myGrade.getTenPercentCoupon()} + '장'"/>
+                                <li th:if="${myGrade.getTwentyPercentCoupon() != 0}" th:text="'20% 할인 쿠폰 ' + ${myGrade.getTwentyPercentCoupon()} + '장'"/>
                             </ul>
-                            <p><strong>등급 UP 까지 남은 주문 금액 : 57,000원</strong></p>
                         </div>
                     </div>
                 </div>
 
                 <h4 class="mb-3 mt-4"><strong>등급 표</strong></h4>
 
-                <div class="col-sm-12 card mt-2 p-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img src="/icon/tier_normal.png" style="width:200px; height:200px;">
-                        </div>
-                        <div class="col-md-9">
-                            <h4><strong>일반</strong></h4>
-                            <h5 class="mt-3"><strong>혜택</strong></h5>
-                            <ul>
-                                <li>도서 주문 시 1% 포인트 적립</li>
-                            </ul>
+                <div th:each="grade : ${gradeList}" class="col-sm-12 card mt-2 p-4 admin-tier" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
+                    <a th:href="'/admin/tier/modify/' + ${grade.getGradeId()}">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <img th:src="'/icon/tier_' + ${grade.getGradeName().toLowerCase()} + '.png'" style="width:200px; height:200px;">
+                            </div>
+                            <div class="col-md-9">
+                                <h4><strong th:text="${grade.getGradeNameKor()}"></strong></h4>
+                                <h5 class="mt-3"><strong>혜택</strong></h5>
+                                <ul>
+                                    <li th:text="'도서 주문 시 ' + ${grade.getAccumulateRate()} + '% 포인트 적립'"/>
+                                    <li th:if="${grade.getTenPercentCoupon() != 0}" th:text="'10% 할인 쿠폰 ' + ${grade.getTenPercentCoupon()} + '장'"/>
+                                    <li th:if="${grade.getTwentyPercentCoupon() != 0}" th:text="'20% 할인 쿠폰 ' + ${grade.getTwentyPercentCoupon()} + '장'"/>
+                                </ul>
 
-                            <h5><strong>조건</strong></h5>
-                            <p>없음</p>
+                                <h5><strong>조건</strong></h5>
+                                <p th:text="'주문 금액 ' + ${grade.getRequiredPayment()} + '원 이상'"></p>
+                            </div>
                         </div>
-                    </div>
+                    </a>
                 </div>
 
-                <div class="col-sm-12 card mt-2 p-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img src="/icon/tier_royal.png" style="width:200px; height:200px;">
-                        </div>
-                        <div class="col-md-9">
-                            <h4 style="display: inline"><strong>로얄</strong></h4>
-                            <span class="text-muted ml-3"> * 등급이 적용된 다음 달부터 쿠폰이 지급됩니다.</span>
-                            <h5 class="mt-3"><strong>혜택</strong></h5>
-                            <ul>
-                                <li>도서 주문 시 2% 포인트 적립</li>
-                                <li>10% 할인 쿠폰 1장</li>
-                            </ul>
-                            <h5><strong>조건</strong></h5>
-                            <p>주문 금액 10만원 이상</p>
-                            <p class="text-muted">* 등급이 적용된 다음 달부터 쿠폰이 지급됩니다.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-sm-12 card mt-2 p-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img src="/icon/tier_gold.png" style="width:200px; height:200px;">
-                        </div>
-                        <div class="col-md-9">
-                            <h4 style="display: inline"><strong>골드</strong></h4>
-                            <span class="text-muted ml-3"> * 등급이 적용된 다음 달부터 쿠폰이 지급됩니다.</span>
-                            <h5 class="mt-3"><strong>혜택</strong></h5>
-                            <ul>
-                                <li>도서 주문 시 3% 포인트 적립</li>
-                                <li>10% 할인 쿠폰 2장</li>
-                            </ul>
-                            <h5><strong>조건</strong></h5>
-                            <p>주문 금액 20만원 이상</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-sm-12 card mt-2 p-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <img src="/icon/tier_platinum.png" style="width:200px; height:200px;">
-                        </div>
-                        <div class="col-md-9">
-                            <h4 style="display: inline"><strong>플래티넘</strong></h4>
-                            <span class="text-muted ml-3"> * 등급이 적용된 다음 달부터 쿠폰이 지급됩니다.</span>
-                            <h5 class="mt-3"><strong>혜택</strong></h5>
-                            <ul>
-                                <li>도서 주문 시 4% 포인트 적립</li>
-                                <li>10% 할인 쿠폰 2장</li>
-                                <li>20% 할인 쿠폰 1장</li>
-                            </ul>
-                            <h5><strong>조건</strong></h5>
-                            <p>주문 금액 30만원 이상</p>
-                        </div>
-                    </div>
-                </div>
                 <br>
                 <br>
             </div>

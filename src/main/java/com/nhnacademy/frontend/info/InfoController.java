@@ -5,6 +5,8 @@ import com.nhnacademy.frontend.address.dto.request.AddressModifyRequestDto;
 import com.nhnacademy.frontend.address.dto.response.AddressResponseDto;
 import com.nhnacademy.frontend.address.dto.response.AddressResponseDtoList;
 import com.nhnacademy.frontend.coupon.dto.response.CouponMemberResponseDtoList;
+import com.nhnacademy.frontend.grade.dto.response.GradeResponseDto;
+import com.nhnacademy.frontend.grade.dto.response.GradeResponseDtoList;
 import com.nhnacademy.frontend.main.order.dto.response.OrdersResponseDtoList;
 import com.nhnacademy.frontend.point.dto.PointResponseDto;
 import com.nhnacademy.frontend.point.dto.PointResponseDtoList;
@@ -117,7 +119,10 @@ public class InfoController {
     public ModelAndView userAddressSave(HttpServletRequest request,
                                         AddressCreateRequestDto addressCreateRequestDto) {
         ModelAndView mav = new ModelAndView("redirect:/info/address");
-        boolean isDefault = request.getParameter("defaultAddress").equals("on");
+        boolean isDefault = false;
+
+        if(request.getParameter("defaultAddress") != null)
+            isDefault = request.getParameter("defaultAddress").equals("on");
 
         Long customerNo = AuthUtil.getCustomerNo(
                 requestUrl,
@@ -266,8 +271,34 @@ public class InfoController {
      * @return mav
      */
     @GetMapping("/tier")
-    public ModelAndView getUserTierPage() {
+    public ModelAndView getUserTierPage(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("index/info/tier");
+        Long customerNo = null;
+
+        try {
+            customerNo = AuthUtil.getCustomerNo(requestUrl, port, request, redisTemplate, restTemplate);
+        } catch(Exception e) {
+            mav.setViewName("redirect:/login");
+            return mav;
+        }
+
+        if(customerNo == null) {
+            mav.setViewName("redirect:/login");
+            return mav;
+        }
+
+        GradeResponseDto myGrade = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/grade/customer/" + customerNo,
+                GradeResponseDto.class
+        ).getBody();
+
+        List<GradeResponseDto> gradeList = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/grade/all",
+                GradeResponseDtoList.class
+        ).getBody().getGradeResponseDtoList();
+
+        mav.addObject("gradeList", gradeList);
+        mav.addObject("myGrade", myGrade);
 
         return mav;
     }

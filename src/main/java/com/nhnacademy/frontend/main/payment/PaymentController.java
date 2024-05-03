@@ -10,7 +10,7 @@ import com.nhnacademy.frontend.main.order.dto.request.OrderDto;
 import com.nhnacademy.frontend.util.AuthUtil;
 import com.nhnacademy.frontend.util.exception.NotFoundToken;
 import com.nhnacademy.frontend.util.exception.UnauthorizedTokenException;
-import com.nhnacademy.frontend.wrap.dto.WrapResponseDto;
+import com.nhnacademy.frontend.wrap.dto.response.WrapResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;

@@ -1,6 +1,6 @@
 package com.nhnacademy.frontend.main.order.dto.response;
 
-import com.nhnacademy.frontend.wrap.dto.WrapResponseDto;
+import com.nhnacademy.frontend.wrap.dto.response.WrapResponseDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
