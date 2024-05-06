@@ -55,59 +55,25 @@
                     </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>9788901279282</td>
-                            <td>유목민의 투자의 정석</td>
-                            <td>28,000원</td>
-                            <td>25,200원</td>
+                        <tr th:each="book : ${bookList}">
+                            <td th:text="${book.getBookIsbn()}"></td>
+                            <td th:text="${book.getBookTitle()}"></td>
+                            <td th:text="${book.getBookFixedPrice()}"></td>
+                            <td th:text="${book.getBookSalePrice()}"></td>
                             <td>
-                                포장 가능
+                                <span th:if="${book.bookIsPacking}">포장 가능</span>
+                                <span th:unless="${book.bookIsPacking}">포장 불가능</span>
                             </td>
                             <td>
-                                판매 중
+                                <span th:switch="${book.bookStatus}">
+                                    <span th:case="0">판매중</span>
+                                    <span th:case="1">수량부족</span>
+                                    <span th:case="2">판매종료</span>
+                                    <span th:case="3">삭제된 도서</span>
+                                </span>
                             </td>
-                            <td>
-                                100
-                            </td>
-                            <td>
-                                <a href="/admin/book/modify/9788901279282">수정</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>9788901279282</td>
-                            <td>유목민의 투자의 정석</td>
-                            <td>28,000원</td>
-                            <td>25,200원</td>
-                            <td>
-                                포장 가능
-                            </td>
-                            <td>
-                                재고 없음
-                            </td>
-                            <td>
-                                0
-                            </td>
-                            <td>
-                                <a href="/admin/book/modify/9788901279282">수정</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>9788901279282</td>
-                            <td>유목민의 투자의 정석</td>
-                            <td>28,000원</td>
-                            <td>25,200원</td>
-                            <td>
-                                포장 가능
-                            </td>
-                            <td>
-                                판매 종료
-                            </td>
-                            <td>
-                                20
-                            </td>
-                            <td>
-                                <a href="/admin/book/modify/9788901279282">수정</a>
-                            </td>
+                            <td th:text="${book.getBookQuantity()}"></td>
+                            <td><a th:href="@{/admin/book/modify/{isbn}(isbn=${book.getBookIsbn()})}">수정</a></td>
                         </tr>
                     </tbody>
                 </table>

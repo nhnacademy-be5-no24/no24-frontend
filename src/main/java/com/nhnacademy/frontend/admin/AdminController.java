@@ -1,5 +1,7 @@
 package com.nhnacademy.frontend.admin;
 
+import com.nhnacademy.frontend.book.dto.BookResponseDto;
+import com.nhnacademy.frontend.book.dto.BookResponseList;
 import com.nhnacademy.frontend.category.dto.CategoryResponseDto;
 import com.nhnacademy.frontend.coupon.dto.CouponTarget;
 import com.nhnacademy.frontend.coupon.dto.Status;
@@ -90,6 +92,13 @@ public class AdminController {
     @GetMapping("/book")
     public ModelAndView getAdminBook() {
         ModelAndView mav = new ModelAndView("index/admin/book");
+        ResponseEntity<BookResponseList> bookResponseDto = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/book?pageSize=0&offset=10" ,
+                BookResponseList.class
+        );
+        List<BookResponseDto> bookList = bookResponseDto.getBody().getContent();
+
+        mav.addObject("bookList", bookList);
 
         return mav;
     }
@@ -102,7 +111,6 @@ public class AdminController {
     @GetMapping("/book/modify/{bookIsbn}")
     public ModelAndView getManageBook(@PathVariable String bookIsbn) {
         ModelAndView mav = new ModelAndView("index/admin/modify_book");
-
         return mav;
     }
 
