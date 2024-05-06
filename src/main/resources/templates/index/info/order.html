@@ -41,7 +41,7 @@
                         <div class="col-xs-2 m-3">
                             <div class="row-md-12">
                                 <form method="post" action="/info/order/detail">
-                                    <input type="text" name="order_id" value="order_id" hidden>
+                                    <input type="text" name="order_id" th:value="${order.orderId}" hidden>
                                     <button type="submit" class="btn btn-primary btn-block">주문 상세</button>
                                 </form>
                             </div>

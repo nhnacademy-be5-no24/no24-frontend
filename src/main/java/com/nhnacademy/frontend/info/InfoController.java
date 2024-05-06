@@ -7,6 +7,9 @@ import com.nhnacademy.frontend.address.dto.response.AddressResponseDtoList;
 import com.nhnacademy.frontend.coupon.dto.response.CouponMemberResponseDtoList;
 import com.nhnacademy.frontend.grade.dto.response.GradeResponseDto;
 import com.nhnacademy.frontend.grade.dto.response.GradeResponseDtoList;
+import com.nhnacademy.frontend.main.order.dto.response.OrderDetailResponseDto;
+import com.nhnacademy.frontend.main.order.dto.response.OrderDetailResponseDtoList;
+import com.nhnacademy.frontend.main.order.dto.response.OrdersResponseDto;
 import com.nhnacademy.frontend.main.order.dto.response.OrdersResponseDtoList;
 import com.nhnacademy.frontend.point.dto.PointResponseDto;
 import com.nhnacademy.frontend.point.dto.PointResponseDtoList;
@@ -378,8 +381,22 @@ public class InfoController {
     public ModelAndView getUserOrderDetailPage(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("index/info/order_detail");
 
-        // todo: get orderId by HttpServletRequest
-        // mav.addObject("orderDetail", orderDetailList);
+        String orderId = request.getParameter("order_id");
+        System.out.println(orderId);
+
+        OrderDetailResponseDtoList orderDetailResponseDtoList = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/orders/detail/" + orderId,
+                OrderDetailResponseDtoList.class
+        ).getBody();
+
+
+        OrdersResponseDto ordersResponseDto = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/orders/orderId/" + orderId,
+                OrdersResponseDto.class
+        ).getBody();
+
+        mav.addObject("orderDetails", orderDetailResponseDtoList.getOrderDetailResponseDtoList());
+        mav.addObject("order", ordersResponseDto);
 
         return mav;
     }
