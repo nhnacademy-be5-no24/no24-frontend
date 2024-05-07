@@ -20,7 +20,7 @@ public class ElasticResponseDto {
     private String bookIsbn;
     private String bookTitle;
     private String bookDescription;
-//    private String bookPublisher;
+    private String bookPublisher;
     private LocalDateTime bookPublishedAt;
     private Long bookFixedPrice;
     private Long bookSalePrice;

@@ -46,6 +46,9 @@ public class ElasticRepositoryImpl implements ElasticRepositoryCustom {
                         .should(QueryBuilders.matchQuery("author.jaso", keyword))
                         .should(QueryBuilders.matchQuery("author.ngram", keyword))
                         .should(QueryBuilders.matchQuery("book_isbn", keyword))
+                        .should(QueryBuilders.matchQuery("book_publisher", keyword))
+                        .should(QueryBuilders.matchQuery("book_publisher.jaso", keyword))
+                        .should(QueryBuilders.matchQuery("book_publisher.ngram", keyword))
                 )
                 .build();
 

@@ -31,6 +31,9 @@ public class ElasticServiceImpl implements ElasticService {
     private final ElasticRepository elasticRepository;
     private ObjectMapper objectMapper;
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<ElasticResponseDto> searchAll(String keyword) {
         List<ElasticDocument> searchBooks = elasticRepository.findAll(keyword);
@@ -39,11 +42,17 @@ public class ElasticServiceImpl implements ElasticService {
                 .map(this::documentTransfer)
                 .collect(Collectors.toList());
     }
+
+    /**
+     * 검색 반응 Dto 생성을 위한 메소드입니다.
+     * @param document Elastic Search에서 반환받은 document 입니다.
+     */
     private ElasticResponseDto documentTransfer(ElasticDocument document) {
         return new ElasticResponseDto(
                 document.getBookIsbn(),
                 document.getBookTitle(),
                 document.getBookDesc(),
+                document.getBookPublisher(),
                 document.getBookPublishedAt(),
                 document.getBookFixedPrice(),
                 document.getBookSalePrice(),

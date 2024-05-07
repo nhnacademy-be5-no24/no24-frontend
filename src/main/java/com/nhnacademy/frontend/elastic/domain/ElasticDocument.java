@@ -26,8 +26,8 @@ public class ElasticDocument {
     private String bookTitle;
     @Field(name = "book_desc")
     private String bookDesc;
-//    @Field(name = "book_publisher")
-//    private String bookPublisher;
+    @Field(name = "book_publisher")
+    private String bookPublisher;
     @Field(name = "book_published_at")
     private LocalDateTime bookPublishedAt;
     @Field(name = "book_fixed_price")
