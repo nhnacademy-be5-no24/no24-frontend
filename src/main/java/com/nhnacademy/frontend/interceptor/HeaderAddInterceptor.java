@@ -23,7 +23,6 @@ import java.util.Map;
  * @Author : 박병휘
  * @Date : 2024/04/22
  */
-@Component
 public class HeaderAddInterceptor implements HandlerInterceptor {
     @Value("${request.url}")
     private String requestUrl;
