@@ -1,7 +1,8 @@
 package com.nhnacademy.frontend.admin;
 
-import com.nhnacademy.frontend.book.dto.BookResponseDto;
-import com.nhnacademy.frontend.book.dto.BookResponseList;
+import com.nhnacademy.frontend.book.dto.request.BookRequestDto;
+import com.nhnacademy.frontend.book.dto.response.BookResponseDto;
+import com.nhnacademy.frontend.book.dto.response.BookResponsePage;
 import com.nhnacademy.frontend.category.dto.CategoryResponseDto;
 import com.nhnacademy.frontend.coupon.dto.CouponTarget;
 import com.nhnacademy.frontend.coupon.dto.Status;
@@ -50,7 +51,7 @@ public class AdminController {
 
     /**
      * get Admin Main Page
-     * @Param none
+     * @Param
      * @return mav
      */
     @GetMapping
@@ -92,15 +93,15 @@ public class AdminController {
     @GetMapping("/book")
     public ModelAndView getAdminBook() {
         ModelAndView mav = new ModelAndView("index/admin/book");
-        ResponseEntity<BookResponseList> bookResponseDto = restTemplate.getForEntity(
-                requestUrl + ":" + port + "/shop/book?pageSize=0&offset=10" ,
-                BookResponseList.class
+        ResponseEntity<BookResponsePage> bookResponseEntity = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/books?pageSize=0&offset=10",
+                BookResponsePage.class
         );
-        List<BookResponseDto> bookList = bookResponseDto.getBody().getContent();
-
+        List<BookResponseDto> bookList = bookResponseEntity.getBody().getBookResponseDtoList();
         mav.addObject("bookList", bookList);
 
         return mav;
+
     }
 
     /**
@@ -111,6 +112,15 @@ public class AdminController {
     @GetMapping("/book/modify/{bookIsbn}")
     public ModelAndView getManageBook(@PathVariable String bookIsbn) {
         ModelAndView mav = new ModelAndView("index/admin/modify_book");
+        ResponseEntity<BookResponseDto> bookResponseDtoResponseEntity = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/books/isbn/" + bookIsbn,
+                BookResponseDto.class
+        );
+
+
+        BookResponseDto bookResponseDto = bookResponseDtoResponseEntity.getBody();
+        mav.addObject("book", bookResponseDto);
+
         return mav;
     }
 
@@ -123,10 +133,39 @@ public class AdminController {
     public ModelAndView modifyBook(@PathVariable String bookIsbn, HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("redirect:/admin/book");
 
-        // todo: 저장 알고리즘 구현, modify_book.html name 수정 필요.
+        String title = request.getParameter("bookTitle");
+        String description = request.getParameter("bookDescription");
+        LocalDate publishedAt = LocalDate.parse(request.getParameter("publishDate"));
+        Long fixPrice = Long.parseLong(request.getParameter("fixprice"));
+        Long salePrice = Long.parseLong(request.getParameter("salePrice"));
+        boolean isPacking = request.getParameter("packagingAvailable") != null;
+        int status = Integer.parseInt(request.getParameter("bookStatus"));
+        int quantity = Integer.parseInt(request.getParameter("quantity"));
+        String publisher = request.getParameter("publisher");
+        String image = request.getParameter("bookImage");
 
+        BookRequestDto bookRequestDto = BookRequestDto.builder()
+                .bookIsbn(bookIsbn)
+                .bookTitle(title)
+                .bookDescription(description)
+                .publishedAt(publishedAt)
+                .bookFixedPrice(fixPrice)
+                .bookSalePrice(salePrice)
+                .bookIsPacking(isPacking)
+                .bookViews(0L)
+                .bookStatus(status)
+                .bookQuantity(quantity)
+                .bookImage(image)
+                .author(publisher)
+                .likes(0L)
+                .build();
+        restTemplate.put(
+                requestUrl + ":" + port + "/shop/books",
+                bookRequestDto
+        );
         return mav;
     }
+
 
     /**
      * get creating book page
@@ -139,6 +178,7 @@ public class AdminController {
 
         return mav;
     }
+
 
     /**
      * get creating book page

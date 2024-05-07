@@ -1,4 +1,4 @@
-package com.nhnacademy.frontend.book.dto;
+package com.nhnacademy.frontend.book.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.nhnacademy.frontend.tag.dto.TagResponseDto;

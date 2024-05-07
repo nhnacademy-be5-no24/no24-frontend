@@ -1,9 +1,8 @@
 package com.nhnacademy.frontend.main.order;
 
 
-import com.nhnacademy.frontend.address.dto.response.AddressResponseDto;
 import com.nhnacademy.frontend.address.dto.response.AddressResponseDtoList;
-import com.nhnacademy.frontend.book.dto.BookResponseDto;
+import com.nhnacademy.frontend.book.dto.response.BookResponseDto;
 import com.nhnacademy.frontend.main.cartOrder.dto.request.CartPaymentRequestDto;
 import com.nhnacademy.frontend.main.cartOrder.dto.response.CartPaymentResponseDto;
 import com.nhnacademy.frontend.main.order.dto.request.OrderDetailDto;
