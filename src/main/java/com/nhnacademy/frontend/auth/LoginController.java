@@ -1,30 +1,31 @@
 package com.nhnacademy.frontend.auth;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.frontend.auth.dto.MemberCreateRequest;
 import com.nhnacademy.frontend.auth.dto.LoginDto;
-import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.nhnacademy.frontend.auth.dto.OAuthRequestDto;
+import com.nhnacademy.frontend.auth.dto.TokenDto;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * Login Controller
@@ -39,6 +40,15 @@ public class LoginController {
 
     @Value("${request.port}")
     private String port;
+
+    @Value("${payco.url}")
+    private String paycoUrl;
+
+    @Value("${payco.client.id}")
+    private String clientId;
+
+    @Value("${payco.client.secret}")
+    private String clientSecret;
 
     private final RestTemplate restTemplate;
     private final RedisTemplate redisTemplate;
@@ -60,7 +70,64 @@ public class LoginController {
             mav.setViewName("redirect:/");
         }
 
+        mav.addObject("paycoUrl", paycoUrl);
+
         return mav;
+    }
+
+    @GetMapping("/auth")
+    public ModelAndView getAuthPage(@RequestParam String code,
+                                    @RequestParam String state) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        ModelAndView mav = new ModelAndView("index/auth/login");
+        String url = "https://id.payco.com/oauth2.0/token?"
+                + "grant_type=authorization_code"
+                + "&client_id=" + clientId
+                + "&client_secret=" + clientSecret
+                + "&state=" + state
+                + "&code=" + code;
+
+        try {
+            JsonNode jsonResponse = objectMapper.readTree(
+                    restTemplate.getForEntity(
+                            url,
+                            String.class
+                    ).getBody()
+            );
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+            httpHeaders.setAccept(List.of(MediaType.APPLICATION_JSON));
+            httpHeaders.set("client_id", clientId);
+            httpHeaders.set("access_token", jsonResponse.get("access_token").asText());
+
+            jsonResponse = objectMapper.readTree(
+                    restTemplate.postForEntity(
+                            "https://apis-payco.krp.toastoven.net/payco/friends/find_member_v2.json",
+                            new HttpEntity<>(null, httpHeaders),
+                            String.class
+                    ).getBody()
+            );
+
+            JsonNode member = jsonResponse.get("data").get("member");
+            String idNo = member.get("idNo").asText();
+            String email = member.get("email").asText();
+            String mobile = member.get("mobile").asText();
+            String name = member.get("name").asText();
+
+            int year = LocalDate.now().getYear() - Integer.parseInt(member.get("ageGroup").asText());
+            int month = Integer.parseInt(member.get("birthdayMMdd").asText().substring(0, 2));
+            int day = Integer.parseInt(member.get("birthdayMMdd").asText().substring(2));
+            LocalDate birthday = LocalDate.of(year, month, day);
+            System.out.println(birthday.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+
+
+            return mav;
+
+        } catch(Exception e) {
+            mav.setViewName("redirect:/error");
+            return mav;
+        }
     }
 
     @GetMapping("/registerPage")
