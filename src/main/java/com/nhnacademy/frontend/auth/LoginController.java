@@ -84,7 +84,7 @@ public class LoginController {
                                     @RequestParam String code,
                                     @RequestParam String state) {
         ObjectMapper objectMapper = new ObjectMapper();
-        ModelAndView mav = new ModelAndView("index/auth/login");
+        ModelAndView mav = new ModelAndView("redirect:/");
         String url = "https://id.payco.com/oauth2.0/token?"
                 + "grant_type=authorization_code"
                 + "&client_id=" + clientId
