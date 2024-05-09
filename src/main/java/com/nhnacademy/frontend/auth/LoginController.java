@@ -133,6 +133,7 @@ public class LoginController {
                     Boolean.class
             ).getBody();
 
+            System.out.println("register id");
             // 유저 정보가 없는 경우 회원가입
             if(!isExist) {
                 MemberCreateRequest memberCreateRequest = MemberCreateRequest.builder()
@@ -150,7 +151,8 @@ public class LoginController {
                         MemberCreateRequest.class
                 );
             }
-
+            System.out.println("register end");
+            System.out.println("login");
             // 로그인
             RestTemplate restTemplate = new RestTemplate();
             HttpSession session = httpServletRequest.getSession();
@@ -171,6 +173,7 @@ public class LoginController {
                     request,
                     LoginDto.class
             );
+            System.out.println("login end");
 
             // header의 authorization와 refreshToken을 얻어온다.
             HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
