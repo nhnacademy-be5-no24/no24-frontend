@@ -12,7 +12,7 @@
     <div th:replace="./nav/header.html"></div>
     <div th:replace="./nav/menu.html"></div>
 
-    <!-- 도서 페이지 -->
+    <!-- 쿠폰 페이지 -->
     <div class="container">
         <div class="row">
             <!-- 왼쪽에 세로 카테고리 네비게이션 -->
@@ -24,22 +24,31 @@
 
             <div class="col-md-10 mt-4 mb-4">
                 <h4 class="mb-3"><strong>쿠폰함</strong></h4>
-                <!-- todo: 쿠폰 이미지 고려 필요 -->
-                <div class="row ">
-                    <div th:each="coupon : ${couponList}" class="col-sm-5 card p-4 m-4" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
-                        <div class="row">
-                            <div class="col-md-5">
-                                <img th:if="${coupon.getDiscountPrice() != null}" th:src="'/icon/coupon/coupon_' + ${coupon.getDiscountPrice()} + '.png'" style="height:70px;">
-                                <img th:if="${coupon.getDiscountRate() != null}" th:src="'/icon/coupon/coupon_' + ${coupon.getDiscountRate()} + 'percent.png'" style="height:70px;">
-                            </div>
-                            <div class="col-md-7">
-                                <h4><strong th:text="${coupon.getCouponName()}"></strong></h4>
-                                <p th:if="${coupon.getDiscountPrice() != null}" th:text="'도서 ' + ${coupon.getDiscountPrice()} + '원 할인'">도서 3,000원 할인</p>
-                                <p th:if="${coupon.getDiscountRate() != null}" th:text="'도서 ' + ${coupon.getDiscountRate()} + '% 할인 (최대금액: ' + ${coupon.getMaxDiscountPrice()} + '원 할인)'">도서 3,000원 할인</p>
-                                <p th:text="'만료 일자: ' + ${coupon.getDestroyedAt()}"></p>
-                            </div>
-                        </div>
-                    </div>
+                <!-- 포인트 사용/적립 내역 표 생성 -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">쿠폰명</th>
+                            <th scope="col">할인액 / 할인율(최대금액)</th>
+                            <th scope="col">발급일자</th>
+                            <th scope="col">만료일자</th>
+                            <th scope="col">사용일자</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="coupon : ${couponList}">
+                            <td th:text="${coupon.getCouponName()}"></td>
+                            <td th:text="${coupon.getCouponType().toString().equals('PERCENTAGE') ?
+                                    ( coupon.getDiscountRate() + '% (' + coupon.getMaxDiscountPrice() + '원)' ) :
+                                    ( coupon.getDiscountPrice() + '원')
+                                    }"></td>
+                            <td th:text="${coupon.getCreatedAt()}"></td>
+                            <td th:text="${coupon.getDestroyedAt()}"></td>
+                            <td th:text="${coupon.getUsedAt()}"></td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
 
                 <!-- Pagination -->

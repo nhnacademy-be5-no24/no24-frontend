@@ -36,17 +36,11 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-                            <td>2024-04-01 09:00:12</td>
-                            <td>적립</td>
-                            <td class="text-success">+100</td>
+                        <tr th:each="point : ${pointList}">
+                            <td th:text="${point.getCreatedAt()}"></td>
+                            <td th:text="${point.pointDescription}"></td>
+                            <td th:text="${point.usage > 0 ? '+' + point.usage : point.usage}" th:class="${point.usage > 0 ? 'text-success' : 'text-danger'}"></td>
                         </tr>
-                        <tr>
-                            <td>2024-04-02 23:34:43</td>
-                            <td>사용</td>
-                            <td class="text-danger">-50</td>
-                        </tr>
-                        <!-- 추가적인 내역들을 이곳에 추가 -->
                         </tbody>
                     </table>
                 </div>

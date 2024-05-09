@@ -39,5 +39,6 @@ public class OrderDto implements Serializable {
     private String postcode;
     private String address;
     private String addressDetail;
+    private Long usedPoint;
     private List<OrderDetailDto> OrderDetailDto;
 }

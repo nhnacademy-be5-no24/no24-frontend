@@ -1,4 +1,4 @@
-package com.nhnacademy.frontend.wrap.dto;
+package com.nhnacademy.frontend.wrap.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

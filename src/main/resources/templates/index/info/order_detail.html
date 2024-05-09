@@ -25,86 +25,29 @@
             <div class="col-md-10 mt-4 mb-4">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="mb-0"><strong>주문번호 : KNB-2404040900-0001</strong></h4>
+                        <h4 class="mb-0"><strong th:text="'주문번호 : ' + ${order.getOrderId()}"></strong></h4>
                     </div>
                     <div class="card-body">
                         <h4 class="mb-4"><strong>주문 상세</strong></h4>
                         <div class="row">
                             <!-- 주문 상세 리스트 -->
-                            <div class="col-md-6 mb-4">
+                            <div th:each="orderDetail : ${orderDetails}" class="col-md-6 mb-4">
                                 <div class="card p-4">
                                     <div class="row">
                                         <div class="col-md-3 mr-4">
-                                            <img src="/img/book1.jpg" style="height: 150px">
+                                            <img th:src="'https://kr1-api-object-storage.nhncloudservice.com/v1/AUTH_fcb81f74e379456b8ca0e091d351a7af/no24/' + ${orderDetail.getBook().getBookImage()}" style="height: 150px">
                                         </div>
                                         <div class="col-md-7">
-                                            <h4><strong>투자의 정석</strong></h4>
-                                            <p>10,500원 · 3권</p>
+                                            <h5><strong th:text="${orderDetail.getBook().getBookTitle()}"></strong></h5>
+                                            <p th:text="${orderDetail.getBook().getBookSalePrice()} + '원 · ' + ${orderDetail.getQuantity()} + '권'">10,500원 · 3권</p>
                                             <h5><strong>포장비</strong></h5>
-                                            <p>1,200원 (A 1권, B 2권)</p>
+                                            <p th:text="${orderDetail.getWrapsPrice()} + '원'"></p>
                                         </div>
                                     </div>
-                                    <form method="post" action="/info/order/detail/delete">
-                                        <input type="text" name="order_detail_id" value="order_detail_id" hidden>
-                                        <button class="btn btn-danger btn-block mt-4">해당 주문 취소</button>
-                                    </form>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mb-4">
-                                <div class="card p-4">
-                                    <div class="row">
-                                        <div class="col-md-3 mr-4">
-                                            <img src="/img/book1.jpg" style="height: 150px">
-                                        </div>
-                                        <div class="col-md-7">
-                                            <h4><strong>투자의 정석</strong></h4>
-                                            <p>10,500원 · 3권</p>
-                                            <h5><strong>포장비</strong></h5>
-                                            <p>1,200원 (A 1권, B 2권)</p>
-                                        </div>
-                                    </div>
-                                    <form method="post" action="/info/order/detail/delete">
-                                        <input type="text" name="order_detail_id" value="order_detail_id" hidden>
-                                        <button class="btn btn-danger btn-block mt-4">해당 주문 취소</button>
-                                    </form>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mb-4">
-                                <div class="card p-4">
-                                    <div class="row">
-                                        <div class="col-md-3 mr-4">
-                                            <img src="/img/book1.jpg" style="height: 150px">
-                                        </div>
-                                        <div class="col-md-7">
-                                            <h4><strong>투자의 정석</strong></h4>
-                                            <p>10,500원 · 3권</p>
-                                            <h5><strong>포장비</strong></h5>
-                                            <p>1,200원 (A 1권, B 2권)</p>
-                                        </div>
-                                    </div>
-                                    <form method="post" action="/info/order/detail/delete">
-                                        <input type="text" name="order_detail_id" value="order_detail_id" hidden>
-                                        <button class="btn btn-danger btn-block mt-4">해당 주문 취소</button>
-                                    </form>
-                                </div>
-                            </div>
-                            <div class="col-md-6 mb-4">
-                                <div class="card p-4">
-                                    <div class="row">
-                                        <div class="col-md-3 mr-4">
-                                            <img src="/img/book1.jpg" style="height: 150px">
-                                        </div>
-                                        <div class="col-md-7">
-                                            <h4><strong>투자의 정석</strong></h4>
-                                            <p>10,500원 · 3권</p>
-                                            <h5><strong>포장비</strong></h5>
-                                            <p>1,200원 (A 1권, B 2권)</p>
-                                        </div>
-                                    </div>
-                                    <form method="post" action="/info/order/detail/delete">
-                                        <input type="text" name="order_detail_id" value="order_detail_id" hidden>
-                                        <button class="btn btn-danger btn-block mt-4">해당 주문 취소</button>
-                                    </form>
+<!--                                    <form method="post" action="/info/order/detail/delete">-->
+<!--                                        <input type="text" name="order_detail_id" value="order_detail_id" hidden>-->
+<!--                                        <button class="btn btn-danger btn-block mt-4">해당 주문 취소</button>-->
+<!--                                    </form>-->
                                 </div>
                             </div>
                         </div>
@@ -116,35 +59,23 @@
                             <tbody>
                             <tr>
                                 <th scope="row">주문 날짜</th>
-                                <td>2024년 4월 4일 23:56</td>
+                                <td th:text="${order.getOrderDate()}">2024년 4월 4일 23:56</td>
                             </tr>
                             <tr>
                                 <th scope="row">주문 상태</th>
-                                <td>배송 중</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">주문 금액</th>
-                                <td>63,000원</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">배송비</th>
-                                <td>0원</td>
+                                <td th:text="${order.getOrderState().toString()}"></td>
                             </tr>
                             <tr>
                                 <th scope="row">총 금액</th>
-                                <td>63,000원</td>
-                            </tr>
-                            <tr>
-                                <th scope="row">결제 수단</th>
-                                <td>토스페이먼츠</td>
+                                <td th:text="${order.getTotalPrice()} + '원'"></td>
                             </tr>
                             <tr>
                                 <th scope="row">수취인</th>
-                                <td>Test User (010-1423-3132)</td>
+                                <td th:text="${order.getReceiverName()} + '(' + ${order.getReceiverPhoneNumber()} + ')'"/>
                             </tr>
                             <tr>
                                 <th scope="row">배송 주소</th>
-                                <td>대전광역시 유성구 궁동 99(34136) 정보화본부 N2-1 1303호</td>
+                                <td th:text="${order.getAddress()} + ' ' + ${order.getAddressDetail()}"></td>
                             </tr>
                             <tr>
                                 <th scope="row">배송 요청사항</th>

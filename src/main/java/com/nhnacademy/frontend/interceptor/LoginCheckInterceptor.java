@@ -22,7 +22,6 @@ import java.util.Map;
  * @Author : 박병휘
  * @Date : 2024/04/22
  */
-@Component
 public class LoginCheckInterceptor implements HandlerInterceptor {
 
     private final RedisTemplate<String, Object> redisTemplate;

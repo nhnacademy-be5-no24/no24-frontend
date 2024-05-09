@@ -24,25 +24,21 @@
         </div>
 
         <div class="col-10 mt-4 mb-4">
-            <form method="post" action="/admin/wrap/modify/1">
-                <h4><strong>포장지 1</strong></h4>
+            <form method="post" th:action="'/admin/wrap/modify/' + ${wrap.getWrapId()}">
+                <h4><strong th:text="${wrap.getWrapName()} + ' 수정'"></strong></h4>
 
                 <!-- 포장지 이름 수정 -->
                 <div class="form-group">
                     <label for="packagingName">포장지 이름</label>
-                    <input type="text" class="form-control" id="packagingName" placeholder="포장지 이름 입력">
-                </div>
-
-                <!-- 소재 수정 -->
-                <div class="form-group">
-                    <label for="material">소재</label>
-                    <input type="text" class="form-control" id="material" placeholder="소재 입력">
+                    <input type="text" class="form-control" id="packagingName" name="wrapName" placeholder="포장지 이름 입력"
+                    th:value="${wrap.getWrapName()}">
                 </div>
 
                 <!-- 가격 수정 -->
                 <div class="form-group">
                     <label for="price">가격</label>
-                    <input type="text" class="form-control" id="price" placeholder="가격 입력">
+                    <input type="text" class="form-control" id="price" name="wrapCost" placeholder="가격 입력"
+                           th:value="${wrap.getWrapCost()}">
                 </div>
 
                 <button type="submit" class="btn btn-primary">저장</button>

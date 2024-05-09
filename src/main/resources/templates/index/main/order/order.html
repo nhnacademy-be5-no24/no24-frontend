@@ -37,6 +37,12 @@
         <hr>
 
         <h4>받는 사람 정보</h4>
+
+        <div class="form-group col-3 pl-0">
+            <select class="form-control" id="address">
+                <option th:each="address : ${addressList}" th:value="${address.getAddressId()}" th:text="${address.getAlias()}"></option>
+            </select>
+        </div>
         <div class="form-group col-3 pl-0">
             <label for="receiverName">이름</label>
             <input type="text" class="form-control" id="receiverName" name="receiverName"
@@ -103,6 +109,14 @@
             </tbody>
         </table>
 
+        <hr>
+
+        <h4>포인트 사용</h4>
+        <div class="form-group">
+            <label for="usedPoint" th:text="'포인트 사용(' + ${point} + ' 포인트 사용 가능)'"></label>
+            <input type="number" class="form-control" id="usedPoint" name="usedPoint" min="0" th:max="${point}" value="0">
+        </div>
+
         <div th:id="'book-coupon-info-' + ${item.getBookIsbn()}" th:each="item : ${cartInfo.getBookInfos()}" hidden>
             <div th:id="'coupon-info-' + ${coupon.getCouponMemberId()}" th:each="coupon : ${item.getCoupons()}">
                 <p class="coupon-member-id" th:text="${coupon.couponMemberId}"></p>
@@ -119,6 +133,17 @@
         <!-- 포장 정보 -->
         <div hidden th:each="item : ${cartInfo.getBookInfos()}">
             <p th:each="wrap : ${item.getWraps()}" th:id="'wrap-price-' + ${wrap.getWrapId()}" th:text="${wrap.getWrapCost()}"></p>
+        </div>
+
+        <p id="user_point" name="maxUserPoint" th:text="${point}" hidden />
+
+        <!-- 주소 정보 -->
+        <div hidden th:each="item : ${addressList}" th:id="'address-' + ${item.getAddressId()}">
+            <p class="address" th:text="${item.getAddress()}"/>
+            <p class="detail" th:text="${item.getAddressDetail()}"/>
+            <p class="zipcode" th:text="${item.getZipcode()}"/>
+            <p class="receiver-name" th:text="${item.getReceiverName()}"/>
+            <p class="receiver-phone-number" th:text="${item.getReceiverPhoneNumber()}"/>
         </div>
 
         <hr>
@@ -178,6 +203,8 @@
         const couponMember = new Map();
         const bookInfo = new Map();
         const wrapInfo = new Map();
+        const addressInfo = new Map();
+        let maxUserPoint = 0;
 
         const updatePrice = () => {
             const selectedCoupon = new Set();
@@ -197,8 +224,6 @@
                         let wrapId = wrap["wrapId"];
                         let quantity = Number(wrap["quantity"]);
                         let wrapCost = wrapInfo.get(wrapId + "");
-
-                        console.log(wrapId + " " + quantity + " " + wrapCost);
 
                         bookPrice += (quantity * wrapCost);
                     });
@@ -227,6 +252,7 @@
                 div.innerText = bookPrice;
                 totalPrice += bookPrice;
             });
+            totalPrice -= Number(document.querySelector("#usedPoint").value);
             // 가격 업데이트
             if(totalPrice < 30000) totalPrice += 3000;
             totalPriceDiv.innerText = totalPrice;
@@ -244,6 +270,8 @@
         }
 
         document.addEventListener("DOMContentLoaded", function() {
+            maxUserPoint = Number(document.querySelector("#user_point").innerText);
+
             document.querySelectorAll('[id^="book-coupon-info-"]').forEach(function(div) {
                 div.querySelectorAll('[id^="coupon-info-"]').forEach(function(couponInfo) {
                     let couponMemberId = couponInfo.querySelector('.coupon-member-id').innerText;
@@ -279,9 +307,52 @@
                 Number(wrap.innerText);
 
                 wrapInfo.set(wrapId, cost);
+            });
+
+
+            document.querySelectorAll('[id^="address-"]').forEach(function(address) {
+                let addressId = address.id.split("-")[address.id.split("-").length - 1];
+                let addressName = address.querySelector('.address').innerText;
+                let detail = address.querySelector('.detail').innerText;
+                let zipcode = address.querySelector('.zipcode').innerText;
+                let receiverName = address.querySelector('.receiver-name').innerText;
+                let receiverPhoneNumber = address.querySelector('.receiver-phone-number').innerText;
+
+                const map = new Map();
+
+                map.set("address", addressName);
+                map.set("detail", detail);
+                map.set("zipcode", zipcode);
+                map.set("receiverName", receiverName);
+                map.set("receiverPhoneNumber", receiverPhoneNumber);
+
+                addressInfo.set(addressId, map);
             })
 
             updatePrice();
+        });
+
+        document.querySelector("#usedPoint").addEventListener("change", restrictValue);
+
+        function restrictValue() {
+            if(this.value > Number(maxUserPoint)) {
+
+                this.value = maxUserPoint;
+            }
+            updatePrice();
+        };
+
+        document.getElementById("address").addEventListener("change", (e) => {
+            let id = e.target.value;
+            let address = addressInfo.get(id);
+            console.log(addressInfo);
+            console.log(address);
+
+            document.getElementById('receiverPostcode').value = address.get("zipcode");
+            document.getElementById("receiverAddress").value = address.get("address");
+            document.getElementById("receiverDetailAddress").value = address.get("detail");
+            document.getElementById("receiverPhoneNumber").value = address.get("receiverPhoneNumber");
+            document.getElementById("receiverName").value = address.get("receiverName");
         });
 
         document.querySelectorAll('[id^="coupon-"]').forEach(function(couponDiv) {

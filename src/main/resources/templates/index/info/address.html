@@ -50,44 +50,13 @@
                             <div class="row-md-12 mt-2">
                                 <form method="post" action="/info/address/delete">
                                     <input type="text" name="address_id" th:value="${address.getAddressId()}" hidden>
-                                    <button class="btn btn-danger btn-block" th:disabled="${addressList.size() == 1}">삭제</button>
+                                    <button class="btn btn-danger btn-block" th:disabled="${addressList.size() == 1 || address.getIsDefault()}">삭제</button>
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-sm-12 card mt-2" style="border: solid 1px #d0d0d0; background-color: #fcfcfc; border-radius: 5px;">
-                    <div class="row justify-content-between">
-                        <div class="col-sm-8 p-3">
-                            <!-- 주소 리스트 -->
-                            <h5><strong>너희 집</strong></h5>
-                            <p class="m-0">받는 사람 : Test User2 (010-2333-2231)</p>
-                            <p class="m-0">주소 : 대전광역시 유성구 궁동 99 정보화본부 N2-1 1305호</p>
-                            <p class="m-0">기본 배송지 X</p>
-                        </div>
-                        <div class="col-xs-2 m-3">
-                            <div class="row-md-12">
-                                <form method="post" action="/info/address/modify">
-                                    <input type="text" name="address_id" value="address_id" hidden>
-                                    <button type="submit" class="btn btn-primary btn-block">배송지 수정</button>
-                                </form>
-                            </div>
-                            <div class="row-md-12 mt-2">
-                                <form method="post" action="/info/address/set/default">
-                                    <input type="text" name="address_id" value="address_id" hidden>
-                                    <button class="btn btn-success btn-block">기본 배송지 설정</button>
-                                </form>
-                            </div>
-                            <div class="row-md-12 mt-2">
-                                <form method="post" action="/info/address/delete">
-                                    <input type="text" name="address_id" value="address_id" hidden>
-                                    <button class="btn btn-danger btn-block">삭제</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <a class="btn btn-primary mt-2" href="/info/address/add">배송지 추가</a>
             </div>
         </div>

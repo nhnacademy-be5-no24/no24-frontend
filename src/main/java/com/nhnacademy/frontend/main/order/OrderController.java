@@ -1,6 +1,8 @@
 package com.nhnacademy.frontend.main.order;
 
 
+import com.nhnacademy.frontend.address.dto.response.AddressResponseDto;
+import com.nhnacademy.frontend.address.dto.response.AddressResponseDtoList;
 import com.nhnacademy.frontend.book.dto.BookResponseDto;
 import com.nhnacademy.frontend.main.cartOrder.dto.request.CartPaymentRequestDto;
 import com.nhnacademy.frontend.main.cartOrder.dto.response.CartPaymentResponseDto;
@@ -12,10 +14,9 @@ import com.nhnacademy.frontend.util.AuthUtil;
 
 import com.nhnacademy.frontend.util.exception.NotFoundToken;
 import com.nhnacademy.frontend.util.exception.UnauthorizedTokenException;
-import com.nhnacademy.frontend.wrap.dto.WrapResponseDto;
+import com.nhnacademy.frontend.wrap.dto.response.WrapResponseDto;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -86,14 +87,17 @@ public class OrderController {
     @PostMapping
     public ModelAndView getOrderPage(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("index/main/order/order");
+        Long customerNo = null;
 
-        Long customerNo = AuthUtil.getCustomerNo(
-                requestUrl,
-                port,
-                request,
-                redisTemplate,
-                restTemplate
-        );
+        try {
+            customerNo = AuthUtil.getCustomerNo(
+                    requestUrl,
+                    port,
+                    request,
+                    redisTemplate,
+                    restTemplate
+            );
+        } catch(Exception e) {}
 
         List<CartPaymentRequestDto.BookInfo> bookInfos = new ArrayList<>();
 
@@ -137,8 +141,21 @@ public class OrderController {
         CartPaymentResponseDto cartInfo = response.getBody();
         System.out.println(cartInfo);
 
+        ResponseEntity<Long> point = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/shop/point/" + customerNo,
+                Long.class);
+
+        // user address 정보 수집
+        if(customerNo != null) {
+            ResponseEntity<AddressResponseDtoList> addressResponseEntity = restTemplate.getForEntity(
+                    requestUrl + ":" + port + "/shop/address/customer/" + customerNo,
+                    AddressResponseDtoList.class);
+            mav.addObject("addressList", addressResponseEntity.getBody().getAddressResponseDtoList());
+        }
+
         mav.addObject("cartInfo", cartInfo);
         mav.addObject("tomorrow", LocalDate.now().plusDays(1));
+        mav.addObject("point", point.getBody());
 
         return mav;
     }
@@ -148,11 +165,11 @@ public class OrderController {
         ModelAndView mav = new ModelAndView("index/main/order/input_wrap");
 
         ResponseEntity<WrapResponseDtoList> response = restTemplate.getForEntity(
-                requestUrl + ":" + port +  "/shop/wraps",
+                requestUrl + ":" + port +  "/shop/wraps?page=0&size=10",
                 WrapResponseDtoList.class
         );
 
-        List<WrapResponseDto> wrapList = response.getBody().getWrapResponseDtoList();
+        List<WrapResponseDto> wrapList = response.getBody().getWrapResponseDtos();
 
         mav.addObject("wrapList", wrapList);
 
@@ -251,6 +268,7 @@ public class OrderController {
                     .addressDetail(orderDto.getAddressDetail())
                     .req("")
                     .orderDetailDtoList(orderDto.getOrderDetailDto())
+                    .usedPoint(orderDto.getUsedPoint())
                     .build();
 
 

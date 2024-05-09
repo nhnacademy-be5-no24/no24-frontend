@@ -24,28 +24,32 @@
         </div>
 
         <div class="col-10 mt-4 mb-4">
-            <h4><strong>일반 등급 수정</strong></h4>
-            <form method="post" action="/admin/tier/modify/1">
+            <h4><strong th:text="${grade.getGradeNameKor()} + ' 등급 수정'"></strong></h4>
+            <form method="post" th:action="'/admin/tier/modify/' + ${grade.getGradeId()}">
             <!-- 조건 수정 -->
                 <div class="form-group">
-                    <label for="orderAmount">주문 금액</label>
-                    <input type="text" class="form-control" id="orderAmount" placeholder="주문 금액 입력">
+                    <label for="orderAmount">등급 업 금액</label>
+                    <input type="number" class="form-control" id="orderAmount" name="requiredPayment" placeholder="주문 금액 입력"
+                    th:value="${grade.getRequiredPayment()}">
                 </div>
 
                 <!-- 혜택 수정 -->
                 <div class="form-group">
                     <label for="pointRate">포인트 적립율</label>
-                    <input type="text" class="form-control" id="pointRate" placeholder="포인트 적립율 입력">
+                    <input type="number" class="form-control" id="pointRate" name="accumulateRate" placeholder="포인트 적립율 입력"
+                           th:value="${grade.getAccumulateRate()}">
                 </div>
 
                 <div class="form-group">
                     <label for="coupon10">10% 할인쿠폰 지급개수</label>
-                    <input type="text" class="form-control" id="coupon10" placeholder="10% 할인쿠폰 지급개수 입력">
+                    <input type="number" class="form-control" id="coupon10" name="tenPercentCoupon" placeholder="10% 할인쿠폰 지급개수 입력"
+                           th:value="${grade.getTenPercentCoupon()}">
                 </div>
 
                 <div class="form-group">
                     <label for="coupon20">20% 할인쿠폰 지급개수</label>
-                    <input type="text" class="form-control" id="coupon20" placeholder="20% 할인쿠폰 지급개수 입력">
+                    <input type="number" class="form-control" id="coupon20" name="twentyPercentCoupon" placeholder="20% 할인쿠폰 지급개수 입력"
+                           th:value="${grade.getTwentyPercentCoupon()}">
                 </div>
 
                 <button type="submit" class="btn btn-primary">저장</button>
