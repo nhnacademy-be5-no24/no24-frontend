@@ -119,18 +119,20 @@ public class LoginController {
 
             JsonNode member = jsonResponse.get("data").get("member");
             String idNo = member.get("idNo").asText();
-            System.out.println("id : " + idNo);
-            String email = member.get("email").asText();
-            System.out.println("email: " + email);
-            String mobile = member.get("mobile").asText();
-            System.out.println("mobile: " + mobile);
-            String name = member.get("name").asText();
-            System.out.println("name: " + name);
+            String email = member.get("email").asText() == null ? "미입력" : member.get("email").asText();
+            String mobile = member.get("mobile").asText() == null ? "미입력" : member.get("mobile").asText();
+            String name = member.get("name").asText() == null ? "미입력" : member.get("name").asText();
+            LocalDate birthday = null;
 
-            int year = LocalDate.now().getYear() - Integer.parseInt(member.get("ageGroup").asText());
-            int month = Integer.parseInt(member.get("birthdayMMdd").asText().substring(0, 2));
-            int day = Integer.parseInt(member.get("birthdayMMdd").asText().substring(2));
-            LocalDate birthday = LocalDate.of(year, month, day);
+            if(member.get("birthdayMMdd") != null) {
+                int year = LocalDate.now().getYear() - Integer.parseInt(member.get("ageGroup").asText());
+                int month = Integer.parseInt(member.get("birthdayMMdd").asText().substring(0, 2));
+                int day = Integer.parseInt(member.get("birthdayMMdd").asText().substring(2));
+                birthday = LocalDate.of(year, month, day);
+            }
+            else {
+                birthday = LocalDate.now();
+            }
 
             boolean isExist = restTemplate.getForEntity(
                     requestUrl + ":" + port +  "/auth/member/exist/" + idNo,
