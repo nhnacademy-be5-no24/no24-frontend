@@ -55,6 +55,12 @@
                     </div>
                 </div>
 
+                <div>
+                    <button id="sortByBookIsbn">기본</button>
+                    <button id="sortByName">책 제목순</button>
+                    <button id="sortByReview">리뷰순</button>
+                </div>
+
                 <!-- 도서 상품 블록 시작 -->
                 <!-- 첫 번째 도서 블록 -->
                 <div th:each="book : ${bookList}" class="col-12 mb-4">
@@ -134,7 +140,7 @@
             bookQuantity: 1
         };
 
-        fetch("/shop/cart/create", {
+        fetch("/cart/create", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
