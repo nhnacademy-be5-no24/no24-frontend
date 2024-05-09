@@ -7,6 +7,8 @@ import com.nhnacademy.frontend.auth.dto.LoginDto;
 import com.nhnacademy.frontend.auth.dto.OAuthRequestDto;
 import com.nhnacademy.frontend.auth.dto.TokenDto;
 import com.nhnacademy.frontend.util.AuthUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.HashOperations;
@@ -36,6 +38,7 @@ import java.util.List;
  */
 @Controller
 public class LoginController {
+    private static final Logger log = LoggerFactory.getLogger(LoginController.class);
     @Value("${request.url}")
     private String requestUrl;
 
@@ -180,6 +183,7 @@ public class LoginController {
 
             return mav;
         } catch(Exception e) {
+            System.out.println(("error: " + e.getMessage()));
             mav.setViewName("redirect:/error");
             return mav;
         }
