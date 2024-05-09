@@ -6,6 +6,7 @@ import com.nhnacademy.frontend.auth.dto.MemberCreateRequest;
 import com.nhnacademy.frontend.auth.dto.LoginDto;
 import com.nhnacademy.frontend.auth.dto.OAuthRequestDto;
 import com.nhnacademy.frontend.auth.dto.TokenDto;
+import com.nhnacademy.frontend.util.AuthUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.HashOperations;
@@ -50,6 +51,9 @@ public class LoginController {
     @Value("${payco.client.secret}")
     private String clientSecret;
 
+    @Value("${payco.password}")
+    private String paycoPassword;
+
     private final RestTemplate restTemplate;
     private final RedisTemplate redisTemplate;
 
@@ -76,7 +80,8 @@ public class LoginController {
     }
 
     @GetMapping("/auth")
-    public ModelAndView getAuthPage(@RequestParam String code,
+    public ModelAndView getAuthPage(HttpServletRequest httpServletRequest,
+                                    @RequestParam String code,
                                     @RequestParam String state) {
         ObjectMapper objectMapper = new ObjectMapper();
         ModelAndView mav = new ModelAndView("index/auth/login");
@@ -119,11 +124,61 @@ public class LoginController {
             int month = Integer.parseInt(member.get("birthdayMMdd").asText().substring(0, 2));
             int day = Integer.parseInt(member.get("birthdayMMdd").asText().substring(2));
             LocalDate birthday = LocalDate.of(year, month, day);
-            System.out.println(birthday.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
 
+            boolean isExist = restTemplate.getForEntity(
+                    requestUrl + ":" + port +  "/auth/member/exist/" + idNo,
+                    Boolean.class
+            ).getBody();
+
+            // 유저 정보가 없는 경우 회원가입
+            if(!isExist) {
+                MemberCreateRequest memberCreateRequest = MemberCreateRequest.builder()
+                        .customerId(idNo)
+                        .customerPassword(idNo + paycoPassword)
+                        .customerName(name)
+                        .customerPhoneNumber(mobile)
+                        .customerEmail(email)
+                        .customerBirthday(birthday)
+                        .build();
+
+                restTemplate.postForEntity(
+                        requestUrl + ":" + port + "/auth/member/create",
+                        memberCreateRequest,
+                        MemberCreateRequest.class
+                );
+            }
+
+            // 로그인
+            RestTemplate restTemplate = new RestTemplate();
+            HttpSession session = httpServletRequest.getSession();
+            String jSessionId = session.getId();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+            // 요청 본문 데이터 설정 (form-data)
+            MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+            map.add("username", idNo);
+            map.add("password", idNo + paycoPassword);
+
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
+
+            ResponseEntity responseEntity = restTemplate.postForEntity(
+                    requestUrl + ":" + port +  "/login",
+                    request,
+                    LoginDto.class
+            );
+
+            // header의 authorization와 refreshToken을 얻어온다.
+            HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
+            String authorization = responseEntity.getHeaders().get("Authorization").get(0);
+            String refreshToken = responseEntity.getHeaders().get("RefreshToken").get(0);
+
+            // Redis session에 저장.
+            hashOperations.put(jSessionId, "Authorization", authorization);
+            hashOperations.put(jSessionId, "RefreshToken", refreshToken);
 
             return mav;
-
         } catch(Exception e) {
             mav.setViewName("redirect:/error");
             return mav;
