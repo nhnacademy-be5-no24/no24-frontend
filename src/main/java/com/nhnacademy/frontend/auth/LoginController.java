@@ -124,7 +124,7 @@ public class LoginController {
             String name = member.get("name").asText() == null ? "미입력" : member.get("name").asText();
             LocalDate birthday = null;
 
-            if(member.get("birthdayMMdd") != null) {
+            if(member.get("birthdayMMdd") != null && member.get("ageGroup") != null) {
                 int year = LocalDate.now().getYear() - Integer.parseInt(member.get("ageGroup").asText());
                 int month = Integer.parseInt(member.get("birthdayMMdd").asText().substring(0, 2));
                 int day = Integer.parseInt(member.get("birthdayMMdd").asText().substring(2));
