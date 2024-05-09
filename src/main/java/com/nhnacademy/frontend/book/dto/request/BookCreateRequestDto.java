@@ -1,21 +1,18 @@
 package com.nhnacademy.frontend.book.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.nhnacademy.frontend.category.dto.CategoryInfoResponseDto;
 import com.nhnacademy.frontend.category.dto.CategoryResponseDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.nhnacademy.frontend.tag.dto.TagResponseDto;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookRequestDto {
+@Getter
+public class BookCreateRequestDto {
     @JsonProperty("book_isbn")
     private String bookIsbn;
 
@@ -25,11 +22,11 @@ public class BookRequestDto {
     @JsonProperty("book_description")
     private String bookDescription;
 
+    @JsonProperty("book_publisher")
+    private String bookPublisher;
+
     @JsonProperty("book_published_at")
     private LocalDate publishedAt;
-
-    @JsonProperty("book_publisher")
-    private String publisher;
 
     @JsonProperty("book_fixed_price")
     private Long bookFixedPrice;
@@ -52,9 +49,15 @@ public class BookRequestDto {
     @JsonProperty("book_image")
     private String bookImage;
 
-    @JsonProperty("author")
+    @JsonProperty
+    private List<TagResponseDto> tags;
+
+    @JsonProperty("book_author")
     private String author;
-//    private List<BookTagResponseDto> tags;
-//    private List<CategoryResponseDto> categories;
+
+    @JsonProperty
+    private List<CategoryResponseDto> categories;
+
+    @JsonProperty("book_like")
     private Long likes;
 }
