@@ -119,9 +119,13 @@ public class LoginController {
 
             JsonNode member = jsonResponse.get("data").get("member");
             String idNo = member.get("idNo").asText();
+            System.out.println("id : " + idNo);
             String email = member.get("email").asText();
+            System.out.println("email: " + email);
             String mobile = member.get("mobile").asText();
+            System.out.println("mobile: " + mobile);
             String name = member.get("name").asText();
+            System.out.println("name: " + name);
 
             int year = LocalDate.now().getYear() - Integer.parseInt(member.get("ageGroup").asText());
             int month = Integer.parseInt(member.get("birthdayMMdd").asText().substring(0, 2));
@@ -153,6 +157,7 @@ public class LoginController {
             }
             System.out.println("register end");
             System.out.println("login");
+
             // 로그인
             RestTemplate restTemplate = new RestTemplate();
             HttpSession session = httpServletRequest.getSession();
