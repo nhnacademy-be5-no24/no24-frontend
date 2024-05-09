@@ -5,6 +5,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.HashOperations;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -13,6 +15,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.Objects;
 
 /**
@@ -32,19 +35,25 @@ public class AuthorizationAspect {
     private String port;
 
     private final RestTemplate restTemplate;
+    private final RedisTemplate redisTemplate;
 
-    public AuthorizationAspect(RestTemplate restTemplate) {
+    public AuthorizationAspect(RestTemplate restTemplate, RedisTemplate redisTemplate) {
         this.restTemplate = restTemplate;
+        this.redisTemplate = redisTemplate;
     }
 
 
     @Around("execution(* com.nhnacademy.frontend.admin..*(..))")
     public Object aroundMethod(ProceedingJoinPoint pjp) throws Throwable {
-
+        // get session
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
         HttpServletRequest request = requestAttributes.getRequest();
+        HttpSession session = request.getSession();
+        String jSessionId = session.getId();
 
-        String token = request.getHeader("Authorization").substring(7);
+        // get user information
+        HashOperations<String, String, String> authHashOperations = redisTemplate.opsForHash();
+        String token = authHashOperations.get(jSessionId, "Authorization").substring(7);
 
         if(token.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
