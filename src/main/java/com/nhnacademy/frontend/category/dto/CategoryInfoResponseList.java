@@ -1,6 +1,5 @@
 package com.nhnacademy.frontend.category.dto;
 
-import com.nhnacademy.frontend.book.dto.BookResponseDto;
 import lombok.Data;
 
 import java.util.List;

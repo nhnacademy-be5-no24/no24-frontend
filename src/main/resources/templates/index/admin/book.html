@@ -52,63 +52,36 @@
                         <th scope="col">도서 상태</th>
                         <th scope="col">수량</th>
                         <th scope="col">수정</th>
+                        <th scope="col">삭제</th>
                     </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>9788901279282</td>
-                            <td>유목민의 투자의 정석</td>
-                            <td>28,000원</td>
-                            <td>25,200원</td>
-                            <td>
-                                포장 가능
-                            </td>
-                            <td>
-                                판매 중
-                            </td>
-                            <td>
-                                100
-                            </td>
-                            <td>
-                                <a href="/admin/book/modify/9788901279282">수정</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>9788901279282</td>
-                            <td>유목민의 투자의 정석</td>
-                            <td>28,000원</td>
-                            <td>25,200원</td>
-                            <td>
-                                포장 가능
-                            </td>
-                            <td>
-                                재고 없음
-                            </td>
-                            <td>
-                                0
-                            </td>
-                            <td>
-                                <a href="/admin/book/modify/9788901279282">수정</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>9788901279282</td>
-                            <td>유목민의 투자의 정석</td>
-                            <td>28,000원</td>
-                            <td>25,200원</td>
-                            <td>
-                                포장 가능
-                            </td>
-                            <td>
-                                판매 종료
-                            </td>
-                            <td>
-                                20
-                            </td>
-                            <td>
-                                <a href="/admin/book/modify/9788901279282">수정</a>
-                            </td>
-                        </tr>
+                    <tr th:each="book : ${bookList}" th:id="'item-box-' + ${book.getBookIsbn()}">
+                        <td th:text="${book.getBookIsbn()}"></td>
+                        <td th:text="${book.getBookTitle()}"></td>
+                        <td th:text="${book.getBookFixedPrice()}"></td>
+                        <td th:text="${book.getBookSalePrice()}"></td>
+                        <td>
+                            <span th:if="${book.bookIsPacking}">포장 가능</span>
+                            <span th:unless="${book.bookIsPacking}">포장 불가능</span>
+                        </td>
+                        <td>
+                                <span th:switch="${book.bookStatus}">
+                                    <span th:case="0">판매중</span>
+                                    <span th:case="1">수량부족</span>
+                                    <span th:case="2">판매종료</span>
+                                    <span th:case="3">삭제된 도서</span>
+                                </span>
+                        </td>
+                        <td th:text="${book.getBookQuantity()}"></td>
+                        <td><a th:href="@{/admin/book/modify/{isbn}(isbn=${book.getBookIsbn()})}">수정</a></td>
+                        <td>
+                            <div class="deleteBook">
+                                <!-- 삭제 버튼 추가 -->
+                                <button type="button" class="btn btn-danger delete-button" th:id="'deleteBtn-' + ${book.getBookIsbn()}">삭제</button>
+                            </div>
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -134,7 +107,7 @@
 </div>
 
 <footer class="bg-dark text-white text-center py-3">
-    © 2024 no24 Bookstore. All rights reserved.
+    :copyright: 2024 no24 Bookstore. All rights reserved.
 </footer>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
@@ -145,5 +118,41 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
         integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
+<script>
+    // <button type="button" className="btn btn-danger delete-button"
+    //         th:id="'deleteBtn-' + ${book.getBookIsbn()}">삭제</button>
+    // 삭제 버튼에 대한 클릭 이벤트 처리
+    document.querySelectorAll('[id^="deleteBtn-"]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            // todo: delete tmp console
+            console.log("try delete!");
+            // 해당 버튼의 ID에서 아이템 ID를 추출
+            var itemId = this.id.split("-")[1];
+            deleteBook(itemId);
+        });
+    });
+
+    function deleteBook(isbn) {
+        let url = '/admin/book/delete/' + isbn;
+
+        fetch(url, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('도서 삭제 실패');
+                }
+                console.log("삭제 성공");
+
+                var itemElement = document.querySelector('#item-box-' + isbn);
+                itemElement.remove();
+
+                window.location.reload();
+            })
+            .catch(error => {
+                console.error('There was an error!', error);
+            });
+    }
+</script>
 </body>
 </html>

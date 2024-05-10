@@ -2,7 +2,7 @@ package com.nhnacademy.frontend.main.payment;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.nhnacademy.frontend.book.dto.BookResponseDto;
+import com.nhnacademy.frontend.book.dto.response.BookResponseDto;
 import com.nhnacademy.frontend.coupon.dto.CouponType;
 import com.nhnacademy.frontend.coupon.dto.response.CouponResponseDto;
 import com.nhnacademy.frontend.main.order.dto.request.OrderDetailDto;

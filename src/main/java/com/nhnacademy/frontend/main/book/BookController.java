@@ -1,7 +1,7 @@
 package com.nhnacademy.frontend.main.book;
 
-import com.nhnacademy.frontend.book.dto.BookResponseDto;
-import com.nhnacademy.frontend.book.dto.BookResponseList;
+import com.nhnacademy.frontend.book.dto.response.BookResponseDto;
+import com.nhnacademy.frontend.book.dto.response.BookResponseList;
 import com.nhnacademy.frontend.category.dto.CategoryInfoResponseDto;
 import com.nhnacademy.frontend.category.dto.CategoryInfoResponseList;
 import com.nhnacademy.frontend.category.dto.ParentCategoryResponseDto;

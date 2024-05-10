@@ -1,27 +1,18 @@
-package com.nhnacademy.frontend.book.dto;
+package com.nhnacademy.frontend.book.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.nhnacademy.frontend.category.dto.CategoryResponseDto;
 import com.nhnacademy.frontend.tag.dto.TagResponseDto;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * 도서관리 Response DTO
- *
- * @author : 이재원
- * @date : 2024-03-27
- */
-@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BookResponseDto {
-
+@Getter
+public class BookCreateRequestDto {
     @JsonProperty("book_isbn")
     private String bookIsbn;
 
@@ -38,10 +29,10 @@ public class BookResponseDto {
     private LocalDate publishedAt;
 
     @JsonProperty("book_fixed_price")
-    private long bookFixedPrice;
+    private Long bookFixedPrice;
 
     @JsonProperty("book_sale_price")
-    private long bookSalePrice;
+    private Long bookSalePrice;
 
     @JsonProperty("book_is_packing")
     private boolean bookIsPacking;
@@ -58,9 +49,15 @@ public class BookResponseDto {
     @JsonProperty("book_image")
     private String bookImage;
 
+    @JsonProperty
     private List<TagResponseDto> tags;
 
+    @JsonProperty("book_author")
     private String author;
 
+    @JsonProperty
+    private List<CategoryResponseDto> categories;
+
+    @JsonProperty("book_like")
     private Long likes;
 }
