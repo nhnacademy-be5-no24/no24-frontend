@@ -1,6 +1,6 @@
 package com.nhnacademy.frontend.main.order.dto.response;
 
-import com.nhnacademy.frontend.book.dto.BookResponseDto;
+import com.nhnacademy.frontend.book.dto.response.BookResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
