@@ -2,6 +2,7 @@ package com.nhnacademy.frontend.interceptor;
 
 import com.nhnacademy.frontend.auth.dto.LoginDto;
 import com.nhnacademy.frontend.auth.dto.TokenDto;
+import com.nhnacademy.frontend.main.member.dto.MemberInfoResponseDto;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,6 +24,11 @@ import java.util.Map;
  * @Date : 2024/04/22
  */
 public class LoginCheckInterceptor implements HandlerInterceptor {
+    @Value("${request.url}")
+    private String requestUrl;
+
+    @Value("${request.port}")
+    private String port;
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final RestTemplate restTemplate;
@@ -52,5 +58,18 @@ public class LoginCheckInterceptor implements HandlerInterceptor {
         String refreshToken = (String) redisTemplate.opsForHash().get(jSessionId, "RefreshToken");
 
         return token != null && refreshToken != null;
+    }
+
+    public boolean isAdmin(String jSessionId) {
+        String token = (String) redisTemplate.opsForHash().get(jSessionId, "Authorization");
+        token = token.substring(7);
+
+        ResponseEntity<MemberInfoResponseDto> memberDto = restTemplate
+                .getForEntity(requestUrl + ":" + port + "/auth/member/token/" + token, MemberInfoResponseDto.class);
+
+        if(memberDto.getBody().getRole().equals("ROLE_ADMIN"))
+            return true;
+
+        return false;
     }
 }

@@ -32,7 +32,9 @@
 <!--                        <strong><a th:class="${#httpServletRequest.requestURI.contains('/logout') ? 'nav-link text-muted current' : 'nav-link text-muted'}" href="/logout">로그아웃</a></strong>-->
                         <strong><a th:class="${#httpServletRequest.requestURI.contains('/info') ? 'nav-link text-muted current' : 'nav-link text-muted'}" href="/info">마이페이지</a></strong>
                         <!-- todo: 관리자 전용. 예외처리 필요 -->
-                        <strong><a th:class="${#httpServletRequest.requestURI.contains('/admin') ? 'nav-link text-muted current' : 'nav-link text-muted'}" href="/admin">관리자페이지</a></strong>
+                        <strong th:if="${@loginCheckInterceptor.isLoggedIn(#request.getSession().getId()) && @loginCheckInterceptor.isAdmin(#request.getSession().getId())}">
+                            <a th:class="${#httpServletRequest.requestURI.contains('/admin') ? 'nav-link text-muted current' : 'nav-link text-muted'}" href="/admin">관리자페이지</a>
+                        </strong>
                     </div>
                 </div>
             </div>
