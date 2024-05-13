@@ -87,10 +87,10 @@
                         <!-- 버튼 -->
                         <div class="col-xs-2">
                             <div class="row-md-12">
-                                <button class="btn btn-primary" id="cart-button" data-isbn="${book.getBookIsbn()}">장바구니</button>
+                                <button class="btn btn-primary" id="cart-button">장바구니</button>
                             </div>
                             <div class="row-md-12 mt-2">
-                                <button class="btn btn-success" id="buyNow-button" data-isbn="${book.getBookIsbn()}">구매하기</button>
+                                <button class="btn btn-success" id="buyNow-button">구매하기</button>
                             </div>
                         </div>
                     </div>
@@ -131,8 +131,10 @@
             integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
 <script>
     document.getElementById("cart-button").addEventListener("click", function(event) {
+        let bookIsbn = this.closest('.col-12').querySelector('a.book').getAttribute('href').split('/').pop();
+
         let cart = {
-            bookIsbn: $(this).data("isbn"),
+            bookIsbn: bookIsbn,
             bookQuantity: 1
         };
 
