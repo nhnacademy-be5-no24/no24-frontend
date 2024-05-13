@@ -60,8 +60,7 @@
 - 담당자: 강병구, 박병휘, 진지원
 - Elastic Search
 - Redis Session
-- Payco
-
+  - Redis 환경 설정
 
 ### 검색
 - 담당자: 강병구
@@ -73,21 +72,72 @@
 - 담당자: 강병구, 박병휘
 - 로그인
     - 기능 구현
-    - Oauth 2.0 적용
+    - Oauth 2.0 적용 (Payco)
 - 로그아웃 - 기능구현 및 쿠키 등 삭제
-- 인가 - 권한별 접근 제한(AOP)
+- 인가 - 권한별 접근 제한 (AOP)
+
+### 도서
+ - 담당자: 박병휘, 이재원
+ - 도서 조회, 등록, 수정, 삭제 기능 구현
+   - 전체 조회, 카테고리 조회, 등록 (알라딘 API 사용), 책 상태 변경, 책 세부내용 수정 기능
 
 ### 회원
-- 담당자: 김병주, 박병휘, 진지원
-- 회원가입
+ - 담당자: 김병주, 박병휘, 진지원
+ - 로그인, 로그아웃 기능 구현
+ - 회원가입 기능 구현
+    - 회원 주소 등록 (kakao 주소 API)
 
+### 장바구니
+ - 담당자: 박병휘, 진지원
+ - 장바구니 조회, 등록, 수정, 삭제 기능 구현 (Redis)
 
-장바구니 → 주문
+### 주문
+ - 담당자: 박동희, 박병휘, 진지원
+ - 주문 등록, 수정, 삭제 기능 구현 (Redis)
+ - 주문 조회 (DB)
+ - 주문서 작성
 
-주문 → 결제
+### 주소
+- 담당자: 진지원
+- 주소 조회, 등록, 수정, 삭제 기능 구현
+  - 수정 시, 회원 주소가 10개 이상인 경우, 추가 못하도록 설정
+  - 주소 등록 (kakao 주소 API)
+- 기본 주소 설정 기능 구현
+
+### 결제
+ - 담당자: 박동희, 박병휘
+ - 결제 조회, 등록 기능 구현
+ - Toss Payments 기능 구현
+
+### 포인트
+ - 담당자: 강병구, 박병휘
+ - 포인트 정책 조회, 등록, 수정, 삭제 기능 구현
+ - 포인트 적립 및 사용 기능 구현
+
+### 포장지
+- 담당자: 박동희, 박병휘
+- 포장지 조회, 등록, 수정, 삭제 기능 구현
+
+### 쿠폰
+ - 담당자: 강병구, 박병휘
+ - 쿠폰 조회, 등록 기능 구현
+ - 쿠폰 정책 조회, 수정 기능 구현
+ - 쿠폰 발급 (Spring Batch, RabbitMQ)
+
+### 카테고리
+- 담당자: 강병구
+- 카테고리 조회 기능 구현
+
+### 파일
+ - 담당자: 박병휘
+ - Object Storage, Local Storage 저장, 호출
+
+### 등급
+ - 담당자: 박병휘
+ - 등급 조회 기능 구현
+ - 등급 정책 조회, 수정 기능 구현
 
 ## Stack
-
 
 ![Apache Maven](https://img.shields.io/badge/Apache%20Maven-C71A36?style=for-the-badge&logo=Apache%20Maven&logoColor=white)<br/> <img src="https://img.shields.io/badge/JAVA-007396?style=for-the-badge&amp;logo=java&amp;logoColor=white"> <img src="https://img.shields.io/badge/Spring-6DB33F?style=for-the-badge&amp;logo=Spring&amp;logoColor=white"> <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&amp;logo=springboot&amp;logoColor=white"> <img src="https://img.shields.io/badge/springbatch-6DB33F?style=for-the-badge&amp;logo=Spring&amp;logoColor=white"> <img src="https://img.shields.io/badge/docker-2496ED?style=for-the-badge&amp;logo=docker&amp;logoColor=white"><br/>
 <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&amp;logo=mysql&amp;logoColor=white"> <img src="https://img.shields.io/badge/hibernate-59666C?style=for-the-badge&amp;logo=hibernate&amp;logoColor=white"> <img src="https://img.shields.io/badge/Jpa-FF0000?style=for-the-badge&amp;logo=Jpa&amp;logoColor=white"> <img src="https://img.shields.io/badge/Querydsl-0769AD?style=for-the-badge&amp;logo=Querydsl&amp;logoColor=white"> <img src="https://img.shields.io/badge/redis-DC382D?style=for-the-badge&amp;logo=redis&amp;logoColor=white"><br/>
@@ -103,6 +153,6 @@
 
 ## 팀원
 
-<a href="https://github.com/nhnacademy-be5-no24/contributors/no24-shop">
-  <img src="https://contrib.rocks/image?repo=nhnacademy-be5-no24/no24-shop"/>
+<a href="https://github.com/nhnacademy-be5-no24/contributors/no24-frontend">
+  <img src="https://contrib.rocks/image?repo=nhnacademy-be5-no24/no24-frontend"/>
 </a>
