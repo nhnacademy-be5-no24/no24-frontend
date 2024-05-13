@@ -243,11 +243,19 @@ public class LoginController {
 
     @PostMapping("/register")
     public String createMember(@ModelAttribute MemberCreateRequest memberCreateRequest) {
-        restTemplate.postForEntity(
+        ResponseEntity<MemberCreateRequest> response = restTemplate.postForEntity(
                 requestUrl + ":" + port + "/auth/member/create",
                 memberCreateRequest,
                 MemberCreateRequest.class
         );
+
+        // 포인트 적립
+        restTemplate.postForEntity(
+                requestUrl + ":" + port + "/shop/points/id/" + memberCreateRequest.getCustomerId(),
+                null,
+                null
+        );
+
         return "index/auth/registerSuccess";
     }
 
