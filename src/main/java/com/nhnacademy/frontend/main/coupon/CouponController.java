@@ -5,6 +5,8 @@ import com.nhnacademy.frontend.coupon.dto.response.CouponResponseDto;
 import com.nhnacademy.frontend.coupon.dto.response.CouponResponseDtoList;
 import com.nhnacademy.frontend.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
@@ -33,6 +35,7 @@ import java.util.List;
 public class CouponController {
     private final RestTemplate restTemplate;
     private final RedisTemplate redisTemplate;
+    private final AmqpTemplate rabbitTemplate;
 
     @Value("${request.url}")
     private String requestUrl;
@@ -67,11 +70,8 @@ public class CouponController {
         Long customerNo = AuthUtil.getCustomerNo(requestUrl, port, request, redisTemplate, restTemplate);
 
         try {
-            restTemplate.postForEntity(
-                    requestUrl + ":" + port + "/shop/coupon/member/" + customerNo + "/" + couponId,
-                    null,
-                    null
-            );
+            String message = "coupon_id: " + couponId + ", member_id: " + customerNo;
+            rabbitTemplate.convertAndSend("COUPON_QUEUE", message);
         } catch(Exception e) {
             mav.setViewName("redirect:/error");
         }
