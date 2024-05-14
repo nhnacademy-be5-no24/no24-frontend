@@ -6,7 +6,10 @@ import com.nhnacademy.frontend.auth.dto.MemberCreateRequest;
 import com.nhnacademy.frontend.auth.dto.LoginDto;
 import com.nhnacademy.frontend.auth.dto.OAuthRequestDto;
 import com.nhnacademy.frontend.auth.dto.TokenDto;
+import com.nhnacademy.frontend.main.member.dto.MemberInfoResponseDto;
 import com.nhnacademy.frontend.util.AuthUtil;
+import com.nhnacademy.frontend.util.AuthorizationDto;
+import com.nhnacademy.frontend.util.EmailDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,13 +17,11 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.*;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -29,6 +30,9 @@ import javax.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static com.nhnacademy.frontend.util.AuthUtil.createKey;
 
 /**
  * Login Controller
@@ -56,6 +60,12 @@ public class LoginController {
 
     @Value("${payco.password}")
     private String paycoPassword;
+
+    @Value("${email.address}")
+    private String fromEmail;
+
+    @Value("${email.password}")
+    private String password;
 
     private final RestTemplate restTemplate;
     private final RedisTemplate redisTemplate;
@@ -205,7 +215,8 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String login(HttpServletRequest httpServletRequest) {
+    public ModelAndView login(HttpServletRequest httpServletRequest) {
+        ModelAndView mav = new ModelAndView("redirect:/");
         // RestTemplate 객체 생성
         RestTemplate restTemplate = new RestTemplate();
         HttpSession session = httpServletRequest.getSession();
@@ -231,6 +242,26 @@ public class LoginController {
         HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
         String authorization = responseEntity.getHeaders().get("Authorization").get(0);
         String refreshToken = responseEntity.getHeaders().get("RefreshToken").get(0);
+        String status = responseEntity.getHeaders().get("MemberStatus").get(0);
+
+        if(!status.equals("ACTIVE")) {
+            if(status.equals("INACTIVE")) {
+                String token = authorization.substring(7);
+                ResponseEntity<MemberInfoResponseDto> memberDto = restTemplate
+                        .getForEntity(requestUrl + ":" + port + "/auth/member/token/" + token, MemberInfoResponseDto.class);
+
+                mav.setViewName("index/auth/member_active");
+                mav.addObject("member", memberDto.getBody());
+            }
+            else {
+                if(status.equals("LEAVE"))
+                    mav.addObject("message", "탈퇴한 회원입니다.");
+                else if(status.equals("BAN"))
+                    mav.addObject("message", "차단된 회원입니다.");
+                mav.setViewName("index/auth/login");
+            }
+            return mav;
+        }
 
         // Redis session에 저장.
         hashOperations.put(jSessionId, "Authorization", authorization);
@@ -238,7 +269,49 @@ public class LoginController {
 
         String value = (String) redisTemplate.opsForHash().get(jSessionId, "Authorization");
 
-        return "redirect:/";
+        return mav;
+    }
+
+    @PostMapping("/send/code")
+    public ResponseEntity<Void> sendCode(@RequestBody EmailDto emailDto) {
+        HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
+        AuthUtil authUtil = new AuthUtil();
+
+        // redis에 activeKey 저장
+        String activeKey = createKey();
+
+        hashOperations.delete("activeKey-" + emailDto.getMemberId(), "activeKey");
+
+        hashOperations.put("activeKey-" + emailDto.getMemberId(), "activeKey", activeKey);
+        redisTemplate.expire("activeKey-" + emailDto.getMemberId(), 5, TimeUnit.MINUTES);
+
+        // email 전송
+        authUtil.sendEmail(fromEmail, password, emailDto.getEmail(), activeKey);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/member/active")
+    public ResponseEntity<Void> memberActive(@RequestBody AuthorizationDto authorizationDto) {
+        HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
+        AuthUtil authUtil = new AuthUtil();
+
+        String code = hashOperations.get("activeKey-" + authorizationDto.getMemberId(), "activeKey");
+
+        if(code.equals(authorizationDto.getAuthorizationCode())) {
+            restTemplate.postForEntity(
+                    requestUrl + ":" + port + "/auth/member/changeToActive",
+                    authorizationDto.getMemberId(),
+                    null
+            );
+
+            hashOperations.delete("activeKey-" + authorizationDto.getMemberId(), "activeKey");
+
+            return ResponseEntity.ok().build();
+        }
+        else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping("/register")

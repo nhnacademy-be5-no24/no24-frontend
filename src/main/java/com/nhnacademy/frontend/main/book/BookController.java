@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -78,7 +79,9 @@ public class BookController {
     }
 
     @GetMapping("/book/{category}")
-    public ModelAndView getBookListPage(@PathVariable("category") Long categoryId){
+    public ModelAndView getBookListPage(@PathVariable("category") Long categoryId,
+                                        @RequestParam(defaultValue="1") int pageSize,
+                                        @RequestParam(defaultValue="10") int offset){
         // 하위 카테고리 조회
         ResponseEntity<ParentCategoryResponseDto> categoryResponseEntity = restTemplate.getForEntity(
                 requestUrl + ":" + port +  "/shop/categories/parents/" + categoryId,
@@ -89,7 +92,7 @@ public class BookController {
 
         // 카테고리에 맞는 책 조회
         ResponseEntity<BookResponseList> bookResponseEntity = restTemplate.getForEntity(
-                requestUrl + ":" + port +  "/shop/books/category/" + categoryId + "?pageSize=0&offset=10",
+                requestUrl + ":" + port +  "/shop/books/category/" + categoryId + "?pageSize=" + (pageSize - 1) + "&offset=" + offset,
                 BookResponseList.class
         );
 
@@ -110,6 +113,11 @@ public class BookController {
         mav.addObject("bookList", bookResponseDtoPage);
         mav.addObject("allParentCategories", categoryInfoResponseDtoList);
         mav.addObject("domesticCategoryId", domesticCategoryId);
+
+        mav.addObject("currentPage", pageSize);
+        mav.addObject("pageSize", pageSize);
+        mav.addObject("offset", offset);
+        mav.addObject("totalPages", 10);
 
         return mav;
     }
