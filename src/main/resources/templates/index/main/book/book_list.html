@@ -156,31 +156,6 @@
                 console.error("장바구니 추가 중 오류 발생:", error);
             });
     });
-
-    document.getElementById("buyNow-button").addEventListener("click", function(event) {
-        let purchaseBook = {
-            bookIsbn: $(this).data("isbn"),
-            bookQuantity: 1
-        };
-
-        fetch("/cartOrder/create/byBuyNow", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(purchaseBook)
-        })
-            .then(function(response) {
-                if (response.ok) {
-                    console.log("바로구매 성공!");
-                } else {
-                    console.error("바로구매 실패!");
-                }
-            })
-            .catch(function(error) {
-                console.error("바로구매 중 오류 발생:", error);
-            });
-    });
 </script>
 </body>
 </html>
