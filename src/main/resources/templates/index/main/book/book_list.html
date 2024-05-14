@@ -96,7 +96,6 @@
                     </div>
                 </div>
 
-
                 <!-- Pagination -->
                 <nav aria-label="Page navigation example" style="margin-bottom: 100px">
                     <ul class="pagination justify-content-center">
@@ -130,7 +129,7 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
             integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
 <script>
-    document.getElementById("cart-button").addEventListener("click", function(event) {
+    $(document).on("click", "#cart-button", function(event) {
         let bookIsbn = this.closest('.col-12').querySelector('a.book').getAttribute('href').split('/').pop();
 
         let cart = {
