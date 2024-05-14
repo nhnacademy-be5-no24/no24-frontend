@@ -211,12 +211,8 @@
             totalValue.innerHTML = totalPrice;
         }
 
-        // todo: 상품 수량 업데이트 하는 함수
         // 상품 수량을 업데이트 하는 함수
         function updateQuantity(itemId, newQuantity) {
-            // todo: customerNo 가져오기
-            // var customerNo = {함수 정의}
-
             fetch('/cart/update', {
                 method: 'PUT',
                 headers: {
@@ -348,7 +344,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({customerNo: customerNo, book: books})
+                    body: JSON.stringify({book: books})
                 })
                     .then(response => {
                         if (!response.ok) {
