@@ -28,25 +28,26 @@
                 <form>
                     <div class="form-group">
                         <label for="username">사용자 이름</label>
-                        <input type="text" class="form-control" id="username" placeholder="사용자 이름" value="Test User" disabled>
+                        <input type="text" class="form-control" id="username" placeholder="사용자 이름" th:value="${member.getMemberName()}" disabled>
                     </div>
                     <div class="form-group">
                         <label for="email">이메일 주소</label>
-                        <input type="email" class="form-control" id="email" placeholder="이메일 주소">
+                        <input type="email" class="form-control" id="email" name="email" th:value="${member.getEmail()}" placeholder="이메일 주소">
                     </div>
                     <div class="form-group">
                         <label for="phone_number">연락처</label>
-                        <input type="tel" class="form-control" id="phone_number" placeholder="연락처">
+                        <input type="tel" class="form-control" id="phone_number" name="phone_number" th:value="${member.getPhoneNumber()}" placeholder="연락처">
                     </div>
                     <div class="form-group">
                         <label for="change_password">변경 비밀번호</label>
-                        <input type="password" class="form-control" id="change_password" placeholder="변경 비밀번호 입력">
+                        <input type="password" class="form-control" id="change_password" name="change_password" placeholder="변경 비밀번호 입력">
                     </div>
                     <div class="form-group">
                         <label for="check_password">변경 비밀번호 확인</label>
-                        <input type="password" class="form-control" id="check_password" placeholder="변경 비밀번호 재입력">
+                        <input type="password" class="form-control" id="check_password" name="check_password" placeholder="변경 비밀번호 재입력">
                     </div>
                     <button type="submit" class="btn btn-primary">변경</button>
+                    <a href="/info/user/delete" class="btn btn-danger" id="deleteBtn">회원 탈퇴</a>
                 </form>
             </div>
         </div>
@@ -65,4 +66,13 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
             integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
     </body>
+    <script>
+        document.getElementById("deleteBtn").addEventListener("click", function(event) {
+            event.preventDefault(); // 기본 동작(링크 이동) 방지
+
+            if (confirm("정말로 삭제하시겠습니까?")) {
+                window.location.href = event.target.getAttribute("href"); // 링크로 이동
+            }
+        });
+    </script>
 </html>

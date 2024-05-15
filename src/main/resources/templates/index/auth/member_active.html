@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>no24 Bookstore</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}" />
+</head>
+<body>
+    <div th:replace="./nav/header.html"></div>
+    <div th:replace="./nav/menu.html"></div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 offset-md-4">
+                <!-- 로그인 항목 -->
+                <div class="card mt-5">
+                    <div class="card-body">
+                        <h5 class="card-title">휴면 상태 해제</h5>
+                        <form method="post" action="/login">
+                            <div class="form-group">
+                                <label for="authorization_code">휴면 해제를 위해 아이디에 등록된 이메일로 인증코드를 받고 입력하세요.</label>
+                                <div class="row pl-3 pr-3">
+                                    <input type="text" class="form-control col-md-9" id="authorization_code" name="authorization_code" placeholder="인증코드를 입력해주세요.">
+                                    <a class="btn btn-primary btn-block col-md-3" id="send-btn">전송</a>
+                                </div>
+                            </div>
+                            <a class="btn btn-primary btn-block" id="submit-btn">휴면 해제</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:text="${member.getEmail()}" id="email" hidden/>
+    <div th:text="${member.getMemberId()}" id="member_id" hidden/>
+
+    <footer class="bg-dark text-white text-center py-3">
+        © 2024 no24 Bookstore. All rights reserved.
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+            crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+            integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shCv6vY+6X5ZbJlFX+XpgYuU=" crossorigin="anonymous"></script>
+
+    <script>
+
+        document.getElementById("send-btn").addEventListener("click", function(event) {
+            let email = document.getElementById("email").innerText;
+            let memberId = document.getElementById("member_id").innerText;
+
+            let emailData = {
+                email: email,
+                memberId: memberId
+            }
+            console.log(emailData);
+
+            fetch("/send/code", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(emailData)
+            })
+            .then(function(response) {
+                if (response.ok) {
+                    alert(email + "로 인증코드가 전송되었습니다.");
+                } else {
+                    alert("인증코드 전송이 실패했습니다.");
+                }
+            });
+        });
+        document.getElementById("submit-btn").addEventListener("click", function(event) {
+            let authorization_code = document.getElementById("authorization_code").value;
+            let memberId = document.getElementById("member_id").innerText;
+
+            let emailData = {
+                authorizationCode: authorization_code,
+                memberId: memberId
+            }
+            console.log(emailData);
+
+            fetch("/member/active", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(emailData)
+            })
+                .then(function(response) {
+                    if (response.ok) {
+                        alert("휴면 해제가 완료되었습니다.");
+                        window.location.href = "/";
+                    } else {
+                        alert("인증코드가 올바르지 않습니다.");
+                    }
+                });
+        });
+    </script>
+    </body>
+</html>

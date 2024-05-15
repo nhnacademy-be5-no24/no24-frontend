@@ -7,6 +7,8 @@ import com.nhnacademy.frontend.address.dto.response.AddressResponseDtoList;
 import com.nhnacademy.frontend.coupon.dto.response.CouponMemberResponseDtoList;
 import com.nhnacademy.frontend.grade.dto.response.GradeResponseDto;
 import com.nhnacademy.frontend.grade.dto.response.GradeResponseDtoList;
+import com.nhnacademy.frontend.main.member.dto.MemberInfoResponseDto;
+import com.nhnacademy.frontend.main.member.dto.MemberVerifyRequest;
 import com.nhnacademy.frontend.main.order.dto.response.OrderDetailResponseDto;
 import com.nhnacademy.frontend.main.order.dto.response.OrderDetailResponseDtoList;
 import com.nhnacademy.frontend.main.order.dto.response.OrdersResponseDto;
@@ -16,6 +18,7 @@ import com.nhnacademy.frontend.point.dto.PointResponseDtoList;
 import com.nhnacademy.frontend.util.AuthUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -26,6 +29,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -85,12 +89,65 @@ public class InfoController {
      * @return mav
      */
     @PostMapping("/user")
-    public ModelAndView userInfoCheck() {
+    public ModelAndView userInfoCheck(HttpServletRequest request) {
         ModelAndView mav = new ModelAndView("index/info/user");
+        
+        Long customerNo = AuthUtil.getCustomerNo(requestUrl, port, request, redisTemplate, restTemplate);
+        String password = request.getParameter("password");
+
+        MemberVerifyRequest memberVerifyRequest = MemberVerifyRequest.builder()
+                .customerNo(customerNo)
+                .customerPassword(password)
+                .build();
+
+        ResponseEntity<Boolean> verify = restTemplate.postForEntity(
+                requestUrl + ":" + port + "/auth/member/verify",
+                memberVerifyRequest,
+                Boolean.class);
+
+        if(!verify.getBody()) {
+            mav.addObject("message", "패스워드를 다시 입력해주세요.");
+            mav.setViewName("index/info/check");
+
+            return mav;
+        }
+
+        ResponseEntity<MemberInfoResponseDto> memberInfo = restTemplate.getForEntity(
+                requestUrl + ":" + port + "/auth/member/info/" + customerNo,
+                MemberInfoResponseDto.class
+        );
+
+        mav.addObject("member", memberInfo.getBody());
 
         return mav;
     }
 
+    /**
+     * check User password
+     * @Param MemberPasswordDto
+     * @return mav
+     */
+    @GetMapping("/user/delete")
+    public ModelAndView deleteUser(HttpServletRequest request) {
+        ModelAndView mav = new ModelAndView("index/auth/deleteSuccess");
+        Long customerNo = AuthUtil.getCustomerNo(requestUrl, port, request, redisTemplate, restTemplate);
+
+        System.out.println("delete user");
+
+        restTemplate.delete(
+                requestUrl + ":" + port + "/auth/member/" + customerNo,
+                Void.class
+        );
+
+        HttpSession session = request.getSession();
+        String jSessionId = session.getId();
+        HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
+
+        hashOperations.delete(jSessionId, "Authorization");
+        hashOperations.delete(jSessionId, "RefreshToken");
+
+        return mav;
+    }
 
     /**
      * get User Address page

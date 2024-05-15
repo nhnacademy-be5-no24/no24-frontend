@@ -28,9 +28,10 @@
                 <form method="post" action="/info/user">
                     <div class="form-group">
                         <label for="password">회원정보 수정을 위해 비밀번호 확인이 필요합니다.</label>
-                        <input type="password" class="form-control" id="password" placeholder="비밀번호를 입력해주세요.">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="비밀번호를 입력해주세요.">
                     </div>
                     <button type="submit" class="btn btn-primary">확인</button>
+                    <span th:if="${message != null}" th:text="${message}" style="color: red;"></span>
                 </form>
             </div>
         </div>
