@@ -286,7 +286,7 @@ public class LoginController {
         redisTemplate.expire("activeKey-" + emailDto.getMemberId(), 5, TimeUnit.MINUTES);
 
         // email 전송
-        authUtil.sendEmail(fromEmail, password, emailDto.getEmail(), activeKey);
+        authUtil.sendEmail(fromEmail, password, emailDto.getEmail(), "No24 Bookstore 휴면 해제 인증 키", "인증 키는 " + activeKey + " 입니다.");
 
         return ResponseEntity.ok().build();
     }

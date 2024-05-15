@@ -50,6 +50,12 @@ import java.util.List;
 @RequestMapping("/order")
 @Slf4j
 public class OrderController {
+    @Value("${email.address}")
+    private String fromEmail;
+
+    @Value("${email.password}")
+    private String password;
+
     @Value("${request.url}")
     private String requestUrl;
 
@@ -227,6 +233,7 @@ public class OrderController {
         String orderId;
         String amount;
         String paymentKey;
+        OrderDto orderDto = null;
 
         try {
             // 클라이언트에서 받은 JSON 요청 바디입니다.
@@ -234,8 +241,6 @@ public class OrderController {
             paymentKey = (String) requestData.get("paymentKey");
             orderId = (String) requestData.get("orderId");
             amount = (String) requestData.get("amount");
-
-            OrderDto orderDto = null;
 
             // redis에 저장된 주문 정보를 가져오는 로직.
             if(customerNo != 0L)
@@ -344,9 +349,34 @@ public class OrderController {
         jsonObject.put("addressDetail", response.getBody().getAddressDetail());
         jsonObject.put("req", response.getBody().getReq());
 
-
+        new AuthUtil().sendEmail(fromEmail, password,
+                orderDto.getCustomerEmail(), "No24 Bookstore - 주문 완료",
+                emailText(orderDto));
 
         return ResponseEntity.status(code).body(jsonObject);
+    }
+
+    public String emailText(OrderDto orderDto) {
+        String text = "";
+
+        text += "<!DOCTYPE html>";
+        text += "<html lang=\"en\">";
+        text += "<head>";
+            text += "<meta charset=\"UTF-8\">";
+            text += "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">";
+            text += "<title>Document</title>";
+        text += "</head>";
+        text += "<body>";
+        text += "<h2>주문번호: " + orderDto.getOrderId() + "</h2>";
+        text += "<hr>";
+        text += "<p>주문 명 : " + orderDto.getOrderName() + "</p>";
+        text += "<p>주문 금액 : " + orderDto.getTotalPrice() + "원</p>";
+        text += "<a href=\"https://no24.store/order/" + orderDto.getOrderId() +"\">주문 상세</a>";
+        text += "</body>";
+        text += "</html>";
+
+
+        return text;
     }
 
 

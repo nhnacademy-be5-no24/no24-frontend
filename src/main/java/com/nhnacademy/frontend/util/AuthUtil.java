@@ -76,7 +76,7 @@ public class AuthUtil {
         return String.valueOf(code);
     }
 
-    public boolean sendEmail(String fromEmail, String password, String receiverEmail, String activeKey) {
+    public boolean sendEmail(String fromEmail, String password, String receiverEmail, String subject, String text) {
         String host = "smtp.gmail.com";
 
         Properties props = new Properties();
@@ -98,8 +98,8 @@ public class AuthUtil {
             Message msg = new MimeMessage(session);
             msg.setFrom(new InternetAddress(fromEmail));
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiverEmail));
-            msg.setSubject("No24 Bookstore 휴면 해제 인증 키");
-            msg.setText("인증 키는 " + activeKey + " 입니다.");
+            msg.setSubject(subject);
+            msg.setContent(text,  "text/html; charset=utf-8");
 
             // 메일 보내기
             Transport.send(msg);
