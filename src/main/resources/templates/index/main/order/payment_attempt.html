@@ -9,9 +9,14 @@
     <link rel="stylesheet" type="text/css" href="style.css" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>토스페이먼츠 샘플 프로젝트</title>
+    <title>No24 Bookstore</title>
+      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+            integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+      <link rel="stylesheet" type="text/css" th:href="@{'/css/style.css'}" />
   </head>
   <body>
+    <div th:replace="./nav/header.html"></div>
+    <div th:replace="./nav/menu.html"></div>
     <div class="result wrapper">
       <div class="box_section">
         <h2 style="padding: 20px 0px 10px 0px">
@@ -75,17 +80,23 @@
           body: JSON.stringify(requestData),
         });
 
-        const json = await response.json();
+        let json;
 
-        if (!response.ok) {
-          // TODO: 결제 실패 비즈니스 로직을 구현하세요.
-          console.log(json);
-          window.location.href = `/fail?message=${json.message}&code=${json.code}`;
+        try {
+            json = await response.json();
+
+            if (!response.ok) {
+                // TODO: 결제 실패 비즈니스 로직을 구현하세요.
+                console.log(json);
+                window.location.href = `/fail?message=${json.message}&code=${json.code}`;
+            }
+
+            // TODO: 결제 성공 비즈니스 로직을 구현하세요.
+            console.log(json);
+            window.location.href = `/order/success?orderId=${urlParams.get("orderId")}`;
+        } catch(e) {
+            window.location.href = `/fail?message=${json.message}&code=${json.code}`;
         }
-
-        // TODO: 결제 성공 비즈니스 로직을 구현하세요.
-        console.log(json);
-        window.location.href = `/order/success?orderId=${urlParams.get("orderId")}`;
       }
       confirm();
     </script>

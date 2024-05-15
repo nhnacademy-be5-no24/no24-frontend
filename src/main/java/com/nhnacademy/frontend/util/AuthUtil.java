@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.security.SecureRandom;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Auth에 대한 Util 클래스
@@ -74,6 +76,14 @@ public class AuthUtil {
         int code = random.nextInt(max - min + 1) + min;
 
         return String.valueOf(code);
+    }
+
+    public static boolean validatePassword(String password) {
+        String regex = "^(?=.*[\\p{Punct}])(?=.*\\d)(?=.*[a-zA-Z]).{6,}$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(password);
+
+        return matcher.matches();
     }
 
     public boolean sendEmail(String fromEmail, String password, String receiverEmail, String subject, String text) {

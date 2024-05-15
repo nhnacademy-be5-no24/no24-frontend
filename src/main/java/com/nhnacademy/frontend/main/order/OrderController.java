@@ -8,6 +8,8 @@ import com.nhnacademy.frontend.main.cartOrder.dto.response.CartPaymentResponseDt
 import com.nhnacademy.frontend.main.order.dto.request.OrderDetailDto;
 import com.nhnacademy.frontend.main.order.dto.request.OrderDto;
 import com.nhnacademy.frontend.main.order.dto.request.OrdersCreateRequestDto;
+import com.nhnacademy.frontend.main.order.dto.response.OrderDetailResponseDtoList;
+import com.nhnacademy.frontend.main.order.dto.response.OrdersResponseDto;
 import com.nhnacademy.frontend.main.order.dto.response.WrapResponseDtoList;
 import com.nhnacademy.frontend.util.AuthUtil;
 
@@ -167,6 +169,32 @@ public class OrderController {
         mav.addObject("tomorrow", LocalDate.now().plusDays(1));
 
         return mav;
+    }
+
+    @GetMapping("/{orderId}")
+    public ModelAndView getOrderDetail(HttpServletRequest request, @PathVariable String orderId) {
+        ModelAndView mav = new ModelAndView("index/main/order/order_detail");
+
+        try {
+            OrderDetailResponseDtoList orderDetailResponseDtoList = restTemplate.getForEntity(
+                    requestUrl + ":" + port + "/shop/orders/detail/" + orderId,
+                    OrderDetailResponseDtoList.class
+            ).getBody();
+
+
+            OrdersResponseDto ordersResponseDto = restTemplate.getForEntity(
+                    requestUrl + ":" + port + "/shop/orders/orderId/" + orderId,
+                    OrdersResponseDto.class
+            ).getBody();
+
+            mav.addObject("orderDetails", orderDetailResponseDtoList.getOrderDetailResponseDtoList());
+            mav.addObject("order", ordersResponseDto);
+
+            return mav;
+        } catch(Exception e) {
+            mav.setViewName("redirect:/error");
+            return mav;
+        }
     }
 
     @GetMapping("/input/wrap/{bookIsbn}")

@@ -439,7 +439,6 @@ public class InfoController {
         ModelAndView mav = new ModelAndView("index/info/order_detail");
 
         String orderId = request.getParameter("order_id");
-        System.out.println(orderId);
 
         OrderDetailResponseDtoList orderDetailResponseDtoList = restTemplate.getForEntity(
                 requestUrl + ":" + port + "/shop/orders/detail/" + orderId,
