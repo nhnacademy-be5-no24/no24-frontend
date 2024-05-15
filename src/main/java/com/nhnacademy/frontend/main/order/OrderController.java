@@ -14,6 +14,7 @@ import com.nhnacademy.frontend.util.AuthUtil;
 import com.nhnacademy.frontend.util.exception.NotFoundToken;
 import com.nhnacademy.frontend.util.exception.UnauthorizedTokenException;
 import com.nhnacademy.frontend.wrap.dto.response.WrapResponseDto;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +48,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping("/order")
+@Slf4j
 public class OrderController {
     @Value("${request.url}")
     private String requestUrl;
@@ -96,7 +98,9 @@ public class OrderController {
                     redisTemplate,
                     restTemplate
             );
-        } catch(Exception e) {}
+        } catch(Exception e) {
+            customerNo = 0L;
+        }
 
         List<CartPaymentRequestDto.BookInfo> bookInfos = new ArrayList<>();
 
@@ -140,12 +144,13 @@ public class OrderController {
         CartPaymentResponseDto cartInfo = response.getBody();
         System.out.println(cartInfo);
 
-        ResponseEntity<Long> point = restTemplate.getForEntity(
-                requestUrl + ":" + port + "/shop/point/" + customerNo,
-                Long.class);
+        // user point와 address 정보 수집
+        if(customerNo != 0L) {
+            ResponseEntity<Long> point = restTemplate.getForEntity(
+                    requestUrl + ":" + port + "/shop/point/" + customerNo,
+                    Long.class);
+            mav.addObject("point", point.getBody());
 
-        // user address 정보 수집
-        if(customerNo != null) {
             ResponseEntity<AddressResponseDtoList> addressResponseEntity = restTemplate.getForEntity(
                     requestUrl + ":" + port + "/shop/address/customer/" + customerNo,
                     AddressResponseDtoList.class);
@@ -154,7 +159,6 @@ public class OrderController {
 
         mav.addObject("cartInfo", cartInfo);
         mav.addObject("tomorrow", LocalDate.now().plusDays(1));
-        mav.addObject("point", point.getBody());
 
         return mav;
     }
@@ -214,7 +218,9 @@ public class OrderController {
                     redisTemplate,
                     restTemplate
             );
-        } catch(NotFoundToken | UnauthorizedTokenException e) {}
+        } catch(NotFoundToken | UnauthorizedTokenException e) {
+            customerNo = 0L;
+        }
 
 
         JSONParser parser = new JSONParser();
@@ -232,7 +238,7 @@ public class OrderController {
             OrderDto orderDto = null;
 
             // redis에 저장된 주문 정보를 가져오는 로직.
-            if(customerNo != null)
+            if(customerNo != 0L)
                 orderDto = hashOperations.get("order", customerNo.toString());
             else
                 orderDto = hashOperations.get("order", jSessionId);
@@ -244,7 +250,7 @@ public class OrderController {
 
             // todo: 주문 정보 확인 후 Shop service에서 쿠폰 사용 이력, 주문 이력, 책 수량, 포인트 적립 등 로직 수행 필요
             // todo: 로직 수행 이후, redis 내 orderId에 해당하는 정보 지우기.
-            if(customerNo != null)
+            if(customerNo != 0L)
                 hashOperations.delete("order", customerNo.toString());
             else
                 hashOperations.delete("order", jSessionId);
@@ -278,9 +284,13 @@ public class OrderController {
             );
 
             // 카트 정보 지우기
-            for(OrderDetailDto orderDetailDto : orderDto.getOrderDetailDto()) {
-                restTemplate.delete(requestUrl + ":" + port +
-                        "/shop/cart/deleteOne/" + customerNo + "?bookIsbn=" + orderDetailDto.getBookIsbn());
+            try {
+                for (OrderDetailDto orderDetailDto : orderDto.getOrderDetailDto()) {
+                    restTemplate.delete(requestUrl + ":" + port +
+                            "/shop/cart/deleteOne/" + (customerNo == 0L ? jSessionId : customerNo) + "?bookIsbn=" + orderDetailDto.getBookIsbn());
+                }
+            } catch(Exception e) {
+                log.error("Can not delete cart information.");
             }
 
         } catch (Exception e) {
@@ -333,6 +343,8 @@ public class OrderController {
         jsonObject.put("address", response.getBody().getAddress());
         jsonObject.put("addressDetail", response.getBody().getAddressDetail());
         jsonObject.put("req", response.getBody().getReq());
+
+
 
         return ResponseEntity.status(code).body(jsonObject);
     }

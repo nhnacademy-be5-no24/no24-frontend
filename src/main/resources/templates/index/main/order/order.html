@@ -20,25 +20,25 @@
         <h4>구매자 정보</h4>
         <div class="form-group col-3 pl-0">
             <label for="receiverName">이름</label>
-            <input type="text" class="form-control" id="customerName" name="customerName" th:value="${cartInfo.customerName}"
-                   placeholder="이름" disabled>
+            <input type="text" class="form-control" id="customerName" name="customerName" th:value="${cartInfo.customerNo == 0 ? '' : cartInfo.customerName}"
+                   placeholder="이름" th:disabled="${cartInfo.customerNo != 0}" required>
         </div>
         <div class="form-group col-3 pl-0">
             <label for="customerEmail">이메일</label>
-            <input type="text" class="form-control" id="customerEmail" name="customerEmail" th:value="${cartInfo.customerEmail}"
-                   placeholder="이메일">
+            <input type="text" class="form-control" id="customerEmail" name="customerEmail" th:value="${cartInfo.customerNo == 0 ? '' : cartInfo.customerEmail}"
+                   placeholder="이메일" required>
         </div>
         <div class="form-group col-3 pl-0">
             <label for="customerPhoneNumber">전화번호</label>
             <input type="tel" class="form-control" id="customerPhoneNumber" name="customerPhoneNumber"
-                   placeholder="전화번호" th:value="${cartInfo.customerPhoneNumber}">
+                   placeholder="전화번호" th:value="${cartInfo.customerPhoneNumber}" required>
         </div>
 
         <hr>
 
         <h4>받는 사람 정보</h4>
 
-        <div class="form-group col-3 pl-0">
+        <div class="form-group col-3 pl-0" th:hidden="${addressList == null}">
             <select class="form-control" id="address">
                 <option th:each="address : ${addressList}" th:value="${address.getAddressId()}" th:text="${address.getAlias()}"></option>
             </select>
@@ -46,20 +46,20 @@
         <div class="form-group col-3 pl-0">
             <label for="receiverName">이름</label>
             <input type="text" class="form-control" id="receiverName" name="receiverName"
-                   placeholder="이름" th:value="${cartInfo.receiverName}">
+                   placeholder="이름" th:value="${cartInfo.receiverName}" required>
         </div>
         <div class="form-group col-3 pl-0">
             주소
             <input type="text" class="form-control" id="receiverPostcode" name="receiverPostcode" placeholder="우편번호" th:value="${cartInfo.zipcode}"
-                   onclick="sample6_execDaumPostcode()" autocomplete="off" />
+                   onclick="sample6_execDaumPostcode()" autocomplete="off" required />
             <input type="text" class="form-control" id="receiverAddress" name="receiverAddress" placeholder="주소" th:value="${cartInfo.address}"
-                   onclick="sample6_execDaumPostcode()" />
+                   onclick="sample6_execDaumPostcode()" required />
             <input type="text" class="form-control" id="receiverDetailAddress" name="receiverDetailAddress" placeholder="상세주소" th:value="${cartInfo.addressDetail}"
-                   autocomplete="off" />
+                   autocomplete="off" required />
         </div>
         <div class="form-group col-3 pl-0">
             <label for="receiverPhoneNumber">전화번호</label>
-            <input type="text" class="form-control" id="receiverPhoneNumber" name="receiverPhoneNumber" th:value="${cartInfo.customerPhoneNumber}">
+            <input type="text" class="form-control" id="receiverPhoneNumber" name="receiverPhoneNumber" th:value="${cartInfo.customerPhoneNumber}" required>
         </div>
 
         <hr>
@@ -113,8 +113,8 @@
 
         <h4>포인트 사용</h4>
         <div class="form-group">
-            <label for="usedPoint" th:text="'포인트 사용(' + ${point} + ' 포인트 사용 가능)'"></label>
-            <input type="number" class="form-control" id="usedPoint" name="usedPoint" min="0" th:max="${point}" value="0">
+            <label for="usedPoint" th:text="'포인트 사용(' + ${point == null ? 0 : point} + ' 포인트 사용 가능)'"></label>
+            <input type="number" class="form-control" id="usedPoint" name="usedPoint" min="0" th:max="${point == null ? 0 : point}" value="0">
         </div>
 
         <div th:id="'book-coupon-info-' + ${item.getBookIsbn()}" th:each="item : ${cartInfo.getBookInfos()}" hidden>
@@ -336,8 +336,10 @@
 
         function restrictValue() {
             if(this.value > Number(maxUserPoint)) {
-
                 this.value = maxUserPoint;
+            }
+            if(this.value < 0) {
+                this.value = 0;
             }
             updatePrice();
         };
