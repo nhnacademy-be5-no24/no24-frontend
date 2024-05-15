@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static com.nhnacademy.frontend.util.AuthUtil.createKey;
+import static com.nhnacademy.frontend.util.AuthUtil.validatePassword;
 
 /**
  * Login Controller
@@ -232,44 +233,50 @@ public class LoginController {
 
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(map, headers);
 
-        ResponseEntity responseEntity = restTemplate.postForEntity(
-                requestUrl + ":" + port +  "/login",
-                request,
-                LoginDto.class
-        );
+        try {
+            ResponseEntity responseEntity = restTemplate.postForEntity(
+                    requestUrl + ":" + port + "/login",
+                    request,
+                    LoginDto.class
+            );
 
-        // header의 authorization와 refreshToken을 얻어온다.
-        HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
-        String authorization = responseEntity.getHeaders().get("Authorization").get(0);
-        String refreshToken = responseEntity.getHeaders().get("RefreshToken").get(0);
-        String status = responseEntity.getHeaders().get("MemberStatus").get(0);
+            // header의 authorization와 refreshToken을 얻어온다.
+            HashOperations<String, String, String> hashOperations = redisTemplate.opsForHash();
+            String authorization = responseEntity.getHeaders().get("Authorization").get(0);
+            String refreshToken = responseEntity.getHeaders().get("RefreshToken").get(0);
+            String status = responseEntity.getHeaders().get("MemberStatus").get(0);
 
-        if(!status.equals("ACTIVE")) {
-            if(status.equals("INACTIVE")) {
-                String token = authorization.substring(7);
-                ResponseEntity<MemberInfoResponseDto> memberDto = restTemplate
-                        .getForEntity(requestUrl + ":" + port + "/auth/member/token/" + token, MemberInfoResponseDto.class);
+            if (!status.equals("ACTIVE")) {
+                if (status.equals("INACTIVE")) {
+                    String token = authorization.substring(7);
+                    ResponseEntity<MemberInfoResponseDto> memberDto = restTemplate
+                            .getForEntity(requestUrl + ":" + port + "/auth/member/token/" + token, MemberInfoResponseDto.class);
 
-                mav.setViewName("index/auth/member_active");
-                mav.addObject("member", memberDto.getBody());
+                    mav.setViewName("index/auth/member_active");
+                    mav.addObject("member", memberDto.getBody());
+                } else {
+                    if (status.equals("LEAVE"))
+                        mav.addObject("message", "탈퇴한 회원입니다.");
+                    else if (status.equals("BAN"))
+                        mav.addObject("message", "차단된 회원입니다.");
+                    mav.setViewName("index/auth/login");
+                }
+                return mav;
             }
-            else {
-                if(status.equals("LEAVE"))
-                    mav.addObject("message", "탈퇴한 회원입니다.");
-                else if(status.equals("BAN"))
-                    mav.addObject("message", "차단된 회원입니다.");
-                mav.setViewName("index/auth/login");
-            }
+
+            // Redis session에 저장.
+            hashOperations.put(jSessionId, "Authorization", authorization);
+            hashOperations.put(jSessionId, "RefreshToken", refreshToken);
+
+            String value = (String) redisTemplate.opsForHash().get(jSessionId, "Authorization");
+
+            return mav;
+        } catch(Exception e) {
+            mav.addObject("message", "비밀번호가 일치하지 않습니다.");
+
+            mav.setViewName("index/auth/login");
             return mav;
         }
-
-        // Redis session에 저장.
-        hashOperations.put(jSessionId, "Authorization", authorization);
-        hashOperations.put(jSessionId, "RefreshToken", refreshToken);
-
-        String value = (String) redisTemplate.opsForHash().get(jSessionId, "Authorization");
-
-        return mav;
     }
 
     @PostMapping("/send/code")
@@ -315,12 +322,33 @@ public class LoginController {
     }
 
     @PostMapping("/register")
-    public String createMember(@ModelAttribute MemberCreateRequest memberCreateRequest) {
-        ResponseEntity<MemberCreateRequest> response = restTemplate.postForEntity(
-                requestUrl + ":" + port + "/auth/member/create",
-                memberCreateRequest,
-                MemberCreateRequest.class
-        );
+    public ModelAndView createMember(@ModelAttribute MemberCreateRequest memberCreateRequest) {
+        ModelAndView mav = new ModelAndView("index/auth/registerSuccess");
+        try {
+            if(!validatePassword(memberCreateRequest.getCustomerPassword())) {
+                mav.setViewName("index/auth/register");
+                mav.addObject("memberCreateRequest", memberCreateRequest);
+                mav.addObject("message", "비밀번호는 6자 이상이며, 특수 문자를 하나 이상 포함한 숫자, 영어로 만들어주세요.");
+                return mav;
+            }
+            if(memberCreateRequest.getCustomerPhoneNumber().contains("-")) {
+                mav.setViewName("index/auth/register");
+                mav.addObject("memberCreateRequest", memberCreateRequest);
+                mav.addObject("message", "전화번호는 \"-\"를 제외하고 작성해주세요.");
+                return mav;
+            }
+
+            ResponseEntity<MemberCreateRequest> response = restTemplate.postForEntity(
+                    requestUrl + ":" + port + "/auth/member/create",
+                    memberCreateRequest,
+                    MemberCreateRequest.class
+            );
+        } catch(Exception e) {
+            mav.setViewName("index/auth/register");
+            mav.addObject("memberCreateRequest", memberCreateRequest);
+            mav.addObject("message", "중복된 아이디입니다.");
+            return mav;
+        }
 
         // 포인트 적립
         restTemplate.postForEntity(
@@ -329,7 +357,7 @@ public class LoginController {
                 null
         );
 
-        return "index/auth/registerSuccess";
+        return mav;
     }
 
 
