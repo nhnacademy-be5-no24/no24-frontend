@@ -101,17 +101,16 @@
                     <ul class="pagination justify-content-center">
                         <!-- 이전 버튼 -->
                         <li class="page-item" th:classappend="${currentPage == 1 ? 'disabled' : ''}">
-                            <a class="page-link" th:href="@{${#httpServletRequest.requestURI}(pageSize=${pageSize}, offset=${offset})}" tabindex="-1" aria-disabled="true">이전</a>
+                            <a class="page-link" th:href="@{${#httpServletRequest.requestURI}(pageSize=${T(java.lang.Math).max((((currentPage - 1) / 10)) * 10, 1)}, offset=${offset})}" tabindex="-1" aria-disabled="true">이전</a>
                         </li>
 
                         <!-- 페이지 번호 -->
-                        <li class="page-item" th:each="pageNumber : ${#numbers.sequence(1, totalPages)}" th:classappend="${pageNumber == currentPage ? 'active' : ''}">
+                        <li class="page-item" th:each="pageNumber : ${#numbers.sequence(((currentPage - 1) / 10) * 10 + 1, T(java.lang.Math).min((((currentPage - 1) / 10) + 1) * 10, totalPages))}" th:classappend="${pageNumber == currentPage ? 'active' : ''}">
                             <a class="page-link" th:href="@{${#httpServletRequest.requestURI}(pageSize=${pageNumber}, offset=${offset})}" th:text="${pageNumber}"></a>
                         </li>
-
                         <!-- 다음 버튼 -->
                         <li class="page-item" th:classappend="${currentPage == totalPages ? 'disabled' : ''}">
-                            <a class="page-link" th:href="@{${#httpServletRequest.requestURI}(pageSize=${pageSize}, offset=${offset})}">다음</a>
+                            <a class="page-link" th:href="@{${#httpServletRequest.requestURI}(pageSize=${T(java.lang.Math).min((((currentPage - 1) / 10) + 1) * 10 + 1, totalPages)}, offset=${offset})}">다음</a>
                         </li>
                     </ul>
                 </nav>

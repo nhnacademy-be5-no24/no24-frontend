@@ -33,7 +33,7 @@ public class ElasticRepositoryImpl implements ElasticRepositoryCustom {
      * {@inheritDoc}
      */
     @Override
-    public List<ElasticDocument> findAll(String keyword) {
+    public Page<ElasticDocument> findAll(String keyword, Pageable pageable) {
         NativeSearchQuery nativeSearchQuery = new NativeSearchQueryBuilder()
                 .withQuery(QueryBuilders.boolQuery()
                         .should(QueryBuilders.matchQuery("book_title.jaso", keyword))
@@ -50,10 +50,12 @@ public class ElasticRepositoryImpl implements ElasticRepositoryCustom {
                         .should(QueryBuilders.matchQuery("book_publisher.jaso", keyword))
                         .should(QueryBuilders.matchQuery("book_publisher.ngram", keyword))
                 )
+                .withPageable(pageable)
                 .build();
 
         SearchHits<ElasticDocument> searchHits = elasticsearchOperations.search(nativeSearchQuery, ElasticDocument.class);
 
-        return searchHits.stream().map(SearchHit::getContent).collect(Collectors.toList());
+        List<ElasticDocument> searchResults = searchHits.stream().map(SearchHit::getContent).collect(Collectors.toList());
+        return new PageImpl<>(searchResults, pageable, searchHits.getTotalHits());
     }
 }

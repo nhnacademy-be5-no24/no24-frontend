@@ -21,4 +21,6 @@ public class BookResponseList {
     public void setContent(List<BookResponseDto> content) {
         this.content = content;
     }
+
+    private int maxPage;
 }

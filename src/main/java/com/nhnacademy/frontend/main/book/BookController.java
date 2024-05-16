@@ -117,7 +117,7 @@ public class BookController {
         mav.addObject("currentPage", pageSize);
         mav.addObject("pageSize", pageSize);
         mav.addObject("offset", offset);
-        mav.addObject("totalPages", 10);
+        mav.addObject("totalPages", bookResponseEntity.getBody().getMaxPage());
 
         return mav;
     }

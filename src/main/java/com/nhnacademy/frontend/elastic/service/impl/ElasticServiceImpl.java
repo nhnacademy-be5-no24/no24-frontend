@@ -35,12 +35,13 @@ public class ElasticServiceImpl implements ElasticService {
      * {@inheritDoc}
      */
     @Override
-    public List<ElasticResponseDto> searchAll(String keyword) {
-        List<ElasticDocument> searchBooks = elasticRepository.findAll(keyword);
+    public Page<ElasticResponseDto> searchAll(String keyword, int pageSize, int offset) {
+        Pageable pageable = PageRequest.of(pageSize, offset);
+        Page<ElasticDocument> searchBooks = elasticRepository.findAll(keyword, pageable);
 
-        return searchBooks.stream()
+        return new PageImpl<> (searchBooks.stream()
                 .map(this::documentTransfer)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()), pageable, searchBooks.getTotalElements());
     }
 
     /**

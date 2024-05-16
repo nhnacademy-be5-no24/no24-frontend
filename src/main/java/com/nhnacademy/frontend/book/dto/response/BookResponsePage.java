@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 public class BookResponsePage {
     private List<BookResponseDto> bookResponseDtoList;
+    private int maxPage;
 
     public List<BookResponseDto> getBookResponseDtoList() {
         return bookResponseDtoList;
