@@ -132,11 +132,24 @@
                             <h3 class="mr-3" style="display: inline; vertical-align: middle;"><strong>리뷰 작성</strong></h3>
                             <span class="text-muted" style="vertical-align: middle;">* 리뷰를 작성하는 경우 200 포인트가 적립되며, 사진 첨부 시 300 포인트가 추가 적립됩니다.</span>
                         </div>
-                        <form>
+                        <form id="review">
                             <!--                                <div class="row">-->
                             <!--                                    <div class="col-10 mb-4">-->
                             <div class="form-group">
-                                <textarea class="form-control" placeholder="리뷰를 작성하세요" rows="3"></textarea>
+                                <fieldset>
+                                    <span class="text-bold">별점을 선택해주세요</span>
+                                    <input type="radio" name="reviewStar" value="5" id="rate1"><label
+                                        for="rate1">★</label>
+                                    <input type="radio" name="reviewStar" value="4" id="rate2"><label
+                                        for="rate2">★</label>
+                                    <input type="radio" name="reviewStar" value="3" id="rate3"><label
+                                        for="rate3">★</label>
+                                    <input type="radio" name="reviewStar" value="2" id="rate4"><label
+                                        for="rate4">★</label>
+                                    <input type="radio" name="reviewStar" value="1" id="rate5"><label
+                                        for="rate5">★</label>
+                                </fieldset>
+                                <textarea class="form-control" name="reviewContent" placeholder="리뷰를 작성하세요" rows="3"></textarea>
                             </div>
                             <!--                                    </div>-->
                             <!--                                    <div class="col-2 mb-4">-->
@@ -210,7 +223,43 @@
           .catch(function(error) {
               console.error("장바구니 추가 중 오류 발생:", error);
           });
-      });
+    });
+
+    document.getElementById("review").addEventListener("submit", function(event) {
+        event.preventDefault(); // 폼 기본 제출 동작 방지
+
+        let url = window.location.href.split('/');
+        let bookIsbn = url[url.length - 1];
+        let reviewContent = document.querySelector("textarea").value;
+        let reviewScore = document.querySelector('input[name="reviewStar"]:checked').value;
+
+        var reviewData = {
+            reviewContent: reviewContent,
+            reviewScore: reviewScore,
+            reviewImage: null,
+            bookIsbn: bookIsbn,
+            customerNo: null
+        };
+
+        fetch("/review", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(reviewData)
+        })
+            .then(function(response) {
+                if (response.ok) {
+                    console.log("리뷰가 작성되었습니다.");
+                    document.getElementById("review").reset();
+                } else {
+                    console.error("구매 확정된 도서에만 리뷰를 작성할 수 있습니다.");
+                }
+            })
+            .catch(function(error) {
+                console.error("리뷰 작성 중 오류 발생:", error);
+            });
+    });
 </script>
 </body>
 </html>
