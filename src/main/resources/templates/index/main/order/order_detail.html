@@ -13,7 +13,7 @@
     <div th:replace="./nav/menu.html"></div>
 
     <!-- 도서 페이지 -->
-    <div class="container text-center">
+    <div class="container">
         <div class="row">
             <div class="col-md-12 mt-4 mb-4">
                 <div class="card">
@@ -52,7 +52,7 @@
                             <tbody>
                             <tr>
                                 <th scope="row">주문 날짜</th>
-                                <td th:text="${order.getOrderDate()}">2024년 4월 4일 23:56</td>
+                                <td th:text="${order.getOrderDate()}"></td>
                             </tr>
                             <tr>
                                 <th scope="row">주문 상태</th>
