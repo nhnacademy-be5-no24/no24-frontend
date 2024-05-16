@@ -250,10 +250,10 @@
         })
             .then(function(response) {
                 if (response.ok) {
-                    console.log("리뷰가 작성되었습니다.");
+                    alert("리뷰가 작성되었습니다.");
                     document.getElementById("review").reset();
                 } else {
-                    console.error("구매 확정된 도서에만 리뷰를 작성할 수 있습니다.");
+                    alert("구매 확정된 도서에만 리뷰를 작성할 수 있습니다.");
                 }
             })
             .catch(function(error) {
