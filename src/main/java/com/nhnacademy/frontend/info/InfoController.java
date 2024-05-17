@@ -25,6 +25,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -369,18 +370,26 @@ public class InfoController {
      * @return mav
      */
     @GetMapping("/coupon")
-    public ModelAndView getUserCouponPage(HttpServletRequest request) {
+    public ModelAndView getUserCouponPage(HttpServletRequest request,
+                                          @RequestParam(defaultValue="1") int pageSize,
+                                          @RequestParam(defaultValue="10") int offset) {
         ModelAndView mav = new ModelAndView("index/info/coupon");
         Long customerNo = AuthUtil.getCustomerNo(requestUrl, port, request, redisTemplate, restTemplate);
 
         try {
             ResponseEntity<CouponMemberResponseDtoList> couponMemberResponseDtoListResponseEntity = restTemplate.getForEntity(
-                    requestUrl + ":" + port + "/shop/coupon/member/" + customerNo + "?pageSize=0&offset=10",
+                    requestUrl + ":" + port + "/shop/coupon/member/" + customerNo + "?pageSize=" +  (pageSize - 1) + "&offset=" + offset,
                     CouponMemberResponseDtoList.class
             );
 
             mav.addObject("couponList", couponMemberResponseDtoListResponseEntity.getBody()
                     .getCouponMemberResponseDtoList());
+
+
+            mav.addObject("currentPage", pageSize);
+            mav.addObject("pageSize", pageSize);
+            mav.addObject("offset", offset);
+            mav.addObject("totalPages", couponMemberResponseDtoListResponseEntity.getBody().getMaxPage());
         } catch(Exception e) {
             mav.setViewName("redirect:/error");
         }

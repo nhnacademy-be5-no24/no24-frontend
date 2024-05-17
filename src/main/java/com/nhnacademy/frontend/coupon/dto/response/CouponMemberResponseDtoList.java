@@ -19,4 +19,5 @@ import java.util.List;
 @AllArgsConstructor
 public class CouponMemberResponseDtoList {
     private List<CouponMemberResponseDto> couponMemberResponseDtoList;
+    private int maxPage;
 }
