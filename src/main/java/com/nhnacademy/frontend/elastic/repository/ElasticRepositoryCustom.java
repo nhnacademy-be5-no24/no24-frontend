@@ -20,5 +20,5 @@ public interface ElasticRepositoryCustom {
      * @param keyword 검색을 위한 검색어 입니다.
      * @return 검색 결과를 반환합니다.
      */
-    List<ElasticDocument> findAll(String keyword);
+    Page<ElasticDocument> findAll(String keyword, Long categoryId, Pageable pageable);
 }

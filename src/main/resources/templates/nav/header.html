@@ -6,7 +6,8 @@
             </a>
         </div>
         <div class="col-md-10 ml-4">
-            <form class="row" action="/book/search" method="get">
+
+            <form class="row" th:action="'/book/' + ${parentCategory.categoryId} + '/search'" method="get">
                 <div class="col-10">
                     <input class="form-control mr-sm-2" type="search" placeholder="찾으려는 도서를 입력해주세요." aria-label="Search" name="keyword">
                 </div>

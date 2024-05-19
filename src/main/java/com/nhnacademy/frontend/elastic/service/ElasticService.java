@@ -18,5 +18,5 @@ public interface ElasticService {
      * @param keyword 검색을 위한 검색어 입니다.
      * @return 검색 결과 리스트를 반환합니다.
      */
-    List<ElasticResponseDto> searchAll(String keyword);
+    Page<ElasticResponseDto> searchAll(String keyword, Long categoryId, int pageSize, int offset);
 }
